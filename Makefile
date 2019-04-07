@@ -38,6 +38,7 @@ Android_arm64-v8a:
 # Make -j4 Android
 Android: Android_x86_64 Android_x86 Android_armeabi Android_armeabi-v7a Android_arm64-v8a
 
+macOS: Mac
 Mac:
 	make -j1 libmono-urho.dylib -f MakeMac
 
@@ -47,18 +48,23 @@ iOS:
 tvOS:
 	make -j1 fat-libmono-urho.dylib -f MaketvOS
 
+Windows: Windows32 Windows64
 Windows32:
-	make -j1 libUrho3D.a -f MakeWindows ARCH="Win32" VS_VER=14 RENDERER=OPENGL
+	make -j1 libUrho3D.a -f MakeWindows ARCH="Win32" RENDERER=OPENGL
 Windows64:
-	make -j1 libUrho3D.a -f MakeWindows ARCH="Win64" VS_VER=14 RENDERER=OPENGL
+	make -j1 libUrho3D.a -f MakeWindows ARCH="Win64" RENDERER=OPENGL
 
+Windows_D3D11: Windows32_D3D11 Windows64_D3D11
 Windows32_D3D11:
-	make -j1 libUrho3D.a -f MakeWindows ARCH="Win32" VS_VER=14 RENDERER=D3D11
+	make -j1 libUrho3D.a -f MakeWindows ARCH="Win32" RENDERER=D3D11
 Windows64_D3D11:
-	make -j1 libUrho3D.a -f MakeWindows ARCH="Win64" VS_VER=14 RENDERER=D3D11
+	make -j1 libUrho3D.a -f MakeWindows ARCH="Win64" RENDERER=D3D11
 
+UWP: UWP32 UWP64
 UWP32:
-	make -j1 libUrho3D.a -f MakeUWP TARGET="Visual Studio 14"
+	make -j1 libUrho3D.a -f MakeUWP ARCH=x86
+UWP64:
+	make -j1 libUrho3D.a -f MakeUWP ARCH=x64
 
 SharpReality: SharpReality32 SharpReality64
 SharpReality32:
@@ -71,16 +77,17 @@ HoloLens64: HoloLens
 HoloLens:
 	@echo "HoloLens was renamed to SharpReality"
 
-Windows: Windows32 Windows64
-Windows_D3D11: Windows32_D3D11 Windows64_D3D11
 All-Macos: Android Mac iOS
-All-Windows: Android Windows
+All-Windows: Windows Windows_D3D11 UWP SharpReality
 
 UpdateCoreDataPak:
 	make -j1 CoreData.pak -f MakeWindows
 
 Tools:
 	make -j1 Tools -f Make$(OSNAME)
+
+Linux:
+	make -j1 libmono-urho.so -f MakeLinux
 
 $(LOCAL_CLANG): 
 	if test ! -e clang+llvm-3.7.0-x86_64-apple-darwin.tar.xz; then curl -O http://releases.llvm.org/3.7.0/clang+llvm-3.7.0-x86_64-apple-darwin.tar.xz; fi
@@ -101,6 +108,6 @@ ParseEventsMac:
 Generated: PchMac SharpieBinder ParseEventsMac
 	
 refresh-docs: Generated
-	xbuild /target:clean bindings/Urho.Desktop.csproj
-	xbuild bindings/Urho.Desktop.csproj
+	xbuild /target:clean bindings/Desktop/Urho.Desktop.csproj
+	xbuild bindings/Desktop/Urho.Desktop.csproj
 	(cd docs; make update)

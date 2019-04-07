@@ -32,6 +32,16 @@ namespace Urho {
 		{
 			return new StringHash(s);
 		}
+
+		public static bool operator ==(StringHash hash1, StringHash hash2)
+		{
+			return hash1.Code.Equals(hash2.Code);
+		}
+
+		public static bool operator !=(StringHash hash1, StringHash hash2)
+		{
+			return !(hash1 == hash2);
+		}
 	}
 
 	// Points to a StringHash

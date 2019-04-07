@@ -22,6 +22,7 @@ namespace Playgrounds.Forms
 
 		public IEnumerable<Bar> Bars => bars;
 
+		[Preserve]
 		public Charts(ApplicationOptions options = null) : base(options) { }
 
 		protected override void Start ()
@@ -35,6 +36,7 @@ namespace Playgrounds.Forms
 		{
 			Input.SubscribeToTouchEnd(OnTouched);
 
+			new MonoDebugHud(this).Show();
 			var cache = ResourceCache;
 			scene = new Scene ();
 			octree = scene.CreateComponent<Octree> ();

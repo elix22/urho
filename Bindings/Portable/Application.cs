@@ -32,11 +32,7 @@ namespace Urho
 		static TaskCompletionSource<bool> exitTask;
 		static TaskCompletionSource<bool> waitFrameEndTaskSource;
 		AutoResetEvent frameEndResetEvent;
-		static int renderThreadId = -1;
 		static bool isExiting = false;
-		static List<Action> staticActionsToDispatch;
-		static List<DelayState> delayTasks;
-		List<Action> actionsToDispatch = new List<Action>();
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		public delegate void ActionIntPtr(IntPtr value);
@@ -70,6 +66,9 @@ namespace Urho
 			private set { currentContext = value; }
 		}
 
+		public static WeakReference CurrentSurface { get; internal set; }
+		public static WeakReference CurrentWindow { get; internal set; }
+
 		// see Drawable2D.h:66
 		public const float PixelSize = 0.01f;
 
@@ -88,7 +87,7 @@ namespace Urho
 			startCallback = ProxyStart;
 			stopCallback = ProxyStop;
 
-#if !ANDROID
+#if !__ANDROID__
 			if (context.Refs() < 1)
 				context.AddRef();
 #endif
@@ -122,59 +121,21 @@ namespace Urho
 		/// <summary>
 		/// Invoke actions in the Main Thread (the next Update call)
 		/// </summary>
-		public static void InvokeOnMain(Action action)
-		{
-			if (!HasCurrent)
-			{
-				if (staticActionsToDispatch == null)
-					staticActionsToDispatch = new List<Action>();
-				lock (staticActionsToDispatch)
-					staticActionsToDispatch.Add(action);
-
-				return;
-			}
-
-			var actions = Current.actionsToDispatch;
-			lock (actions)
-			{
-				actions.Add(action);
-			}
-		}
+		public static void InvokeOnMain(Action action) => MainLoopDispatcher.InvokeOnMain(action);
 
 		/// <summary>
 		/// Dispatch to OnUpdate
 		/// </summary>
-		public static ConfiguredTaskAwaitable<bool> ToMainThreadAsync()
-		{
-			var tcs = new TaskCompletionSource<bool>();
-			InvokeOnMain(() => tcs.TrySetResult(true));
-			return tcs.Task.ConfigureAwait(false);
-		}
+		public static ConfiguredTaskAwaitable<bool> ToMainThreadAsync() => MainLoopDispatcher.ToMainThreadAsync();
 
 		/// <summary>
 		/// Invoke actions in the Main Thread (the next Update call)
 		/// </summary>
-		public static Task<bool> InvokeOnMainAsync(Action action)
-		{
-			var tcs = new TaskCompletionSource<bool>();
-			InvokeOnMain(() =>
-				{
-					action?.Invoke();
-					tcs.TrySetResult(true);
-				});
-			return tcs.Task;
-		}
+		public static Task<bool> InvokeOnMainAsync(Action action) => MainLoopDispatcher.InvokeOnMainAsync(action);
 
-		public Task Delay(float seconds)
-		{
-			var tcs = new TaskCompletionSource<bool>();
-			if (delayTasks == null)
-				delayTasks = new List<DelayState>();
-			delayTasks.Add(new DelayState { Duration = seconds, Task = tcs });
-			return tcs.Task;
-		}
+		public ConfiguredTaskAwaitable<bool> Delay(float seconds) => MainLoopDispatcher.Delay(seconds);
 
-		public Task Delay(TimeSpan timeSpan) => Delay((float)timeSpan.TotalSeconds);
+		public ConfiguredTaskAwaitable<bool> Delay(TimeSpan timeSpan) => MainLoopDispatcher.Delay((float)timeSpan.TotalSeconds);
 
 		static Application GetApp(IntPtr h) => Runtime.LookupObject<Application>(h);
 
@@ -208,37 +169,7 @@ namespace Urho
 			ActionManager.Update(timeStep);
 			OnUpdate(timeStep);
 
-			if (staticActionsToDispatch != null)
-			{
-				lock (staticActionsToDispatch)
-					foreach (var action in staticActionsToDispatch)
-						action();
-				staticActionsToDispatch = null;
-			}
-
-			if (actionsToDispatch.Count > 0)
-			{
-				lock (actionsToDispatch)
-				{
-					foreach (var action in actionsToDispatch)
-						action();
-					actionsToDispatch.Clear();
-				}
-			}
-
-			if (delayTasks != null)
-			{
-				for (int i = 0; i < delayTasks.Count; i++)
-				{
-					var task = delayTasks[i];
-					task.Duration -= timeStep;
-					if (task.Duration <= 0)
-					{
-						task.Task.TrySetResult(true);
-						delayTasks.RemoveAt(i);
-					}
-				}
-			}
+			MainLoopDispatcher.HandleUpdate(timeStep);
 		}
 
 		[MonoPInvokeCallback(typeof(ActionIntPtr))]
@@ -266,10 +197,6 @@ namespace Urho
 #endif
 			Current.Start();
 			Started?.Invoke();
-
-#if ANDROID
-			renderThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-#endif
 		}
 
 		public static bool CancelActiveActionsOnStop { get; set; }
@@ -286,17 +213,12 @@ namespace Urho
 			var app = GetApp(h);
 			app.IsClosed = true;
 			app.Stop();
-#if ANDROID
+
 			LogSharp.Debug("ProxyStop: Runtime.Cleanup");
-			Runtime.Cleanup(false);
+			Runtime.Cleanup(Platform != Platforms.Android);
 			LogSharp.Debug("ProxyStop: Disposing context");
 			Current = null;
-#else
-			LogSharp.Debug("ProxyStop: Runtime.Cleanup");
-			Runtime.Cleanup();
-			LogSharp.Debug("ProxyStop: Disposing context");
-			Current = null;
-#endif
+
 			Stopped?.Invoke();
 			LogSharp.Debug("ProxyStop: end");
 			exitTask?.TrySetResult(true);
@@ -323,14 +245,14 @@ namespace Urho
 			if (current == null || !current.IsActive)
 				return;
 
-#if ANDROID
+#if __ANDROID__
 			current.WaitFrameEnd();
 			Org.Libsdl.App.SDLActivity.OnDestroy();
 			return;
 #endif
 			Current.Input.Enabled = false;
 			isExiting = true;
-#if IOS
+#if __IOS__
 			iOS.UrhoSurface.StopRendering(current);
 #endif
 
@@ -349,7 +271,7 @@ namespace Urho
 
 			Current.Engine.Exit();
 
-#if DESKTOP
+#if NET46
 			if (Current.Options.DelayedStart)
 #endif
 			ProxyStop(Current.Handle);
@@ -361,7 +283,7 @@ namespace Urho
 
 		public bool IsExiting => isExiting || Runtime.IsClosing || Engine.Exiting;
 
-		public bool IsActive => !IsClosed && !IsDeleted && !Engine.IsDeleted && !IsExiting;
+		public bool IsActive => !IsClosed && !IsDeleted && Engine != null && !Engine.IsDeleted && !IsExiting;
 
 		public async Task Exit()
 		{
@@ -391,8 +313,22 @@ namespace Urho
 
 		protected virtual void OnUpdate(float timeStep) { }
 
-		internal ActionManager ActionManager { get; } = new ActionManager();
 
+		public event Action Paused;
+		internal static void HandlePause()
+		{
+			if (HasCurrent)
+				Current.Paused?.Invoke();
+		}
+
+		public event Action Resumed;
+		internal static void HandleResume() 
+		{ 
+			if (HasCurrent)
+				Current.Resumed?.Invoke(); 
+		}
+
+		internal ActionManager ActionManager { get; } = new ActionManager();
 
 		[DllImport(Consts.NativeImport, EntryPoint = "Urho_GetPlatform", CallingConvention = CallingConvention.Cdecl)]
 		static extern IntPtr GetPlatform();
@@ -403,6 +339,15 @@ namespace Urho
 		{
 			get
 			{
+#if __ANDROID__ // avoid redundant pinvoke for iOS and Android
+				return Platforms.Android;
+#elif __IOS__
+				return Platforms.iOS;
+#elif UWP_HOLO
+				return Platforms.SharpReality;
+#elif WINDOWS_UWP
+				return Platforms.UWP;
+#endif
 				Runtime.Validate(typeof(Application));
 				if (platform == Platforms.Unknown)
 					platform = PlatformsMap.FromString(Marshal.PtrToStringAnsi(GetPlatform()));
@@ -619,12 +564,12 @@ namespace Urho
 				string assetDir = msg.Remove(0, msg.IndexOf('\'') + 1);
 
 				msg +=
-#if ANDROID
+#if __ANDROID__
 							$"\n Assets must be located in '/Assets/{assetDir}' with 'AndroidAsset' Build Action.";
-#elif iOS
+#elif __iOS__
 							$"\n Assets must be located in '/Resources/{assetDir}' with 'BundleResource' Build Action.";
 #elif WINDOWS_UWP || UWP_HOLO
-							$"\n Assets must be located in '/{assetDir}' with 'Resource' Build Action"; 
+							$"\n Assets must be located in '/{assetDir}' with 'Content' Build Action"; 
 #else
 							$"\n Assets must be located in '/{assetDir}'";
 #endif

@@ -1,4 +1,4 @@
-﻿//
+//
 // CURRENTLY
 //    Generate base classes without a call to base
 //    Generate the standard idioms/patterns for init, dispose
@@ -83,6 +83,7 @@ namespace SharpieBinder
 
 		readonly List<SyntaxTree> syntaxTrees = new List<SyntaxTree>();
 		readonly Dictionary<string, BaseNodeType> baseNodeTypes;
+		readonly List<string> extraClasses;
 
 		TypeDeclaration currentType;
 		StreamWriter cbindingStream;
@@ -108,6 +109,14 @@ namespace SharpieBinder
 			pn("using namespace Urho3D;");
 			pn("extern \"C\" {");
 
+			extraClasses = new List<string>
+			{
+				"AreaAllocator",
+				"Spline",
+				"Sphere",
+				"SceneResolver",
+				"UIBatch"
+			};
 		}
 
 		public void Close()
@@ -217,6 +226,15 @@ namespace SharpieBinder
 					return;
 				}
 			}
+			
+			// Some of the api are not inherited from anything
+			// They should be start with Urho3D and we should skip Variants         
+			if (decl.Attrs.Any(a=> a.Kind == AttrKind.Visibility) && 
+				decl.QualifiedName.StartsWith("Urho3D::", StringComparison.CurrentCulture) &&
+				decl.Bases.Count() < 1 &&
+				extraClasses.Contains(decl.Name))
+                
+				new BaseNodeType(Bind).Bind(decl);
 		}
 
 		//
@@ -232,7 +250,8 @@ namespace SharpieBinder
 				return false;
 
 			if (decl.TagKind == TagDeclKind.Struct || !(decl.IsDerivedFrom(ScanBaseTypes.UrhoRefCounted) || decl == ScanBaseTypes.UrhoRefCounted))
-				return true;
+				if (!extraClasses.Contains(decl.Name))
+					return true;
 			
 			return false;
 		}
@@ -257,6 +276,32 @@ namespace SharpieBinder
 				ClassType = isStruct ? ClassType.Struct : ClassType.Class,
 				Modifiers = modifiers
 			}, StringUtil.GetTypeComments(decl));
+
+			if (extraClasses.Contains(decl.Name) && !decl.Bases.Any())
+			{
+				//Extra classes who have no any base should contains handle field and property
+				var handleField = new FieldDeclaration()
+				{
+					Modifiers = Modifiers.Private,
+					ReturnType = AstType.Create("IntPtr")
+				};
+				handleField.Variables.Add(new VariableInitializer("handle"));
+				currentType.Members.Add(handleField);
+
+				var handleProp = new PropertyDeclaration()
+				{
+					Modifiers = Modifiers.Public,
+					ReturnType = AstType.Create("IntPtr"),
+					Name = "Handle",
+					Getter = new Accessor()
+					{
+						Body = new BlockStatement() {
+							new ReturnStatement (new IdentifierExpression("handle"))
+						}
+					}
+				};
+				currentType.Members.Add(handleProp);
+			}
 
 			if (baseDecl != null) {
 				foreach (var baseType in decl.Bases) {
@@ -428,6 +473,9 @@ namespace SharpieBinder
 			case "const class Urho3D::Frustum &":
 			case "class Urho3D::Frustum &":
 			case "class Urho3D::Frustum":
+			case "const class Urho3D::Sphere &":
+			case "class Urho3D::Sphere &":
+			case "class Urho3D::Sphere":
 			case "const class Urho3D::Polyhedron &":
 			case "class Urho3D::Polyhedron &":
 			case "class Urho3D::Polyhedron":
@@ -439,8 +487,10 @@ namespace SharpieBinder
 			case "const struct Urho3D::CrowdObstacleAvoidanceParams &":
 			case "class Urho3D::Serializer &":
 			case "class Urho3D::Deserializer &":
-				case "const class Urho3D::Variant &":
-					return false;
+			case "const class Urho3D::Variant &":
+			case "int &":
+			case "float &":
+				return false;
 			}
 
 			if (returnType) {
@@ -591,6 +641,15 @@ namespace SharpieBinder
 				lowLevelParameterMod = ICSharpCode.NRefactory.CSharp.ParameterModifier.Ref;
 				wrapKind = WrapKind.RefBlittable;
 				return;
+			case "int &":
+			case "float &":
+				var primitiveType = cleanTypeStr.DropConstAndReference();
+				highLevel = new PrimitiveType(primitiveType);
+				lowLevel = new PrimitiveType(primitiveType);
+				lowLevelParameterMod = ICSharpCode.NRefactory.CSharp.ParameterModifier.Ref;
+				highLevelParameterMod = ICSharpCode.NRefactory.CSharp.ParameterModifier.Ref;
+				wrapKind = WrapKind.RefBlittable;
+				return;
 			case "Image &":
 				highLevel = new SimpleType("Image");
 				lowLevel = new SimpleType(nameof(IntPtr));
@@ -602,6 +661,8 @@ namespace SharpieBinder
 			case "Polyhedron &":
 			case "Frustum":
 			case "Frustum &":
+			case "Sphere":
+			case "Sphere &":
 				highLevel = new SimpleType(typeName.RemapAcronyms().DropConstAndReference());
 				lowLevel = new SimpleType (nameof(IntPtr));
 				wrapKind = WrapKind.SimpleObject;
@@ -800,7 +861,7 @@ namespace SharpieBinder
 			{ "ConstantBuffer",		new[] { "OnDeviceReset" } },
 			{ "Graphics",			new[] { "CleanupRenderSurface","CleanupShaderPrograms","GetAnisotropySupport","GetDepthTexture","GetForceGL2","GetGL3Support","GetGL3Support","GetOrCreateConstantBuffer","GetShaderProgram","MarkFBODirty","MarkFBODirty","Release","Restore","SetForceGL2","SetTextureForUpdate","SetUBO","SetVBO" } },
 			{ "IndexBuffer",		new[] { "OnDeviceReset" } },
-			{ "RenderSurface",		new[] { "CreateRenderBuffer","GetRenderBuffer","GetTarget","OnDeviceLost","SetTarget" } },
+			{ "RenderSurface",		new[] { "OnDeviceLost" } },
 			{ "ShaderProgram",		new[] { "GetUsedVertexAttributes", "ClearGlobalParameterSource","ClearGlobalParameterSource","ClearParameterSource","ClearParameterSources","ClearParameterSources","GetLinkerOutput","GetParameter","GetPixelShader","GetVertexShader","HasParameter","HasTextureUnit","Link","NeedParameterUpdate","OnDeviceLost","Release" } },
 			{ "ShaderVariation",	new[] { "OnDeviceLost" } },
 			{ "Texture",			new[] { "GetDataType","GetDataType","GetExternalFormat","GetExternalFormat","GetTarget" } },
@@ -818,7 +879,7 @@ namespace SharpieBinder
 		bool SkipMethod (CXXMethodDecl decl)
 		{
 			//DEBUG specific method
-			//if (currentType.Name == "File" && decl.Name == "Write")
+			//if (currentType.Name == "TileMap2D" && decl.Name == "PositionToTileIndex")
 			//	return false;
 			//return true;
 
@@ -972,7 +1033,7 @@ namespace SharpieBinder
 
 				if (IsUnsupportedType(p.QualType, returnType: false) && !isVariantArgument)
 				{
-					//Console.WriteLine($"Bailing out on {p.QualType} from {decl.QualifiedName}");
+					Console.WriteLine($"Bailing out on {p.QualType} from {decl.QualifiedName}");
 					return false;
 				}
 			}
@@ -981,7 +1042,7 @@ namespace SharpieBinder
 				return false; //it won't be easy to handle if it has more than one Variant argument
 
 			if (IsUnsupportedType(decl.ReturnQualType, returnType: true)) {//variant return type is not support yet
-				//Console.WriteLine($"RETURN Bailing out on {decl.ReturnQualType} from {decl.QualifiedName}");
+				Console.WriteLine($"RETURN Bailing out on {decl.ReturnQualType} from {decl.QualifiedName}");
 				return false;
 			}
 			return true;
@@ -1505,7 +1566,7 @@ namespace SharpieBinder
 					//C:
 					p(code
 					  .Replace(variantArgDef, cVarReplacedType)
-						.Replace(methodNameSuffix, index.ToString())
+						.Replace(methodNameSuffix, "_" + index.ToString())
 					    .Replace("%ConvertReturn%", !isPrimitive ? $"*(({cVarReplacedType} *) &" : (isString ? "stringdup" : ""))
 					  	.Replace("%VariantToTypeMethod%", "Get" + item.Value.Capitalize(false) + "()" + (isString ? ".CString()" : "") + (isPrimitive ? "" : ")"))
 						.Replace(variantConverterMask, isString ? "Urho3D::String" : string.Empty));
@@ -1531,7 +1592,7 @@ namespace SharpieBinder
 
 					var dllImportItem = (MethodDeclaration)pinvoke.Clone();
 					var originalEntryPointName = dllImportItem.Name;
-					dllImportItem.Name += index;
+					dllImportItem.Name += "_" + index;
 					var variantParam = dllImportItem.Parameters.First(p => p.ToString().Contains(variantArgDef));
 					variantParam.Type = argumentType.Clone();
 					variantParam.ParameterModifier = argumentModifier;
@@ -1551,14 +1612,27 @@ namespace SharpieBinder
 							{
 								if (!isPrimitive)
 								{
-									//non-primitive types should be marked with 'ref' keyword
-									var argument = ie.Arguments.OfType<IdentifierExpression>().First(arg => arg.Identifier == variantParam.Name);
-									ie.Arguments.Remove(argument);
-									ie.Arguments.Add(new DirectionExpression(FieldDirection.Ref, argument));
+									//for multiple argument we should keep the ordering that why we need to copy all arguments once then add them one by one
+									//we don't have Insert method in ie.Arguments because it's ICollection 
+									//ex: Spline.cs , Spline_SetKnot_0 (handle, ref knot, index);
+									var arguments = ie.Arguments.ToList();
+									ie.Arguments.Clear();
+                            
+									foreach (var argument in arguments) {
+										if (argument is IdentifierExpression idnArgument && idnArgument.Identifier == variantParam.Name)
+										{
+											//non-primitive types should be marked with 'ref' keyword
+											ie.Arguments.Add(new DirectionExpression(FieldDirection.Ref, argument));
+										}
+										else
+										{
+											ie.Arguments.Add(argument);
+										}
+									}
 								}
 
 								var exp = (IdentifierExpression)ie.Target;
-								exp.Identifier += index;
+								exp.Identifier += "_" + index;
 							});
 
 					currentType.Members.Add(clonedMethod);

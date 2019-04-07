@@ -259,6 +259,30 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void DebugRenderer_AddSphere (IntPtr handle, IntPtr sphere, ref Urho.Color color, bool depthTest);
+
+		/// <summary>
+		/// Add a sphere.
+		/// </summary>
+		public void AddSphere (SphereShape sphere, Urho.Color color, bool depthTest = true)
+		{
+			Runtime.ValidateRefCounted (this);
+			DebugRenderer_AddSphere (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle, ref color, depthTest);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void DebugRenderer_AddSphereSector (IntPtr handle, IntPtr sphere, ref Urho.Quaternion rotation, float angle, bool drawLines, ref Urho.Color color, bool depthTest);
+
+		/// <summary>
+		/// Add a sphere sector.
+		/// </summary>
+		public void AddSphereSector (SphereShape sphere, Urho.Quaternion rotation, float angle, bool drawLines, Urho.Color color, bool depthTest = true)
+		{
+			Runtime.ValidateRefCounted (this);
+			DebugRenderer_AddSphereSector (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle, ref rotation, angle, drawLines, ref color, depthTest);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void DebugRenderer_AddCylinder (IntPtr handle, ref Urho.Vector3 position, float radius, float height, ref Urho.Color color, bool depthTest);
 
 		/// <summary>
@@ -280,6 +304,18 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			DebugRenderer_AddTriangleMesh (handle, vertexData, vertexSize, indexData, indexSize, indexStart, indexCount, ref transform, ref color, depthTest);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void DebugRenderer_AddTriangleMesh4 (IntPtr handle, void* vertexData, uint vertexSize, uint vertexStart, void* indexData, uint indexSize, uint indexStart, uint indexCount, ref Urho.Matrix3x4 transform, ref Urho.Color color, bool depthTest);
+
+		/// <summary>
+		/// Add a triangle mesh.
+		/// </summary>
+		public void AddTriangleMesh (void* vertexData, uint vertexSize, uint vertexStart, void* indexData, uint indexSize, uint indexStart, uint indexCount, Urho.Matrix3x4 transform, Urho.Color color, bool depthTest = true)
+		{
+			Runtime.ValidateRefCounted (this);
+			DebugRenderer_AddTriangleMesh4 (handle, vertexData, vertexSize, vertexStart, indexData, indexSize, indexStart, indexCount, ref transform, ref color, depthTest);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

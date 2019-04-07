@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Timer = System.Threading.Timer;
 
 namespace Urho.Extensions.WinForms
 {
@@ -13,6 +15,8 @@ namespace Urho.Extensions.WinForms
 	{
 		static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1);
 		bool paused;
+
+		public static Thread RenderThread { get; private set; }
 
 		public UrhoSurface()
 		{
@@ -33,18 +37,17 @@ namespace Urho.Extensions.WinForms
 
 		public bool Paused
 		{
-			get { return paused; }
-			set
-			{
-				if (paused && !value)
-				{
-					paused = value;
-					StartLoop(Application);
-				}
-				else
-					paused = value;
-			}
+			get => paused;
+			set => paused = value;
 		}
+
+		async void Focuse()
+		{
+			await Task.Delay(1000);
+			UnderlyingPanel.Focus();
+		}
+
+		public bool ForceFocus { get; set; }
 
 		public int FpsLimit { get; set; } = 60;
 
@@ -63,53 +66,80 @@ namespace Urho.Extensions.WinForms
 			paused = false;
 			opts = opts ?? new ApplicationOptions();
 			await Semaphore.WaitAsync();
+
 			if (Application.HasCurrent)
-				await Application.Current.Exit();
-			await Task.Yield();
+				Application.InvokeOnMain(async () => {
+				if (Application.HasCurrent)
+					await Application.Current.Exit();
+				});
+
+			RenderThread?.Join();
+
+			if (UnderlyingPanel != null)
+				UnderlyingPanel.MouseDown -= UrhoSurface_MouseDown;
 			Controls.Clear();
+
 			UnderlyingPanel = new Panel { Dock = DockStyle.Fill };
+			UnderlyingPanel.MouseDown += UrhoSurface_MouseDown;
 			Controls.Add(UnderlyingPanel);
 			UnderlyingPanel.Visible = false;
 
 			opts.ExternalWindow = UnderlyingPanel.Handle;
 			opts.DelayedStart = true;
 			opts.LimitFps = false;
-			var app = Application.CreateInstance(appType, opts);
-			Application = app;
-			app.Run();
+
+			var mre = new ManualResetEvent(false);
+			Urho.Application.Started += () => { mre.Set(); };
+
+			RenderThread = new Thread(_ =>
+				{
+					Application = Application.CreateInstance(appType, opts);
+					Application.Run();
+					var sw = new Stopwatch();
+
+					var engine = Application.Engine;
+					engine.RunFrame();
+					while (Application != null && Application.IsActive)
+					{
+						if (!Paused)
+						{
+							sw.Restart();
+							engine.RunFrame();
+							sw.Stop();
+
+							var elapsed = sw.Elapsed.TotalMilliseconds;
+							var targetMax = 1000f / FpsLimit;
+							if (elapsed < targetMax)
+								Thread.Sleep(TimeSpan.FromMilliseconds(targetMax - elapsed));
+						}
+						else
+						{
+							Thread.Sleep(500);
+						}
+					}
+				});
+			RenderThread.Start();
+			mre.WaitOne();
 			Semaphore.Release();
-			StartLoop(app);
 			UnderlyingPanel.Visible = true;
 			UnderlyingPanel.Focus();
-			return app;
+			return Application;
 		}
-
+		
 		public void Stop()
 		{
-			Application?.Exit();
-			Controls.Clear();
-		}
+			Application.InvokeOnMain(async () => {
+				if (Application.HasCurrent)
+					await Application.Current.Exit();
+			});
 
-		async void StartLoop(Application app)
-		{
-			while (!Paused && app != null && app.IsActive)
-			{
-				var elapsed = app.Engine.RunFrame();
-				var targetMax = 1000000L / FpsLimit;
-				if (elapsed >= targetMax)
-					await Task.Yield();
-				else
-				{
-					var ts = TimeSpan.FromMilliseconds((targetMax - elapsed) / 1000d);
-					await Task.Delay(ts);
-				}
-				System.Windows.Forms.Application.DoEvents();
-			}
+			RenderThread?.Join();
+			Controls.Clear();
 		}
 
 		void UrhoSurface_MouseDown(object sender, MouseEventArgs e)
 		{
-			UnderlyingPanel?.Focus();
+			UnderlyingPanel.Focus();
 		}
 	}
 }

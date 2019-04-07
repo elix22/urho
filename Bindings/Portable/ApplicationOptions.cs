@@ -10,16 +10,24 @@ namespace Urho
 	/// </summary>
 	public class ApplicationOptions
 	{
+		internal static ApplicationOptions LastUsedOptions { get; private set; }
+
+
 		/// <param name="assetsFolder">usually it's "Data". Can be null if built-in assets are enough for you</param>
 		public ApplicationOptions(string assetsFolder)
 		{
 			if (assetsFolder != null)
 			{
-				ResourcePaths = new[] { assetsFolder };
+				if (assetsFolder.Contains(";"))
+					ResourcePaths = assetsFolder.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+				else
+					ResourcePaths = new[] { assetsFolder };
 			}
+
+			LastUsedOptions = this;
 		}
 
-		public ApplicationOptions() {}
+		public ApplicationOptions() : this(null) {}
 
 		/// <summary>
 		/// Desktop only
@@ -55,7 +63,7 @@ namespace Urho
 		/// iOS & Android only
 		/// </summary>
 		public OrientationType Orientation { get; set; }
-#if IOS && !XFORMS
+#if __IOS__ && !XFORMS
 			= OrientationType.Landscape;
 #else
 			= OrientationType.LandscapeAndPortrait;
@@ -103,6 +111,8 @@ namespace Urho
 
 		public int Multisampling { get; set; }
 
+		public bool UseDirectX11 { get; set; }
+
 		public enum OrientationType
 		{
 			Landscape,
@@ -115,7 +125,7 @@ namespace Urho
 			StringBuilder builder = new StringBuilder();
 			builder.Append("args");//it will be skipped by Urho;
 
-#if !IOS //always use -w on iOS
+#if !__IOS__ //always use -w on iOS
 			if (WindowedMode)
 #endif
 				builder.Append(" -w");
@@ -135,12 +145,19 @@ namespace Urho
 			if (Multisampling > 0)
 				builder.AppendFormat(" -m {0}", Multisampling);
 
-#if !IOS //always use -s on iOS
+#if !__IOS__ //always use -s on iOS
 			if (ResizableWindow)
 #endif
 				builder.Append(" -s");
 
-			string[] resourcePathes = new[] { "CoreData" }.Concat(ResourcePaths ?? new string[0]).ToArray();
+			string[] resourcePathes =
+#if __ANDROID__
+				new[] { "Assets/CoreData" } // CoreData on Android is embedded into the lib now
+#else
+				new[] { "CoreData" }
+#endif
+					.Concat(ResourcePaths ?? new string[0]).ToArray();
+
 			if (!AutoloadCoreData)
 				resourcePathes = ResourcePaths ?? new string[0];
 			builder.AppendFormat(" -p \"{0}\"", string.Join(";", resourcePathes.Distinct()));
@@ -149,7 +166,7 @@ namespace Urho
 				builder.AppendFormat(" -pf \"{0}\"", string.Join(";", ResourcePackagesPaths));
 
 			string[] resourcePrefixPaths = ResourcePrefixPaths;
-#if DESKTOP
+#if NET45
 			var urhoDllFolder = System.IO.Path.GetDirectoryName(typeof(SimpleApplication).Assembly.Location);
 			var possibleCoreDataDirectories = new[]
 				{

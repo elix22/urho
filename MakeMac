@@ -1,4 +1,4 @@
-ARCH=-arch i386 -arch x86_64
+ARCH=-arch x86_64
 URHO3D_SRC_DIR=Urho3D/Source
 URHO3D_MAC_DIR=Urho3D/Urho3D_Mac
 OUTPUT_DIR=Bin/Desktop
@@ -9,7 +9,7 @@ URHO_LIBS=-L$(URHO3D_MAC_DIR)/lib -framework SystemConfiguration -framework Audi
 CXXFLAGS=-g $(ARCH) -stdlib=libc++ -std=c++0x -Wno-address-of-temporary -Wno-return-type-c-linkage -Wno-clang++11-extensions $(URHO_FLAGS)
 
 Urho3D_Mac:
-	$(URHO3D_SRC_DIR)/./cmake_xcode.sh $(URHO3D_MAC_DIR) -DURHO3D_PCH=0 -DURHO3D_LUA=0 -DURHO3D_ANGELSCRIPT=0 -DURHO3D_TOOLS=1 -DURHO3D_CXX11=1
+	$(URHO3D_SRC_DIR)/./cmake_xcode.sh $(URHO3D_MAC_DIR) -DURHO3D_PCH=0  -DURHO3D_WEBP=0 -DURHO3D_LUA=0 -DURHO3D_ANGELSCRIPT=0 -DURHO3D_TOOLS=1 -DURHO3D_CXX11=1
 
 libUrho3D_32.a: Urho3D_Mac
 	cd $(URHO3D_MAC_DIR) && xcodebuild ARCHS=i386 ONLY_ACTIVE_ARCH=NO -target Urho3D -configuration Release && mv lib/libUrho3D.a lib/libUrho3D_32.a
@@ -17,8 +17,8 @@ libUrho3D_32.a: Urho3D_Mac
 libUrho3D_64.a: Urho3D_Mac
 	cd $(URHO3D_MAC_DIR) && xcodebuild ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO -target Urho3D -configuration Release && mv lib/libUrho3D.a lib/libUrho3D_64.a
 
-libUrho3D_Fat.a: libUrho3D_32.a libUrho3D_64.a
-	cd $(URHO3D_MAC_DIR) && lipo -create lib/libUrho3D_32.a lib/libUrho3D_64.a -output lib/libUrho3D.a
+libUrho3D_Fat.a: libUrho3D_64.a
+	cd $(URHO3D_MAC_DIR) && lipo -create lib/libUrho3D_64.a -output lib/libUrho3D.a
 
 libmono-urho.dylib: MakeBinDirectory libUrho3D_Fat.a binding.o glue.o events.o ApplicationProxy.o vector.o
 	mkdir -p $(OUTPUT_DIR) && clang++  $(ARCH) -dynamiclib -g -o $(OUTPUT_DIR)/libmono-urho.dylib -g -DURHO3D_OPENGL $(URHO_LIBS) $(OUTPUT_DIR)/binding.o $(OUTPUT_DIR)/glue.o $(OUTPUT_DIR)/vector.o $(OUTPUT_DIR)/events.o $(OUTPUT_DIR)/ApplicationProxy.o
@@ -42,4 +42,4 @@ ApplicationProxy.o:
 	clang++ -c $(CXXFLAGS) -o $(OUTPUT_DIR)/ApplicationProxy.o Bindings/Native/ApplicationProxy.cpp
 
 Tools: libUrho3D_Fat.a
-	cd $(URHO3D_MAC_DIR)/Source/Tools && xcodebuild ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO -target AssetImporter -target PackageTool -configuration Release && cd ../../ && mkdir -p $(TOOLS_DIR) && cp bin/tool/AssetImporter $(TOOLS_DIR)/AssetImporter_macOS.exe && cp bin/tool/PackageTool $(TOOLS_DIR)/PackageTool_macOS.exe && chmod 777 $(TOOLS_DIR)/*
+	cd $(URHO3D_MAC_DIR)/Source/Tools && xcodebuild ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO -target AssetImporter -target PackageTool -configuration Release && cd ../../ && mkdir -p $(TOOLS_DIR) && cp bin/tool/AssetImporter $(TOOLS_DIR)/AssetImporter_macOS && cp bin/tool/PackageTool $(TOOLS_DIR)/PackageTool_macOS && chmod 777 $(TOOLS_DIR)/*

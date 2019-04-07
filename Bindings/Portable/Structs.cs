@@ -483,6 +483,14 @@ namespace Urho {
 				left.M41 * rhs.m03 + left.M42 * rhs.m13 + left.M43 * rhs.m23 + left.M44
 			);
 		}
+
+		public override string ToString()
+		{
+			const int cellSize = 6, prec = 2;
+			return  $"| {m00.ToFixedSizeString(cellSize, prec)} | {m01.ToFixedSizeString(cellSize, prec)} | {m02.ToFixedSizeString(cellSize, prec)} | {m03.ToFixedSizeString(cellSize, prec)} |\n" +
+					$"| {m10.ToFixedSizeString(cellSize, prec)} | {m11.ToFixedSizeString(cellSize, prec)} | {m12.ToFixedSizeString(cellSize, prec)} | {m13.ToFixedSizeString(cellSize, prec)} |\n" +
+					$"| {m20.ToFixedSizeString(cellSize, prec)} | {m21.ToFixedSizeString(cellSize, prec)} | {m22.ToFixedSizeString(cellSize, prec)} | {m23.ToFixedSizeString(cellSize, prec)} |";
+		}
 	}
 
 	[StructLayout (LayoutKind.Sequential)]
@@ -745,6 +753,7 @@ namespace Urho {
 
 		public UrhoString Name { get { return b->Name; } set { b->Name = value; } }
 		public int NameHash { get { return b->NameHash; } set { b->NameHash = value; } }
+		public StringHash NameStringHash { get { return new StringHash(b->NameHash); } set { b->NameHash = value.Code; } }
 		public uint ParentIndex { get { return b->ParentIndex; } set { b->ParentIndex = value; } }
 		public Vector3 InitialPosition { get { return b->InitialPosition; } set { b->InitialPosition = value; } }
 		public Quaternion InitialRotation { get { return b->InitialRotation; } set { b->InitialRotation = value; } }
@@ -796,7 +805,7 @@ namespace Urho {
 		public UrhoString TextureName6;
 		public UrhoString TextureName7;
 
-#if !IOS && !ANDROID
+#if !__IOS__ && !__ANDROID__
 		public UrhoString TextureName8;
 		public UrhoString TextureName9;
 		public UrhoString TextureName10;
@@ -832,7 +841,7 @@ namespace Urho {
 			TextureName5 = default(UrhoString);
 			TextureName6 = default(UrhoString);
 			TextureName7 = default(UrhoString);
-#if !IOS && !ANDROID
+#if !__IOS__ && !__ANDROID__
 			TextureName8 = default(UrhoString);
 			TextureName9 = default(UrhoString);
 			TextureName10 = default(UrhoString);
@@ -885,7 +894,7 @@ namespace Urho {
 					TextureName7 = nameStr;
 					break;
 
-#if !IOS && !ANDROID
+#if !__IOS__ && !__ANDROID__
 				case TextureUnit.Lightramp:
 					TextureName8 = nameStr;
 					break;
@@ -920,13 +929,19 @@ namespace Urho {
 		// TODO: Surface more members via SharpieBinder
 
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		static extern void RenderPathCommand_SetShaderParameter(ref RenderPathCommand rpc, string parameter, float value);
+		static extern void RenderPathCommand_SetShaderParameter_float(ref RenderPathCommand rpc, string parameter, float value);
+
+		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		static extern void RenderPathCommand_SetShaderParameter_Matrix4(ref RenderPathCommand rpc, string parameter, ref Matrix4 value);
 
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		static extern void RenderPathCommand_SetOutput(ref RenderPathCommand rpc, int index, string name);
 
 		public void SetShaderParameter(string parameter, float value) =>
-			RenderPathCommand_SetShaderParameter(ref this, parameter, value);
+		RenderPathCommand_SetShaderParameter_float(ref this, parameter, value);
+
+		public void SetShaderParameter(string parameter, Matrix4 value) =>
+		RenderPathCommand_SetShaderParameter_Matrix4(ref this, parameter, ref value);
 
 		public void SetOutput(int index, string name) =>
 			RenderPathCommand_SetOutput(ref this, index, name);

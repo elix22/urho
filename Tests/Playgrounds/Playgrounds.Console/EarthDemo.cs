@@ -9,6 +9,7 @@ namespace Playgrounds.Console
 	public class EarthDemo : SimpleApplication
 	{
 		Node earthNode;
+		MonoDebugHud hud;
 
 		[Preserve]
 		public EarthDemo(ApplicationOptions options) : base(options) { }
@@ -16,9 +17,10 @@ namespace Playgrounds.Console
 		public static void RunApp()
 		{
 			var app = new EarthDemo(
-				new ApplicationOptions(@"..\..\..\..\..\Samples\HoloLens\02_HelloWorldAdvanced\Data") {
+				new ApplicationOptions(@"..\..\Samples\HoloLens\02_HelloWorldAdvanced\Data") {
 				Width = 960,
-				Height = 720
+				Height = 720,
+				UseDirectX11 = false
 			});
 			app.Run();
 		}
@@ -26,6 +28,9 @@ namespace Playgrounds.Console
 		protected override async void Start()
 		{
 			base.Start();
+
+			hud = new MonoDebugHud(this);
+			hud.Show(Color.Yellow, 24);
 
 			var timeLabel = new Text {
 				HorizontalAlignment = HorizontalAlignment.Center,
