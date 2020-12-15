@@ -29,7 +29,7 @@ packages/
 /Urho3D/Urho3D_UWP
 /Urho3D/Urho3D_Linux
 /Urho3D/Urho3D_Windows
-clang+llvm-3.7.0-x86_64-apple-darwin*
+#clang+llvm-3.7.0-x86_64-apple-darwin*
 /UpgradeLog.htm
 /docsync.log
 *.VC.opendb
