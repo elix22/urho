@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "Newtonsoft.Json": "9.0.1",
+    "rda.SocketsForPCL": "2.0.2",
+    "UrhoSharp.Forms": "1.8.71",
+    "Xamarin.Forms": "2.3.2.127",
+    "ZXing.Net.Mobile.Forms": "2.1.47"
+  },
+  "frameworks": {
+    "uap10.0": {}
+  },
+  "runtimes": {
+    "win10-x86": {},
+    "win10-x86-aot": {}
+  }
+}
