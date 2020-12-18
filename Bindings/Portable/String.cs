@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 namespace Urho {
+	/* TBD ELI
 	[StructLayout(LayoutKind.Sequential)]
 	public partial struct String {
 		uint length;
@@ -18,4 +19,5 @@ namespace Urho {
 			}
 		}
 	}
+	*/
 }

@@ -23,6 +23,8 @@ namespace Urho
 	/// </summary>
 	public unsafe partial class UrhoString
 	{
+		private IntPtr handle ;
+
 		unsafe partial void OnUrhoStringCreated ();
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -69,16 +71,6 @@ namespace Urho
 			OnUrhoStringCreated ();
 		}
 
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr UrhoString_String3 (System.nint value);
-
-		[Preserve]
-		public UrhoString (System.nint value)
-		{
-			Runtime.Validate (typeof(UrhoString));
-			handle = UrhoString_String3 (value);
-			OnUrhoStringCreated ();
-		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr UrhoString_String4 (long value);
@@ -113,16 +105,6 @@ namespace Urho
 			OnUrhoStringCreated ();
 		}
 
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr UrhoString_String7 (System.nuint value);
-
-		[Preserve]
-		public UrhoString (System.nuint value)
-		{
-			Runtime.Validate (typeof(UrhoString));
-			handle = UrhoString_String7 (value);
-			OnUrhoStringCreated ();
-		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr UrhoString_String8 (ulong value);

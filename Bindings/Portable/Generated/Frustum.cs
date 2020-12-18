@@ -151,7 +151,7 @@ namespace Urho
 		/// <summary>
 		/// Test if a sphere is inside, outside or intersects.
 		/// </summary>
-		public Intersection IsInside (SphereShape sphere)
+		public Intersection IsInside (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			return Frustum_IsInside4 (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);
@@ -163,7 +163,7 @@ namespace Urho
 		/// <summary>
 		/// Test if a sphere if (partially) inside or outside.
 		/// </summary>
-		public Intersection IsInsideFast (SphereShape sphere)
+		public Intersection IsInsideFast (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			return Frustum_IsInsideFast (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);

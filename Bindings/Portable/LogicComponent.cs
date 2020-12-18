@@ -7,7 +7,7 @@ namespace Urho
 	/// <summary>
 	/// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 	/// </summary>
-	public class LogicComponent : Component
+	public partial class LogicComponent : Component
 	{
 		Subscription physicsPreStepSubscription;
 		Subscription physicsPostStepSubscription;
@@ -86,10 +86,12 @@ namespace Urho
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr LogicComponent_GetTypeNameStatic();
 
+/* TBD ELI , generated automatically
 		public override StringHash Type => new StringHash(LogicComponent_GetType(handle));
 		public override string TypeName => Marshal.PtrToStringAnsi(LogicComponent_GetTypeName(handle));
 		[Preserve]
 		public new static StringHash TypeStatic => new StringHash(LogicComponent_GetTypeStatic());
 		public new static string TypeNameStatic => Marshal.PtrToStringAnsi(LogicComponent_GetTypeNameStatic());
+*/
 	}
 }

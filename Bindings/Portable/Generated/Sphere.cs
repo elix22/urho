@@ -21,7 +21,7 @@ namespace Urho
 	/// <summary>
 	/// %Sphere in three-dimensional space.
 	/// </summary>
-	public unsafe partial class SphereShape
+	public unsafe partial class Sphere
 	{
 		private IntPtr handle;
 
@@ -37,9 +37,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere ();
 
 		[Preserve]
-		public SphereShape ()
+		public Sphere ()
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere ();
 			OnSphereCreated ();
 		}
@@ -48,9 +48,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere0 (IntPtr sphere);
 
 		[Preserve]
-		public SphereShape (SphereShape sphere)
+		public Sphere (Sphere sphere)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere0 ((object)sphere == null ? IntPtr.Zero : sphere.Handle);
 			OnSphereCreated ();
 		}
@@ -59,9 +59,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere1 (ref Urho.Vector3 center, float radius);
 
 		[Preserve]
-		public SphereShape (Urho.Vector3 center, float radius)
+		public Sphere (Urho.Vector3 center, float radius)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere1 (ref center, radius);
 			OnSphereCreated ();
 		}
@@ -70,9 +70,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere2 (Vector3* vertices, uint count);
 
 		[Preserve]
-		public SphereShape (Vector3* vertices, uint count)
+		public Sphere (Vector3* vertices, uint count)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere2 (vertices, count);
 			OnSphereCreated ();
 		}
@@ -81,9 +81,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere3 (ref Urho.BoundingBox box);
 
 		[Preserve]
-		public SphereShape (Urho.BoundingBox box)
+		public Sphere (Urho.BoundingBox box)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere3 (ref box);
 			OnSphereCreated ();
 		}
@@ -92,9 +92,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere4 (IntPtr frustum);
 
 		[Preserve]
-		public SphereShape (Frustum frustum)
+		public Sphere (Frustum frustum)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere4 ((object)frustum == null ? IntPtr.Zero : frustum.Handle);
 			OnSphereCreated ();
 		}
@@ -103,9 +103,9 @@ namespace Urho
 		internal static extern IntPtr Sphere_Sphere5 (IntPtr poly);
 
 		[Preserve]
-		public SphereShape (Polyhedron poly)
+		public Sphere (Polyhedron poly)
 		{
-			Runtime.Validate (typeof(SphereShape));
+			Runtime.Validate (typeof(Sphere));
 			handle = Sphere_Sphere5 ((object)poly == null ? IntPtr.Zero : poly.Handle);
 			OnSphereCreated ();
 		}
@@ -116,7 +116,7 @@ namespace Urho
 		/// <summary>
 		/// Define from another sphere.
 		/// </summary>
-		public void Define (SphereShape sphere)
+		public void Define (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			Sphere_Define (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);
@@ -248,7 +248,7 @@ namespace Urho
 		/// <summary>
 		/// Merge a sphere.
 		/// </summary>
-		public void Merge (SphereShape sphere)
+		public void Merge (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			Sphere_Merge15 (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);
@@ -296,7 +296,7 @@ namespace Urho
 		/// <summary>
 		/// Test if another sphere is inside, outside or intersects.
 		/// </summary>
-		public Intersection IsInside (SphereShape sphere)
+		public Intersection IsInside (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			return Sphere_IsInside16 (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);
@@ -308,7 +308,7 @@ namespace Urho
 		/// <summary>
 		/// Test if another sphere is (partially) inside or outside.
 		/// </summary>
-		public Intersection IsInsideFast (SphereShape sphere)
+		public Intersection IsInsideFast (Sphere sphere)
 		{
 			Runtime.ValidateObject (this);
 			return Sphere_IsInsideFast (handle, (object)sphere == null ? IntPtr.Zero : sphere.Handle);
