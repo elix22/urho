@@ -115,42 +115,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_OnClickBegin (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse click begin.
-		/// </summary>
-		public override void OnClickBegin (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			Button_OnClickBegin (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_OnClickEnd (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor, IntPtr beginElement);
-
-		/// <summary>
-		/// React to mouse click end.
-		/// </summary>
-		public override void OnClickEnd (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor, UIElement beginElement)
-		{
-			Runtime.ValidateRefCounted (this);
-			Button_OnClickEnd (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle, (object)beginElement == null ? IntPtr.Zero : beginElement.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_OnKey (IntPtr handle, int key, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to a key press.
-		/// </summary>
-		public override void OnKey (int key, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			Button_OnKey (handle, key, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Button_SetPressedOffset (IntPtr handle, ref Urho.IntVector2 offset);
 
 		/// <summary>
@@ -175,30 +139,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_SetDisabledOffset (IntPtr handle, ref Urho.IntVector2 offset);
-
-		/// <summary>
-		/// Set offset to image rectangle used when disabled.
-		/// </summary>
-		private void SetDisabledOffset (Urho.IntVector2 offset)
-		{
-			Runtime.ValidateRefCounted (this);
-			Button_SetDisabledOffset (handle, ref offset);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_SetDisabledOffset1 (IntPtr handle, int x, int y);
-
-		/// <summary>
-		/// Set offset to image rectangle used when disabled.
-		/// </summary>
-		public void SetDisabledOffset (int x, int y)
-		{
-			Runtime.ValidateRefCounted (this);
-			Button_SetDisabledOffset1 (handle, x, y);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Button_SetPressedChildOffset (IntPtr handle, ref Urho.IntVector2 offset);
 
 		/// <summary>
@@ -211,7 +151,7 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Button_SetPressedChildOffset2 (IntPtr handle, int x, int y);
+		internal static extern void Button_SetPressedChildOffset1 (IntPtr handle, int x, int y);
 
 		/// <summary>
 		/// Set offset of child elements when pressed.
@@ -219,7 +159,7 @@ namespace Urho.Gui
 		public void SetPressedChildOffset (int x, int y)
 		{
 			Runtime.ValidateRefCounted (this);
-			Button_SetPressedChildOffset2 (handle, x, y);
+			Button_SetPressedChildOffset1 (handle, x, y);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -268,18 +208,6 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return Button_GetPressedOffset (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Urho.IntVector2 Button_GetDisabledOffset (IntPtr handle);
-
-		/// <summary>
-		/// Return disabled image offset.
-		/// </summary>
-		private Urho.IntVector2 GetDisabledOffset ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return Button_GetDisabledOffset (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -366,20 +294,6 @@ namespace Urho.Gui
 			}
 			set {
 				SetPressedOffset (value);
-			}
-		}
-
-		/// <summary>
-		/// Return disabled image offset.
-		/// Or
-		/// Set offset to image rectangle used when disabled.
-		/// </summary>
-		public Urho.IntVector2 DisabledOffset {
-			get {
-				return GetDisabledOffset ();
-			}
-			set {
-				SetDisabledOffset (value);
 			}
 		}
 

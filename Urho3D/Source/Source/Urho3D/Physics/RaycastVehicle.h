@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@
 
 namespace Urho3D
 {
-
 struct RaycastVehicleData;
 
 class URHO3D_API RaycastVehicle : public LogicComponent
@@ -37,18 +36,18 @@ class URHO3D_API RaycastVehicle : public LogicComponent
 
 public:
     /// Construct.
-    RaycastVehicle(Urho3D::Context* context);
+    explicit RaycastVehicle(Urho3D::Context* context);
     /// Destruct.
-    virtual ~RaycastVehicle() override;
+    ~RaycastVehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Add a wheel. All parameters are relative to RigidBody / node.
     void AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
@@ -60,6 +59,8 @@ public:
     void SetSteeringValue(int wheel, float steeringValue);
     /// Set suspension stiffness for particular wheel.
     void SetWheelSuspensionStiffness(int wheel, float stiffness);
+    /// Set wheel max suspension force. Good results are often obtained by a value that is about 3x to 4x the vehicle weight.
+    void SetWheelMaxSuspensionForce(int wheel, float force);
     /// Set wheel damping relaxation.
     void SetWheelDampingRelaxation(int wheel, float damping);
     /// Set wheel damping compression.
@@ -70,7 +71,7 @@ public:
     void SetWheelRollInfluence(int wheel, float rollInfluence);
     /// Set engine force for the wheel.
     void SetEngineForce(int wheel, float force);
-    /// Set hand brake (wheel rotation blocking force.)
+    /// Set hand brake (wheel rotation blocking force).
     void SetBrake(int wheel, float force);
     /// Set wheel radius.
     void SetWheelRadius(int wheel, float wheelRadius);
@@ -78,7 +79,7 @@ public:
     void ResetWheels();
     /// Set sliding factor 0 <= x <= 1. The less the value, more sliding.
     void SetWheelSkidInfo(int wheel, float factor);
-    /// True if wheel touches ground (raycast hits something.)
+    /// True if wheel touches ground (raycast hits something).
     bool WheelIsGrounded(int wheel) const;
     /// Set maximum suspension travel value.
     void SetMaxSuspensionTravel(int wheel, float maxSuspensionTravel);
@@ -92,14 +93,16 @@ public:
     void SetWheelSkidInfoCumulative(int wheel, float skid);
     /// Set revolution per minute value for when wheel doesn't touch ground. If set to 0 (or not set), calculated from engine force (probably not what you want).
     void SetInAirRPM(float rpm);
-    /// Init the vehicle component after creation
+    /// Set the coordinate system. The default is (0, 1, 2).
+    void SetCoordinateSystem(const IntVector3& coordinateSystem = RIGHT_FORWARD_UP);
+    /// Init the vehicle component after creation.
     void Init();
     /// Perform fixed step pre-update.
-    virtual void FixedUpdate(float timeStep) override;
+    void FixedUpdate(float timeStep) override;
     /// Perform fixed step post-update.
-    virtual void FixedPostUpdate(float timeStep) override;
+    void FixedPostUpdate(float timeStep) override;
     /// Perform variable step post-update.
-    virtual void PostUpdate(float timeStep) override;
+    void PostUpdate(float timeStep) override;
 
     /// Get wheel position relative to RigidBody.
     Vector3 GetWheelPosition(int wheel);
@@ -115,6 +118,8 @@ public:
     float GetSteeringValue(int wheel) const;
     /// Get suspension stiffness for particular wheel.
     float GetWheelSuspensionStiffness(int wheel) const;
+    /// Get wheel max suspension force.
+    float GetWheelMaxSuspensionForce(int wheel) const;
     /// Get wheel damping relaxation.
     float GetWheelDampingRelaxation(int wheel) const;
     /// Get wheel damping compression.
@@ -155,24 +160,41 @@ public:
     Vector3 GetContactNormal(int wheel) const;
     /// Get revolution per minute value for when wheel doesn't touch ground.
     float GetInAirRPM() const;
+    /// Get the coordinate system.
+    IntVector3 GetCoordinateSystem() const { return coordinateSystem_; }
 
     /// Get wheel data attribute for serialization.
     VariantVector GetWheelDataAttr() const;
     /// Set wheel data attribute during loading.
     void SetWheelDataAttr(const VariantVector& value);
 
+    /// (0, 1, 2) coordinate system (default).
+    static const IntVector3 RIGHT_UP_FORWARD;
+    /// (0, 2, 1) coordinate system.
+    static const IntVector3 RIGHT_FORWARD_UP;
+    /// (1, 2, 0) coordinate system.
+    static const IntVector3 UP_FORWARD_RIGHT;
+    /// (1, 0, 2) coordinate system.
+    static const IntVector3 UP_RIGHT_FORWARD;
+    /// (2, 0, 1) coordinate system.
+    static const IntVector3 FORWARD_RIGHT_UP;
+    /// (2, 1, 0) coordinate system.
+    static const IntVector3 FORWARD_UP_RIGHT;
+
 private:
     /// If the RigidBody should be activated.
     bool activate_;
-    /// Hull RigidBody
+    /// Hull RigidBody.
     WeakPtr<RigidBody> hullBody_;
-    /// Opaque Bullet data hidden from public
+    /// Opaque Bullet data hidden from public.
     RaycastVehicleData* vehicleData_;
-    /// Nodes of all wheels
+    /// Coordinate system.
+    IntVector3 coordinateSystem_;
+    /// Nodes of all wheels.
     Vector<Node*> wheelNodes_;
-    /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle
+    /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle.
     Vector<Quaternion> origRotation_;
-    /// Revolutions per minute value for in-air motor wheels. FIXME: set this one per wheel
+    /// Revolutions per minute value for in-air motor wheels. FIXME: set this one per wheel.
     float inAirRPM_;
     /// Per-wheel extra settings.
     Vector<float> skidInfoCumulative_;

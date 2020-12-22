@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,17 +18,17 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef _SDL_uikitwindow_h
-#define _SDL_uikitwindow_h
+#ifndef SDL_uikitwindow_h_
+#define SDL_uikitwindow_h_
 
 #include "../SDL_sysvideo.h"
 #import "SDL_uikitvideo.h"
 #import "SDL_uikitview.h"
 #import "SDL_uikitviewcontroller.h"
-#import <UIKit/UIKit.h>
 
-UIView *urhoPlaceholderView;
-UIWindow *urhoPlaceholderWindow;
+#if SDL_VIDEO_OPENGL_EGL
+#include "../SDL_egl_c.h"
+#endif
 
 extern int UIKit_CreateWindow(_THIS, SDL_Window * window);
 extern void UIKit_SetWindowTitle(_THIS, SDL_Window * window);
@@ -52,9 +52,11 @@ extern NSUInteger UIKit_GetSupportedOrientations(SDL_Window * window);
 
 /* Array of SDL_uikitviews owned by this window. */
 @property (nonatomic, copy) NSMutableArray *views;
-
+#if SDL_VIDEO_OPENGL_EGL
+@property (nonatomic)  EGLSurface egl_surface;
+#endif
 @end
 
-#endif /* _SDL_uikitwindow_h */
+#endif /* SDL_uikitwindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

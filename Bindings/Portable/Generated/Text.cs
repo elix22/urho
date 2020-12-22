@@ -21,7 +21,7 @@ namespace Urho.Gui
 	/// <summary>
 	/// %Text %UI element.
 	/// </summary>
-	public unsafe partial class Text : UIElement
+	public unsafe partial class Text : UISelectable
 	{
 		unsafe partial void OnTextCreated ();
 
@@ -259,30 +259,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Text_SetSelectionColor (IntPtr handle, ref Urho.Color color);
-
-		/// <summary>
-		/// Set selection background color. Color with 0 alpha (default) disables.
-		/// </summary>
-		private void SetSelectionColor (Urho.Color color)
-		{
-			Runtime.ValidateRefCounted (this);
-			Text_SetSelectionColor (handle, ref color);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Text_SetHoverColor (IntPtr handle, ref Urho.Color color);
-
-		/// <summary>
-		/// Set hover background color. Color with 0 alpha (default) disables.
-		/// </summary>
-		private void SetHoverColor (Urho.Color color)
-		{
-			Runtime.ValidateRefCounted (this);
-			Text_SetHoverColor (handle, ref color);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Text_SetTextEffect (IntPtr handle, TextEffect textEffect);
 
 		/// <summary>
@@ -448,30 +424,6 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return Text_GetSelectionLength (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Urho.Color Text_GetSelectionColor (IntPtr handle);
-
-		/// <summary>
-		/// Return selection background color.
-		/// </summary>
-		private Urho.Color GetSelectionColor ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return Text_GetSelectionColor (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Urho.Color Text_GetHoverColor (IntPtr handle);
-
-		/// <summary>
-		/// Return hover background color.
-		/// </summary>
-		private Urho.Color GetHoverColor ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return Text_GetHoverColor (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -772,34 +724,6 @@ namespace Urho.Gui
 			}
 			set {
 				SetAutoLocalizable (value);
-			}
-		}
-
-		/// <summary>
-		/// Return selection background color.
-		/// Or
-		/// Set selection background color. Color with 0 alpha (default) disables.
-		/// </summary>
-		public Urho.Color SelectionColor {
-			get {
-				return GetSelectionColor ();
-			}
-			set {
-				SetSelectionColor (value);
-			}
-		}
-
-		/// <summary>
-		/// Return hover background color.
-		/// Or
-		/// Set hover background color. Color with 0 alpha (default) disables.
-		/// </summary>
-		public Urho.Color HoverColor {
-			get {
-				return GetHoverColor ();
-			}
-			set {
-				SetHoverColor (value);
 			}
 		}
 

@@ -115,42 +115,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Slider_OnHover (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse hover.
-		/// </summary>
-		public override void OnHover (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			Slider_OnHover (handle, ref position, ref screenPosition, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Slider_OnClickBegin (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse click begin.
-		/// </summary>
-		public override void OnClickBegin (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			Slider_OnClickBegin (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Slider_OnClickEnd (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor, IntPtr beginElement);
-
-		/// <summary>
-		/// React to mouse click end.
-		/// </summary>
-		public override void OnClickEnd (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor, UIElement beginElement)
-		{
-			Runtime.ValidateRefCounted (this);
-			Slider_OnClickEnd (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle, (object)beginElement == null ? IntPtr.Zero : beginElement.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Slider_OnResize (IntPtr handle, ref Urho.IntVector2 newSize, ref Urho.IntVector2 delta);
 
 		/// <summary>
@@ -178,7 +142,7 @@ namespace Urho.Gui
 		internal static extern void Slider_SetRange (IntPtr handle, float range);
 
 		/// <summary>
-		/// Set slider range maximum value (minimum value is always 0.)
+		/// Set slider range maximum value (minimum value is always 0).
 		/// </summary>
 		private void SetRange (float range)
 		{
@@ -324,7 +288,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return slider range.
 		/// Or
-		/// Set slider range maximum value (minimum value is always 0.)
+		/// Set slider range maximum value (minimum value is always 0).
 		/// </summary>
 		public float Range {
 			get {

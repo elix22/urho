@@ -127,15 +127,15 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void AnimatedSprite2D_SetEntity (IntPtr handle, string name);
+		internal static extern void AnimatedSprite2D_SetEntity (IntPtr handle, string entity);
 
 		/// <summary>
 		/// Set entity name (skin name for spine, entity name for spriter).
 		/// </summary>
-		private void SetEntity (string name)
+		private void SetEntity (string entity)
 		{
 			Runtime.ValidateRefCounted (this);
-			AnimatedSprite2D_SetEntity (handle, name);
+			AnimatedSprite2D_SetEntity (handle, entity);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

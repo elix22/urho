@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -49,30 +51,30 @@ class URHO3D_API Window : public BorderImage
 
 public:
     /// Construct.
-    Window(Context* context);
+    explicit Window(Context* context);
     /// Destruct.
-    virtual ~Window() override;
+    ~Window() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
 
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse drag begin.
-    virtual void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
+    void
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) override;
     /// React to mouse drag motion.
-    virtual void OnDragMove
-        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+    void OnDragMove
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers,
             Cursor* cursor) override;
     /// React to mouse drag end.
-    virtual void
-        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor) override;
+    void
+        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor) override;
     /// React to mouse drag cancel.
-    virtual void
-        OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor) override;
+    void
+        OnDragCancel(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags cancelButtons, Cursor* cursor) override;
 
     /// Set whether can be moved.
     void SetMovable(bool enable);
@@ -126,7 +128,7 @@ public:
     bool GetModalAutoDismiss() const { return modalAutoDismiss_; }
 
 protected:
-    /// Identify drag mode (move/resize.)
+    /// Identify drag mode (move/resize).
     WindowDragMode GetDragMode(const IntVector2& position) const;
     /// Set cursor shape based on drag mode.
     void SetCursorShape(WindowDragMode mode, Cursor* cursor) const;

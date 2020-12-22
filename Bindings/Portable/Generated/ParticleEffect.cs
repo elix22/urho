@@ -358,7 +358,7 @@ namespace Urho
 		internal static extern void ParticleEffect_SetActiveTime (IntPtr handle, float time);
 
 		/// <summary>
-		/// Set emission active period length (0 = infinite.)
+		/// Set emission active period length (0 = infinite).
 		/// </summary>
 		private void SetActiveTime (float time)
 		{
@@ -370,7 +370,7 @@ namespace Urho
 		internal static extern void ParticleEffect_SetInactiveTime (IntPtr handle, float time);
 
 		/// <summary>
-		/// Set emission inactive period length (0 = infinite.)
+		/// Set emission inactive period length (0 = infinite).
 		/// </summary>
 		private void SetInactiveTime (float time)
 		{
@@ -550,7 +550,7 @@ namespace Urho
 		internal static extern void ParticleEffect_SetFaceCameraMode (IntPtr handle, FaceCameraMode mode);
 
 		/// <summary>
-		/// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+		/// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
 		/// </summary>
 		private void SetFaceCameraMode (FaceCameraMode mode)
 		{
@@ -574,7 +574,7 @@ namespace Urho
 		internal static extern void ParticleEffect_RemoveColorFrame (IntPtr handle, uint index);
 
 		/// <summary>
-		/// Remove color frame at index
+		/// Remove color frame at index.
 		/// </summary>
 		public void RemoveColorFrame (uint index)
 		{
@@ -610,7 +610,7 @@ namespace Urho
 		internal static extern void ParticleEffect_RemoveTextureFrame (IntPtr handle, uint index);
 
 		/// <summary>
-		/// Remove texture frame at index
+		/// Remove texture frame at index.
 		/// </summary>
 		public void RemoveTextureFrame (uint index)
 		{
@@ -826,7 +826,7 @@ namespace Urho
 		internal static extern float ParticleEffect_GetActiveTime (IntPtr handle);
 
 		/// <summary>
-		/// Return emission active period length (0 = infinite.)
+		/// Return emission active period length (0 = infinite).
 		/// </summary>
 		private float GetActiveTime ()
 		{
@@ -838,7 +838,7 @@ namespace Urho
 		internal static extern float ParticleEffect_GetInactiveTime (IntPtr handle);
 
 		/// <summary>
-		/// Return emission inactive period length (0 = infinite.)
+		/// Return emission inactive period length (0 = infinite).
 		/// </summary>
 		private float GetInactiveTime ()
 		{
@@ -1368,9 +1368,9 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return emission active period length (0 = infinite.)
+		/// Return emission active period length (0 = infinite).
 		/// Or
-		/// Set emission active period length (0 = infinite.)
+		/// Set emission active period length (0 = infinite).
 		/// </summary>
 		public float ActiveTime {
 			get {
@@ -1382,9 +1382,9 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return emission inactive period length (0 = infinite.)
+		/// Return emission inactive period length (0 = infinite).
 		/// Or
-		/// Set emission inactive period length (0 = infinite.)
+		/// Set emission inactive period length (0 = infinite).
 		/// </summary>
 		public float InactiveTime {
 			get {
@@ -1594,7 +1594,7 @@ namespace Urho
 		/// <summary>
 		/// Return how the particles rotate in relation to the camera.
 		/// Or
-		/// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+		/// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
 		/// </summary>
 		public FaceCameraMode FaceCameraMode {
 			get {

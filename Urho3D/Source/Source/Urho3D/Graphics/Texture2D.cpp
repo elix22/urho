@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,11 +57,6 @@ void Texture2D::RegisterObject(Context* context)
     context->RegisterFactory<Texture2D>();
 }
 
-void Texture2D::SetCustomTarget(unsigned target)
-{
-    target_ = target;
-}
-
 bool Texture2D::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load the texture, just return success
@@ -83,20 +78,13 @@ bool Texture2D::BeginLoad(Deserializer& source)
         loadImage_.Reset();
         return false;
     }
-    
-#if IOS
-    auto h = loadImage_->GetHeight();
-    auto w = loadImage_->GetWidth();
-    if (w > 1 && h > 1 && ((w & (w - 1) || (h & (h - 1)))))
-        URHO3D_LOGERROR("On iOS textures should be power of two (e.g. 512x512, 256x128)");
-#endif
 
     // Precalculate mip levels if async loading
     if (GetAsyncLoadState() == ASYNC_LOADING)
         loadImage_->PrecalculateLevels();
 
     // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
 
@@ -152,8 +140,8 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         renderSurface_ = new RenderSurface(this);
 
         // Clamp mode addressing by default and nearest filtering
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
+        addressModes_[COORD_U] = ADDRESS_CLAMP;
+        addressModes_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
     }
 
@@ -197,7 +185,7 @@ void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& even
 {
     if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderer->QueueRenderSurface(renderSurface_);
         renderSurface_->ResetUpdateQueued();

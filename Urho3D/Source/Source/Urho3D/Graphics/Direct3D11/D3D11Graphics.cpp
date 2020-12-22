@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,6 +75,7 @@ static const D3D11_COMPARISON_FUNC d3dCmpFunc[] =
 static const DWORD d3dBlendEnable[] =
 {
     FALSE,
+    TRUE,
     TRUE,
     TRUE,
     TRUE,
@@ -199,39 +200,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
-    window_(nullptr),
-    externalWindow_(nullptr),
-    width_(0),
-    height_(0),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
-    multiSample_(1),
-    fullscreen_(false),
-    borderless_(false),
-    resizable_(false),
-    highDPI_(false),
-    vsync_(false),
-    monitor_(0),
-    refreshRate_(0),
-    tripleBuffer_(false),
-    flushGPU_(false),
-    forceGL2_(false),
-    sRGB_(false),
-    stereoRendering_(false),
-    anisotropySupport_(false),
-    dxtTextureSupport_(false),
-    etcTextureSupport_(false),
-    pvrtcTextureSupport_(false),
-    hardwareShadowSupport_(false),
-    lightPrepassSupport_(false),
-    deferredSupport_(false),
-    instancingSupport_(false),
-    sRGBSupport_(false),
-    sRGBWriteSupport_(false),
-    numPrimitives_(0),
-    numBatches_(0),
-    maxScratchBufferRequest_(0),
-    defaultTextureFilterMode_(FILTER_TRILINEAR),
-    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -280,9 +249,6 @@ Graphics::~Graphics()
     impl_->rasterizerStates_.Clear();
 
     URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
-#if UWP_HOLO
-    URHO3D_SAFE_RELEASE(impl_->defaultStereoRenderTargetView_);
-#endif
     URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
     URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
     URHO3D_SAFE_RELEASE(impl_->resolveTexture_);
@@ -292,163 +258,63 @@ Graphics::~Graphics()
 
     if (window_)
     {
-#if !UWP_HOLO
         SDL_ShowCursor(SDL_TRUE);
         SDL_DestroyWindow(window_);
-#endif
-        window_ = 0;
+        window_ = nullptr;
     }
 
     delete impl_;
-    impl_ = 0;
+    impl_ = nullptr;
 
     context_->ReleaseSDL();
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
-    int multiSample, int monitor, int refreshRate)
+bool Graphics::SetScreenMode(int width, int height, const ScreenModeParams& params, bool maximize)
 {
     URHO3D_PROFILE(SetScreenMode);
 
-    highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
-
-    bool maximize = false;
-
-    // Make sure monitor index is not bigger than the currently detected monitors
-    int monitors = SDL_GetNumVideoDisplays();
-    if (monitor >= monitors || monitor < 0)
-        monitor = 0; // this monitor is not present, use first monitor
+    // Ensure that parameters are properly filled
+    ScreenModeParams newParams = params;
+    AdjustScreenMode(width, height, newParams, maximize);
 
     // Find out the full screen mode display format (match desktop color depth)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(monitor, &mode);
-    DXGI_FORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
-
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
-    if (!width || !height)
-    {
-        if (fullscreen || borderless)
-        {
-            width = mode.w;
-            height = mode.h;
-        }
-        else
-        {
-            maximize = resizable;
-            width = 512;
-            height = 400;
-        }
-    }
-
-    // Fullscreen or Borderless can not be resizable
-    if (fullscreen || borderless)
-        resizable = false;
-
-    // Borderless cannot be fullscreen, they are mutually exclusive
-    if (borderless)
-        fullscreen = false;
+    SDL_GetDesktopDisplayMode(newParams.monitor_, &mode);
+    const DXGI_FORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? DXGI_FORMAT_B5G6R5_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
 
     // If nothing changes, do not reset the device
-    if (width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&
-        vsync == vsync_ && tripleBuffer == tripleBuffer_ && multiSample == multiSample_)
+    if (width == width_ && height == height_ && newParams == screenParams_)
         return true;
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
     if (!window_)
     {
-        if (!OpenWindow(width, height, resizable, borderless))
+        if (!OpenWindow(width, height, newParams.resizable_, newParams.borderless_))
             return false;
     }
 
-    // Check fullscreen mode validity. Use a closest match if not found
-    if (fullscreen)
-    {
-        PODVector<IntVector3> resolutions = GetResolutions(monitor);
-#if !UWP_HOLO
-        if (resolutions.Size())
-        {
-            unsigned best = 0;
-            unsigned bestError = M_MAX_UNSIGNED;
-
-            for (unsigned i = 0; i < resolutions.Size(); ++i)
-            {
-                unsigned error = (unsigned)(Abs(resolutions[i].x_ - width) + Abs(resolutions[i].y_ - height));
-                if (error < bestError)
-                {
-                    best = i;
-                    bestError = error;
-                }
-            }
-
-            width = resolutions[best].x_;
-            height = resolutions[best].y_;
-            refreshRate = resolutions[best].z_;
-        }
-#endif
-    }
-
-#if !defined(UWP)
-    AdjustWindow(width, height, fullscreen, borderless, monitor);
-#endif
-    monitor_ = monitor;
-    refreshRate_ = refreshRate;
+    AdjustWindow(width, height, newParams.fullscreen_, newParams.borderless_, newParams.monitor_);
 
     if (maximize)
     {
-#if !UWP_HOLO
         Maximize();
         SDL_GetWindowSize(window_, &width, &height);
-#endif
     }
 
-    if (!impl_->device_ || multiSample_ != multiSample)
-        CreateDevice(width, height, multiSample);
-    UpdateSwapChain(width, height);
+    const int oldMultiSample = screenParams_.multiSample_;
+    screenParams_ = newParams;
 
-    fullscreen_ = fullscreen;
-    borderless_ = borderless;
-    resizable_ = resizable;
-    highDPI_ = highDPI;
-    vsync_ = vsync;
-    tripleBuffer_ = tripleBuffer;
+    if (!impl_->device_ || screenParams_.multiSample_ != oldMultiSample)
+        CreateDevice(width, height);
+    UpdateSwapChain(width, height);
 
     // Clear the initial window contents to black
     Clear(CLEAR_COLOR);
-    if (impl_->swapChain_)
-        impl_->swapChain_->Present(0, 0);
+    impl_->swapChain_->Present(0, 0);
 
-#ifdef URHO3D_LOGGING
-    String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
-    if (borderless_)
-        msg.Append(" borderless");
-    if (resizable_)
-        msg.Append(" resizable");
-    if (multiSample > 1)
-        msg.AppendWithFormat(" multisample %d", multiSample);
-    URHO3D_LOGINFO(msg);
-#endif
-
-    using namespace ScreenMode;
-
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_WIDTH] = width_;
-    eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_HIGHDPI] = highDPI_;
-    eventData[P_MONITOR] = monitor_;
-    eventData[P_REFRESHRATE] = refreshRate_;
-    SendEvent(E_SCREENMODE, eventData);
-
+    OnScreenModeChanged();
     return true;
-}
-
-bool Graphics::SetMode(int width, int height)
-{
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -460,7 +326,7 @@ void Graphics::SetSRGB(bool enable)
         if (impl_->swapChain_)
         {
             // Recreate swap chain for the new backbuffer format
-            CreateDevice(width_, height_, multiSample_);
+            CreateDevice(width_, height_);
             UpdateSwapChain(width_, height_);
         }
     }
@@ -533,7 +399,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
     ID3D11Resource* source = nullptr;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
-    if (multiSample_ > 1)
+    if (screenParams_.multiSample_ > 1)
     {
         // If backbuffer is multisampled, need another DEFAULT usage texture to resolve the data to first
         CreateResolveTexture();
@@ -588,7 +454,6 @@ bool Graphics::BeginFrame()
         return false;
 
     // If using an external window, check it for size changes, and reset screen mode if necessary
-#if !UWP_HOLO
     if (externalWindow_)
     {
         int width, height;
@@ -601,10 +466,9 @@ bool Graphics::BeginFrame()
     {
         // To prevent a loop of endless device loss and flicker, do not attempt to render when in fullscreen
         // and the window is minimized
-        if (fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
+        if (screenParams_.fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
             return false;
     }
-#endif
 
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
@@ -629,15 +493,14 @@ void Graphics::EndFrame()
         URHO3D_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
-        if (impl_->swapChain_)
-            impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
+        impl_->swapChain_->Present(screenParams_.vsync_ ? 1 : 0, 0);
     }
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
 }
 
-void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
+void Graphics::Clear(ClearTargetFlags flags, const Color& color, float depth, unsigned stencil)
 {
     IntVector2 rtSize = GetRenderTargetDimensions();
 
@@ -653,14 +516,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         PrepareDraw();
 
         if ((flags & CLEAR_COLOR) && impl_->renderTargetViews_[0])
-        {
-#if UWP_HOLO
-            Color holoClear(0, 0, 0, 0);//TODO: edit render path?
-            impl_->deviceContext_->ClearRenderTargetView(impl_->renderTargetViews_[0], holoClear.Data());
-#else
             impl_->deviceContext_->ClearRenderTargetView(impl_->renderTargetViews_[0], color.Data());
-#endif
-        }
+
         if ((flags & (CLEAR_DEPTH | CLEAR_STENCIL)) && impl_->depthStencilView_)
         {
             unsigned depthClearFlags = 0;
@@ -684,13 +541,13 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         model.m23_ = Clamp(depth, 0.0f, 1.0f);
 
         SetBlendMode(BLEND_REPLACE);
-        SetColorWrite((flags & CLEAR_COLOR) != 0);
+        SetColorWrite(flags & CLEAR_COLOR);
         SetCullMode(CULL_NONE);
         SetDepthTest(CMP_ALWAYS);
-        SetDepthWrite((flags & CLEAR_DEPTH) != 0);
+        SetDepthWrite(flags & CLEAR_DEPTH);
         SetFillMode(FILL_SOLID);
         SetScissorTest(false);
-        SetStencilTest((flags & CLEAR_STENCIL) != 0, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, stencil);
+        SetStencilTest(flags & CLEAR_STENCIL, CMP_ALWAYS, OP_REF, OP_KEEP, OP_KEEP, stencil);
         SetShaders(GetShader(VS, "ClearFramebuffer"), GetShader(PS, "ClearFramebuffer"));
         SetShaderParameter(VSP_MODEL, model);
         SetShaderParameter(VSP_VIEWPROJ, projection);
@@ -729,7 +586,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     srcBox.back = 1;
 
     ID3D11Resource* source = nullptr;
-    bool resolve = multiSample_ > 1;
+    const bool resolve = screenParams_.multiSample_ > 1;
     impl_->defaultRenderTargetView_->GetResource(&source);
 
     if (!resolve)
@@ -1329,7 +1186,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             }
         }
 
-        if (texture->GetLevelsDirty())
+        if (texture && texture->GetLevelsDirty())
             texture->RegenerateLevels();
     }
 
@@ -1427,7 +1284,6 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     {
         renderTargets_[index] = renderTarget;
         impl_->renderTargetsDirty_ = true;
-        impl_->stereoRenderTargetsDirty_ = true;
 
         // If the rendertarget is also bound as a texture, replace with backup texture or null
         if (renderTarget)
@@ -1469,7 +1325,6 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
     {
         depthStencil_ = depthStencil;
         impl_->renderTargetsDirty_ = true;
-        impl_->stereoRenderTargetsDirty_ = true;
     }
 }
 
@@ -1570,7 +1425,6 @@ void Graphics::SetDepthWrite(bool enable)
         impl_->depthStateDirty_ = true;
         // Also affects whether a read-only version of depth-stencil should be bound, to allow sampling
         impl_->renderTargetsDirty_ = true;
-        impl_->stereoRenderTargetsDirty_ = true;
     }
 }
 
@@ -1733,11 +1587,7 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
 
 bool Graphics::IsInitialized() const
 {
-#if UWP_HOLO
-    return impl_->GetDevice() != 0;
-#else
-    return window_ != 0 && impl_->GetDevice() != 0;
-#endif
+    return window_ != nullptr && impl_->GetDevice() != nullptr;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -1877,9 +1727,6 @@ bool Graphics::IsDeviceLost() const
 
 void Graphics::OnWindowResized()
 {
-#if UWP_HOLO
-    return;
-#endif
     if (!impl_->device_ || !window_)
         return;
 
@@ -1901,19 +1748,16 @@ void Graphics::OnWindowResized()
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
-    eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
-    eventData[P_BORDERLESS] = borderless_;
-    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_FULLSCREEN] = screenParams_.fullscreen_;
+    eventData[P_RESIZABLE] = screenParams_.resizable_;
+    eventData[P_BORDERLESS] = screenParams_.borderless_;
+    eventData[P_HIGHDPI] = screenParams_.highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
 void Graphics::OnWindowMoved()
 {
-#if UWP_HOLO
-    return;
-#endif
-    if (!impl_->device_ || !window_ || fullscreen_)
+    if (!impl_->device_ || !window_ || screenParams_.fullscreen_)
         return;
 
     int newX, newY;
@@ -2104,9 +1948,6 @@ bool Graphics::GetGL3Support()
 
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
-#if UWP_HOLO
-    return true;
-#endif
     if (!externalWindow_)
     {
         unsigned flags = 0;
@@ -2135,11 +1976,12 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
 void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
 {
-#if UWP_HOLO
-    return;
-#endif
     if (!externalWindow_)
     {
+        // Keep current window position because it may change in intermediate callbacks
+        const IntVector2 oldPosition = position_;
+        bool reposition = false;
+        bool resizePostponed = false;
         if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(window_);
@@ -2150,20 +1992,37 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_Rect display_rect;
             SDL_GetDisplayBounds(monitor, &display_rect);
 
-            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
+            reposition = newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h);
+            if (reposition)
             {
                 // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
 
-            SDL_SetWindowSize(window_, newWidth, newHeight);
+            // Postpone window resize if exiting fullscreen to avoid redundant resolution change
+            if (!newFullscreen && screenParams_.fullscreen_)
+                resizePostponed = true;
+            else
+                SDL_SetWindowSize(window_, newWidth, newHeight);
         }
 
+        // Turn off window fullscreen mode so it gets repositioned to the correct monitor
+        SDL_SetWindowFullscreen(window_, SDL_FALSE);
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
-        SDL_HideWindow(window_);
+        if (!newFullscreen) SDL_HideWindow(window_);
         SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
-        SDL_ShowWindow(window_);
+        if (!newFullscreen) SDL_ShowWindow(window_);
+
+        // Resize now if was postponed
+        if (resizePostponed)
+            SDL_SetWindowSize(window_, newWidth, newHeight);
+
+        // Ensure that window keeps its position
+        if (!reposition)
+            SDL_SetWindowPosition(window_, oldPosition.x_, oldPosition.y_);
+        else
+            position_ = oldPosition;
     }
     else
     {
@@ -2173,13 +2032,8 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     }
 }
 
-bool Graphics::CreateDevice(int width, int height, int multiSample)
+bool Graphics::CreateDevice(int width, int height)
 {
-#if defined(UWP)
-    HRESULT uwphr = SDL_UWP_CreateWinrtSwapChain(width, height, multiSample, &impl_->device_, &impl_->swapChain_, &impl_->deviceContext_);
-    multiSample_ = multiSample;
-    return true;
-#endif
     // Device needs only to be created once
     if (!impl_->device_)
     {
@@ -2211,8 +2065,8 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
 
     // Check that multisample level is supported
     PODVector<int> multiSampleLevels = GetMultiSampleLevels();
-    if (!multiSampleLevels.Contains(multiSample))
-        multiSample = 1;
+    if (!multiSampleLevels.Contains(screenParams_.multiSample_))
+        screenParams_.multiSample_ = 1;
 
     // Create swap chain. Release old if necessary
     if (impl_->swapChain_)
@@ -2221,6 +2075,49 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
         impl_->swapChain_ = nullptr;
     }
 
+    IDXGIDevice* dxgiDevice = nullptr;
+    impl_->device_->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
+    IDXGIAdapter* dxgiAdapter = nullptr;
+    dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
+    IDXGIFactory* dxgiFactory = nullptr;
+    dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
+
+    DXGI_RATIONAL refreshRateRational = {};
+    IDXGIOutput* dxgiOutput = nullptr;
+    UINT numModes = 0;
+    dxgiAdapter->EnumOutputs(screenParams_.monitor_, &dxgiOutput);
+    dxgiOutput->GetDisplayModeList(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, 0);
+
+    // find the best matching refresh rate with the specified resolution
+    if (numModes > 0)
+    {
+        DXGI_MODE_DESC* modes = new DXGI_MODE_DESC[numModes];
+        dxgiOutput->GetDisplayModeList(sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM, 0, &numModes, modes);
+        unsigned bestMatchingRateIndex = -1;
+        unsigned bestError = M_MAX_UNSIGNED;
+        for (unsigned i = 0; i < numModes; ++i)
+        {
+            if (width != modes[i].Width || height != modes[i].Height)
+                continue;
+
+            float rate = (float)modes[i].RefreshRate.Numerator / modes[i].RefreshRate.Denominator;
+            unsigned error = (unsigned)(Abs(rate - screenParams_.refreshRate_));
+            if (error < bestError)
+            {
+                bestMatchingRateIndex = i;
+                bestError = error;
+            }
+        }
+        if (bestMatchingRateIndex != -1)
+        {
+            refreshRateRational.Numerator = modes[bestMatchingRateIndex].RefreshRate.Numerator;
+            refreshRateRational.Denominator = modes[bestMatchingRateIndex].RefreshRate.Denominator;
+        }
+        delete[] modes;
+    }
+
+    dxgiOutput->Release();
+
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     memset(&swapChainDesc, 0, sizeof swapChainDesc);
     swapChainDesc.BufferCount = 1;
@@ -2228,22 +2125,25 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferDesc.Height = (UINT)height;
     swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapChainDesc.BufferDesc.RefreshRate.Numerator = refreshRateRational.Numerator;
+    swapChainDesc.BufferDesc.RefreshRate.Denominator = refreshRateRational.Denominator;
     swapChainDesc.OutputWindow = GetWindowHandle(window_);
-    swapChainDesc.SampleDesc.Count = (UINT)multiSample;
-    swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, multiSample);
+    swapChainDesc.SampleDesc.Count = static_cast<UINT>(screenParams_.multiSample_);
+    swapChainDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(swapChainDesc.BufferDesc.Format, screenParams_.multiSample_);
     swapChainDesc.Windowed = TRUE;
     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    IDXGIDevice* dxgiDevice = nullptr;
-    impl_->device_->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
-    IDXGIAdapter* dxgiAdapter = nullptr;
-    dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
-    IDXGIFactory* dxgiFactory = nullptr;
-    dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
     HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)
     dxgiFactory->MakeWindowAssociation(GetWindowHandle(window_), DXGI_MWA_NO_ALT_ENTER);
+
+#ifdef URHO3D_LOGGING
+    DXGI_ADAPTER_DESC desc;
+    dxgiAdapter->GetDesc(&desc);
+    String adapterDesc(desc.Description);
+    URHO3D_LOGINFO("Adapter used " + adapterDesc);
+#endif
 
     dxgiFactory->Release();
     dxgiAdapter->Release();
@@ -2256,7 +2156,6 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
         return false;
     }
 
-    multiSample_ = multiSample;
     return true;
 }
 
@@ -2291,25 +2190,12 @@ bool Graphics::UpdateSwapChain(int width, int height)
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         impl_->renderTargetViews_[i] = nullptr;
     impl_->renderTargetsDirty_ = true;
-    impl_->stereoRenderTargetsDirty_ = true;
 
-    UINT buffersCount = 1;
-#if UWP
-    buffersCount = 2;
-#endif
+    impl_->swapChain_->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
     // Create default rendertarget view representing the backbuffer
     ID3D11Texture2D* backbufferTexture;
-    HRESULT hr = 0;
-    if (impl_->swapChain_)
-    {
-        impl_->swapChain_->ResizeBuffers(buffersCount, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-        hr = impl_->swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backbufferTexture);
-    }
-#if UWP_HOLO
-    backbufferTexture = HoloLens_GetBackbuffer();
-#endif
-
+    HRESULT hr = impl_->swapChain_->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backbufferTexture);
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(backbufferTexture);
@@ -2318,32 +2204,17 @@ bool Graphics::UpdateSwapChain(int width, int height)
     }
     else
     {
-#if UWP_HOLO
-        D3D11_RENDER_TARGET_VIEW_DESC desc1;
-        memset(&desc1, 0, sizeof desc1);
-        desc1.Format = DXGI_FORMAT_UNKNOWN;// textureDesc.Format;
-        desc1.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-        desc1.Texture2DArray.ArraySize = 1;
-        desc1.Texture2DArray.FirstArraySlice = 0;
-        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, &desc1, &impl_->defaultRenderTargetView_);
-
-        D3D11_RENDER_TARGET_VIEW_DESC desc2 = desc1;
-        desc2.Texture2DArray.FirstArraySlice = 1;
-
-        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, &desc2, &impl_->defaultStereoRenderTargetView_);
-#else
-        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, 0, &impl_->defaultRenderTargetView_);
-#endif
+        hr = impl_->device_->CreateRenderTargetView(backbufferTexture, nullptr, &impl_->defaultRenderTargetView_);
         backbufferTexture->Release();
         if (FAILED(hr))
         {
             URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
-            URHO3D_SAFE_RELEASE(impl_->defaultStereoRenderTargetView_);
             URHO3D_LOGD3DERROR("Failed to create backbuffer rendertarget view", hr);
             success = false;
         }
     }
 
+    // Create default depth-stencil texture and view
     D3D11_TEXTURE2D_DESC depthDesc;
     memset(&depthDesc, 0, sizeof depthDesc);
     depthDesc.Width = (UINT)width;
@@ -2351,14 +2222,13 @@ bool Graphics::UpdateSwapChain(int width, int height)
     depthDesc.MipLevels = 1;
     depthDesc.ArraySize = 1;
     depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthDesc.SampleDesc.Count = (UINT)multiSample_;
-    depthDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(depthDesc.Format, multiSample_);
+    depthDesc.SampleDesc.Count = static_cast<UINT>(screenParams_.multiSample_);
+    depthDesc.SampleDesc.Quality = impl_->GetMultiSampleQuality(depthDesc.Format, screenParams_.multiSample_);
     depthDesc.Usage = D3D11_USAGE_DEFAULT;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     depthDesc.CPUAccessFlags = 0;
     depthDesc.MiscFlags = 0;
     hr = impl_->device_->CreateTexture2D(&depthDesc, nullptr, &impl_->defaultDepthTexture_);
-
     if (FAILED(hr))
     {
         URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
@@ -2460,7 +2330,6 @@ void Graphics::ResetCachedState()
     useClipPlane_ = false;
     impl_->shaderProgram_ = nullptr;
     impl_->renderTargetsDirty_ = true;
-    impl_->stereoRenderTargetsDirty_ = true;
     impl_->texturesDirty_ = true;
     impl_->vertexDeclarationDirty_ = true;
     impl_->blendStateDirty_ = true;
@@ -2478,7 +2347,7 @@ void Graphics::ResetCachedState()
 
 void Graphics::PrepareDraw()
 {
-    if ((impl_->renderTargetsDirty_ && !stereoRendering_) || (impl_->stereoRenderTargetsDirty_ && stereoRendering_))
+    if (impl_->renderTargetsDirty_)
     {
         impl_->depthStencilView_ =
             (depthStencil_ && depthStencil_->GetUsage() == TEXTURE_DEPTHSTENCIL) ?
@@ -2497,14 +2366,10 @@ void Graphics::PrepareDraw()
         // backbuffer rendering with a custom depth stencil
         if (!renderTargets_[0] &&
             (!depthStencil_ || (depthStencil_ && depthStencil_->GetWidth() == width_ && depthStencil_->GetHeight() == height_)))
-            impl_->renderTargetViews_[0] = stereoRendering_ ? impl_->defaultStereoRenderTargetView_ : impl_->defaultRenderTargetView_;
+            impl_->renderTargetViews_[0] = impl_->defaultRenderTargetView_;
 
-        
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &impl_->renderTargetViews_[0], impl_->depthStencilView_);
-        if (!stereoRendering_)
-            impl_->renderTargetsDirty_ = false;
-        else
-            impl_->stereoRenderTargetsDirty_ = false;
+        impl_->renderTargetsDirty_ = false;
     }
 
     if (impl_->texturesDirty_ && impl_->firstDirtyTexture_ < M_MAX_UNSIGNED)

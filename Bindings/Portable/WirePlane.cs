@@ -59,7 +59,7 @@ namespace Urho
 			geom = Node.CreateComponent<CustomGeometry>();
 			geom.BeginGeometry(0, PrimitiveType.LineList);
 			var material = new Material();
-			material.SetTechnique(0, CoreAssets.Techniques.NoTextureUnlitVCol, 1, 1);
+			material.SetTechnique(0, CoreAssets.Techniques.NoTextureUnlitVCol, MaterialQuality.Medium, 1);
 			geom.SetMaterial(material);
 
 			var halfSize = Size / 2;

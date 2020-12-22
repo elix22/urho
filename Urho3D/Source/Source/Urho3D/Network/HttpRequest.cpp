@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,15 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
 
     URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
+#ifdef URHO3D_SSL
+    static bool sslInitialized = false;
+    if (!sslInitialized)
+    {
+        mg_init_library(MG_FEATURES_TLS);
+        sslInitialized = true;
+    }
+#endif
+
 #ifdef URHO3D_THREADING
     // Start the worker thread to actually create the connection and read the response data.
     Run();
@@ -68,7 +77,6 @@ HttpRequest::~HttpRequest()
 
 void HttpRequest::ThreadFunction()
 {
-#ifndef UWP //TODO: fix UWP
     String protocol = "http";
     String host;
     String path = "/";
@@ -95,7 +103,8 @@ void HttpRequest::ThreadFunction()
     {
         port = ToInt(host.Substring(portStart + 1));
         host = host.Substring(0, portStart);
-    }
+    } else if (protocol.Compare("https", false) >= 0)
+        port = 443;
 
     char errorBuffer[ERROR_BUFFER_SIZE];
     memset(errorBuffer, 0, sizeof(errorBuffer));
@@ -110,11 +119,11 @@ void HttpRequest::ThreadFunction()
     }
 
     // Initiate the connection. This may block due to DNS query
-    /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
     mg_connection* connection = nullptr;
+
     if (postData_.Empty())
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
@@ -122,7 +131,7 @@ void HttpRequest::ThreadFunction()
     }
     else
     {
-        connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
+        connection = mg_download(host.CString(), port, protocol.Compare("https", false) >= 0 ? 1 : 0, errorBuffer, sizeof(errorBuffer),
             "%s %s HTTP/1.0\r\n"
             "Host: %s\r\n"
             "%s"
@@ -195,7 +204,6 @@ void HttpRequest::ThreadFunction()
         MutexLock lock(mutex_);
         state_ = HTTP_CLOSED;
     }
-#endif
 }
 
 unsigned HttpRequest::Read(void* dest, unsigned size)
@@ -203,13 +211,13 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
-    unsigned char* destPtr = (unsigned char*)dest;
+    auto* destPtr = (unsigned char*)dest;
     unsigned sizeLeft = size;
     unsigned totalRead = 0;
 
     for (;;)
     {
-        Pair<unsigned, bool> status;
+        Pair<unsigned, bool> status{};
 
         for (;;)
         {
@@ -290,10 +298,8 @@ unsigned HttpRequest::GetAvailableSize() const
 
 Pair<unsigned, bool> HttpRequest::CheckAvailableSizeAndEof() const
 {
-    Pair<unsigned, bool> ret;
-    ret.first_ = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
-    ret.second_ = (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !ret.first_));
-    return ret;
+    unsigned size = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    return {size, (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !size))};
 }
 
 }

@@ -130,7 +130,7 @@ namespace Urho.Urho2D
 		internal static extern void TileMapLayer2D_SetDrawOrder (IntPtr handle, int drawOrder);
 
 		/// <summary>
-		/// Set draw order
+		/// Set draw order.
 		/// </summary>
 		private void SetDrawOrder (int drawOrder)
 		{
@@ -202,7 +202,7 @@ namespace Urho.Urho2D
 		internal static extern bool TileMapLayer2D_HasProperty (IntPtr handle, string name);
 
 		/// <summary>
-		/// Return has property
+		/// Return has property.
 		/// </summary>
 		public bool HasProperty (string name)
 		{
@@ -358,7 +358,7 @@ namespace Urho.Urho2D
 		/// <summary>
 		/// Return draw order.
 		/// Or
-		/// Set draw order
+		/// Set draw order.
 		/// </summary>
 		public int DrawOrder {
 			get {

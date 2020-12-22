@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,7 +44,7 @@ SDL_bool WINRT_XAMLWasEnabled = SDL_FALSE;
 #if WINAPI_FAMILY == WINAPI_FAMILY_APP
 extern "C"
 ISwapChainBackgroundPanelNative * WINRT_GlobalSwapChainBackgroundPanelNative = NULL;
-static Windows::Foundation::EventRegistrationToken	WINRT_XAMLAppEventToken;
+static Windows::Foundation::EventRegistrationToken  WINRT_XAMLAppEventToken;
 #endif
 
 
@@ -97,16 +97,6 @@ WINRT_OnRenderViaXAML(_In_ Platform::Object^ sender, _In_ Platform::Object^ args
 /*
  * SDL + XAML Initialization
  */
-
-extern "C" __declspec(dllexport) void SDL_WINRT_InitSdl()
-{
-	SDL_SetMainReady();
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
-		// SDL_InitSubSystem will, on error, set the SDL error.  Let that propogate to
-		// the caller to here:
-		WINRT_XAMLWasEnabled = SDL_TRUE;
-	}
-}
 
 int
 SDL_WinRTInitXAMLApp(int (*mainFunction)(int, char **), void * backgroundPanelAsIInspectable)

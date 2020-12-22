@@ -186,6 +186,18 @@ namespace Urho.Resources
 			return JsonFile_FromString (handle, source);
 		}
 
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr JsonFile_ToString (IntPtr handle, string indendation);
+
+		/// <summary>
+		/// Save to a string.
+		/// </summary>
+		public string ToDebugString (string indendation = "\t")
+		{
+			Runtime.ValidateRefCounted (this);
+			return Marshal.PtrToStringAnsi (JsonFile_ToString (handle, indendation));
+		}
+
 		public override StringHash Type {
 			get {
 				return UrhoGetType ();

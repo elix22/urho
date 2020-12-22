@@ -199,12 +199,12 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Material_SetTechnique (IntPtr handle, uint index, IntPtr tech, uint qualityLevel, float lodDistance);
+		internal static extern void Material_SetTechnique (IntPtr handle, uint index, IntPtr tech, MaterialQuality qualityLevel, float lodDistance);
 
 		/// <summary>
 		/// Set technique.
 		/// </summary>
-		public void SetTechnique (uint index, Technique tech, uint qualityLevel = 0, float lodDistance = 0f)
+		public void SetTechnique (uint index, Technique tech, MaterialQuality qualityLevel = MaterialQuality.Low, float lodDistance = 0f)
 		{
 			Runtime.ValidateRefCounted (this);
 			Material_SetTechnique (handle, index, (object)tech == null ? IntPtr.Zero : tech.Handle, qualityLevel, lodDistance);

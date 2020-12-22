@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -78,32 +80,32 @@ class URHO3D_API Node : public Animatable
 
 public:
     /// Construct.
-    Node(Context* context);
+    explicit Node(Context* context);
     /// Destruct. Any child nodes are detached.
-    virtual ~Node() override;
+    ~Node() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false) override;
+    bool Load(Deserializer& source) override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source) override;
     /// Load from JSON data. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
+    bool LoadJSON(const JSONValue& source) override;
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
+    bool SaveXML(XMLElement& dest) const override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const override;
+    bool SaveJSON(JSONValue& dest) const override;
     /// Apply attribute changes that can not be applied immediately recursively to child nodes and components.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Return whether should save default-valued attributes into XML. Always save node transforms for readability, even if identity.
-    virtual bool SaveDefaultAttributes() const override { return true; }
+    bool SaveDefaultAttributes() const override { return true; }
 
     /// Mark for attribute check on the next network update.
-    virtual void MarkNetworkUpdate() override;
+    void MarkNetworkUpdate() override;
     /// Add a replication state that is tracking this node.
     virtual void AddReplicationState(NodeReplicationState* state);
 
@@ -118,7 +120,7 @@ public:
     void SetTags(const StringVector& tags);
     /// Add a tag.
     void AddTag(const String& tag);
-    /// Add tags with the specified separator, by default ;
+    /// Add tags with the specified separator (; by default).
     void AddTags(const String& tags, char separator = ';');
     /// Add tags.
     void AddTags(const StringVector& tags);
@@ -157,9 +159,9 @@ public:
 
     /// Set both position and rotation in parent space as an atomic operation. This is faster than setting position and rotation separately.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set both position, rotation and uniform scale in parent space as an atomic operation.
+    /// Set position, rotation, and uniform scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// Set both position, rotation and scale in parent space as an atomic operation.
+    /// Set position, rotation, and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     /// Set node transformation in parent space as an atomic operation.
     void SetTransform(const Matrix3x4& matrix);
@@ -167,13 +169,13 @@ public:
     /// Set both position and rotation in parent space as an atomic operation (for Urho2D).
     void SetTransform2D(const Vector2& position, float rotation) { SetTransform(Vector3(position), Quaternion(rotation)); }
 
-    /// Set both position, rotation and uniform scale in parent space as an atomic operation (for Urho2D).
+    /// Set position, rotation, and uniform scale in parent space as an atomic operation (for Urho2D).
     void SetTransform2D(const Vector2& position, float rotation, float scale)
     {
         SetTransform(Vector3(position), Quaternion(rotation), scale);
     }
 
-    /// Set both position, rotation and scale in parent space as an atomic operation (for Urho2D).
+    /// Set position, rotation, and scale in parent space as an atomic operation (for Urho2D).
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     {
         SetTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f));
@@ -209,10 +211,12 @@ public:
 
     /// Set both position and rotation in world space as an atomic operation.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set both position, rotation and uniform scale in world space as an atomic operation.
+    /// Set position, rotation, and uniform scale in world space as an atomic operation.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// Set both position, rotation and scale in world space as an atomic opration.
+    /// Set position, rotation, and scale in world space as an atomic opration.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Set position, rotation, and scale in world space as an atomic operation from a transformation matrix.
+    void SetWorldTransform(const Matrix3x4& worldTransform);
 
     /// Set both position and rotation in world space as an atomic operation (for Urho2D).
     void SetWorldTransform2D(const Vector2& position, float rotation)
@@ -220,13 +224,13 @@ public:
         SetWorldTransform(Vector3(position), Quaternion(rotation));
     }
 
-    /// Set both position, rotation and uniform scale in world space as an atomic operation (for Urho2D).
+    /// Set position, rotation, and uniform scale in world space as an atomic operation (for Urho2D).
     void SetWorldTransform2D(const Vector2& position, float rotation, float scale)
     {
         SetWorldTransform(Vector3(position), Quaternion(rotation), scale);
     }
 
-    /// Set both position, rotation and scale in world space as an atomic opration (for Urho2D).
+    /// Set position, rotation, and scale in world space as an atomic opration (for Urho2D).
     void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     {
         SetWorldTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f));
@@ -336,6 +340,8 @@ public:
 
     /// Return ID.
     unsigned GetID() const { return id_; }
+    /// Return whether the node is replicated or local to a scene.
+    bool IsReplicated() const;
 
     /// Return name.
     const String& GetName() const { return impl_->name_; }
@@ -629,11 +635,11 @@ public:
 
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded() override;
+    void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved() override;
+    void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
+    Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
 
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
@@ -675,7 +681,7 @@ protected:
 private:
     /// Parent scene node.
     Node* parent_;
-    /// Scene (root node.)
+    /// Scene (root node).
     Scene* scene_;
     /// Unique ID within the scene.
     unsigned id_;
@@ -735,7 +741,7 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             return component;
     }
@@ -750,7 +756,7 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 template <class T> T* Node::GetParentDerivedComponent(bool fullTraversal) const
@@ -777,7 +783,7 @@ template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool rec
 
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             dest.Push(component);
     }

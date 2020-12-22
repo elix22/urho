@@ -415,15 +415,15 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void ParticleEffect2D_SetFinishParticleSizeVariance (IntPtr handle, float FinishParticleSizeVariance);
+		internal static extern void ParticleEffect2D_SetFinishParticleSizeVariance (IntPtr handle, float finishParticleSizeVariance);
 
 		/// <summary>
 		/// Set finish particle size variance.
 		/// </summary>
-		private void SetFinishParticleSizeVariance (float FinishParticleSizeVariance)
+		private void SetFinishParticleSizeVariance (float finishParticleSizeVariance)
 		{
 			Runtime.ValidateRefCounted (this);
-			ParticleEffect2D_SetFinishParticleSizeVariance (handle, FinishParticleSizeVariance);
+			ParticleEffect2D_SetFinishParticleSizeVariance (handle, finishParticleSizeVariance);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

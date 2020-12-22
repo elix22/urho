@@ -24,6 +24,9 @@ namespace Urho
 	public enum EmitterType
 	{
 		Sphere = 0,
-		Box
+		Box,
+		Spherevolume,
+		Cylinder,
+		Ring
 	}
 }

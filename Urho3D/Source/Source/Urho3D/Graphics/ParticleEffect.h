@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #include "../Graphics/GraphicsDefs.h"
@@ -32,7 +34,10 @@ namespace Urho3D
 enum EmitterType
 {
     EMITTER_SPHERE = 0,
-    EMITTER_BOX
+    EMITTER_BOX,
+    EMITTER_SPHEREVOLUME,
+    EMITTER_CYLINDER,
+    EMITTER_RING
 };
 
 /// %Color animation frame definition.
@@ -45,7 +50,7 @@ struct ColorFrame
     }
 
     /// Construct with a color and zero time.
-    ColorFrame(const Color& color) :
+    explicit ColorFrame(const Color& color) :
         color_(color),
         time_(0.0f)
     {
@@ -106,18 +111,18 @@ class URHO3D_API ParticleEffect : public Resource
 
 public:
     /// Construct.
-    ParticleEffect(Context* context);
+    explicit ParticleEffect(Context* context);
     /// Destruct.
-    virtual ~ParticleEffect() override;
+    ~ParticleEffect() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Save resource to XMLElement. Return true if successful.
     bool Save(XMLElement& dest) const;
@@ -151,9 +156,9 @@ public:
     void SetConstantForce(const Vector3& force);
     /// Set particle velocity damping force.
     void SetDampingForce(float force);
-    /// Set emission active period length (0 = infinite.)
+    /// Set emission active period length (0 = infinite).
     void SetActiveTime(float time);
-    /// Set emission inactive period length (0 = infinite.)
+    /// Set emission inactive period length (0 = infinite).
     void SetInactiveTime(float time);
     /// Set minimum emission rate.
     void SetMinEmissionRate(float rate);
@@ -183,14 +188,14 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
-    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Add a color frame sorted in the correct position based on time.
-    void AddColorTime(const Color& color, const float time);
+    void AddColorTime(const Color& color, float time);
     /// Add a color frame sorted in the correct position based on time.
     void AddColorFrame(const ColorFrame& colorFrame);
-    /// Remove color frame at index
+    /// Remove color frame at index.
     void RemoveColorFrame(unsigned index);
     /// Set color animation of particles.
     void SetColorFrames(const Vector<ColorFrame>& colorFrames);
@@ -202,13 +207,13 @@ public:
     void SortColorFrames();
 
     /// Add a texture frame sorted in the correct position based on time.
-    void AddTextureTime(const Rect& uv, const float time);
+    void AddTextureTime(const Rect& uv, float time);
     /// Add a texture frame sorted in the correct position based on time.
     void AddTextureFrame(const TextureFrame& textureFrame);
-    /// Remove texture frame at index
+    /// Remove texture frame at index.
     void RemoveTextureFrame(unsigned index);
     /// Set particle texture animation.
-    void SetTextureFrames(const Vector<TextureFrame>& animation);
+    void SetTextureFrames(const Vector<TextureFrame>& textureFrames);
     /// Set number of texture animation frames.
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
     /// Set number of texture frames.
@@ -260,10 +265,10 @@ public:
     /// Return particle velocity damping force.
     float GetDampingForce() const { return dampingForce_; }
 
-    /// Return emission active period length (0 = infinite.)
+    /// Return emission active period length (0 = infinite).
     float GetActiveTime() const { return activeTime_; }
 
-    /// Return emission inactive period length (0 = infinite.)
+    /// Return emission inactive period length (0 = infinite).
     float GetInactiveTime() const { return inactiveTime_; }
 
     /// Return minimum emission rate.

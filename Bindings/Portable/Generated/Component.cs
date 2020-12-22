@@ -199,6 +199,18 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Component_IsReplicated (IntPtr handle);
+
+		/// <summary>
+		/// Return whether the component is replicated or local to a scene.
+		/// </summary>
+		private bool IsReplicated ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Component_IsReplicated (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr Component_GetNode (IntPtr handle);
 
 		/// <summary>
@@ -238,7 +250,7 @@ namespace Urho
 		internal static extern bool Component_IsEnabledEffective (IntPtr handle);
 
 		/// <summary>
-		/// Return whether is effectively enabled (node is also enabled.)
+		/// Return whether is effectively enabled (node is also enabled).
 		/// </summary>
 		private bool IsEnabledEffective ()
 		{
@@ -343,6 +355,15 @@ namespace Urho
 		}
 
 		/// <summary>
+		/// Return whether the component is replicated or local to a scene.
+		/// </summary>
+		public bool Replicated {
+			get {
+				return IsReplicated ();
+			}
+		}
+
+		/// <summary>
 		/// Return scene node.
 		/// </summary>
 		public Node Node {
@@ -361,7 +382,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return whether is effectively enabled (node is also enabled.)
+		/// Return whether is effectively enabled (node is also enabled).
 		/// </summary>
 		public bool EnabledEffective {
 			get {

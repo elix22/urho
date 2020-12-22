@@ -319,18 +319,6 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void View_SetStereoMode (IntPtr handle, bool stereo);
-
-		/// <summary>
-		/// Set stereo mode
-		/// </summary>
-		public void SetStereoMode (bool stereo)
-		{
-			Runtime.ValidateRefCounted (this);
-			View_SetStereoMode (handle, stereo);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void View_DrawFullscreenQuad (IntPtr handle, bool setIdentityProjection);
 
 		/// <summary>

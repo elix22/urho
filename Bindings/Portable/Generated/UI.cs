@@ -131,7 +131,7 @@ namespace Urho.Gui
 		internal static extern void UI_Clear (IntPtr handle);
 
 		/// <summary>
-		/// Clear the UI (excluding the cursor.)
+		/// Clear the UI (excluding the cursor).
 		/// </summary>
 		public void Clear ()
 		{
@@ -269,6 +269,18 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			UI_SetDoubleClickInterval (handle, interval);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void UI_SetMaxDoubleClickDistance (IntPtr handle, float distPixels);
+
+		/// <summary>
+		/// Set max screen distance in pixels between double click clicks.
+		/// </summary>
+		private void SetMaxDoubleClickDistance (float distPixels)
+		{
+			Runtime.ValidateRefCounted (this);
+			UI_SetMaxDoubleClickDistance (handle, distPixels);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -560,6 +572,30 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Urho.IntVector2 UI_ConvertSystemToUI (IntPtr handle, ref Urho.IntVector2 systemPos);
+
+		/// <summary>
+		/// Convert system mouse position (or offset) to scaled UI position (or offset).
+		/// </summary>
+		public Urho.IntVector2 ConvertSystemToUI (Urho.IntVector2 systemPos)
+		{
+			Runtime.ValidateRefCounted (this);
+			return UI_ConvertSystemToUI (handle, ref systemPos);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Urho.IntVector2 UI_ConvertUIToSystem (IntPtr handle, ref Urho.IntVector2 uiPos);
+
+		/// <summary>
+		/// Convert scaled UI position (or offset) to system mouse position (or offset).
+		/// </summary>
+		public Urho.IntVector2 ConvertUIToSystem (Urho.IntVector2 uiPos)
+		{
+			Runtime.ValidateRefCounted (this);
+			return UI_ConvertUIToSystem (handle, ref uiPos);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr UI_GetFocusElement (IntPtr handle);
 
 		/// <summary>
@@ -629,6 +665,18 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return UI_GetDoubleClickInterval (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float UI_GetMaxDoubleClickDistance (IntPtr handle);
+
+		/// <summary>
+		/// Return max screen distance in pixels for double clicks to register.
+		/// </summary>
+		private float GetMaxDoubleClickDistance ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return UI_GetMaxDoubleClickDistance (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -815,7 +863,7 @@ namespace Urho.Gui
 		internal static extern Urho.IntVector2 UI_GetCustomSize (IntPtr handle);
 
 		/// <summary>
-		/// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
+		/// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default).
 		/// </summary>
 		private Urho.IntVector2 GetCustomSize ()
 		{
@@ -824,15 +872,15 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UI_SetRenderToTexture (IntPtr handle, IntPtr component, bool enable);
+		internal static extern void UI_SetElementRenderTexture (IntPtr handle, IntPtr element, IntPtr texture);
 
 		/// <summary>
-		/// Register UIElement for being rendered into a texture.
+		/// Set texture to which element will be rendered.
 		/// </summary>
-		public void SetRenderToTexture (UIComponent component, bool enable)
+		public void SetElementRenderTexture (UIElement element, Texture2D texture)
 		{
 			Runtime.ValidateRefCounted (this);
-			UI_SetRenderToTexture (handle, (object)component == null ? IntPtr.Zero : component.Handle, enable);
+			UI_SetElementRenderTexture (handle, (object)element == null ? IntPtr.Zero : element.Handle, (object)texture == null ? IntPtr.Zero : texture.Handle);
 		}
 
 		public override StringHash Type {
@@ -899,6 +947,20 @@ namespace Urho.Gui
 			}
 			set {
 				SetDoubleClickInterval (value);
+			}
+		}
+
+		/// <summary>
+		/// Return max screen distance in pixels for double clicks to register.
+		/// Or
+		/// Set max screen distance in pixels between double click clicks.
+		/// </summary>
+		public float MaxDoubleClickDistance {
+			get {
+				return GetMaxDoubleClickDistance ();
+			}
+			set {
+				SetMaxDoubleClickDistance (value);
 			}
 		}
 
@@ -1085,7 +1147,7 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
-		/// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
+		/// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default).
 		/// Or
 		/// Set custom size of the root element. This disables automatic resizing of the root element according to window size. Set custom size 0,0 to return to automatic resizing.
 		/// </summary>

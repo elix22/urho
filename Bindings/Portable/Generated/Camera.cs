@@ -151,18 +151,6 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Camera_SetSkew (IntPtr handle, float skew);
-
-		/// <summary>
-		/// Set skew
-		/// </summary>
-		private void SetSkew (float skew)
-		{
-			Runtime.ValidateRefCounted (this);
-			Camera_SetSkew (handle, skew);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Camera_SetOrthoSize (IntPtr handle, float orthoSize);
 
 		/// <summary>
@@ -247,18 +235,6 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Camera_SetViewOverrideFlags (IntPtr handle, uint flags);
-
-		/// <summary>
-		/// Set view override flags.
-		/// </summary>
-		private void SetViewOverrideFlags (uint flags)
-		{
-			Runtime.ValidateRefCounted (this);
-			Camera_SetViewOverrideFlags (handle, flags);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Camera_SetOrthographic (IntPtr handle, bool enable);
 
 		/// <summary>
@@ -286,7 +262,7 @@ namespace Urho
 		internal static extern void Camera_SetProjectionOffset (IntPtr handle, ref Urho.Vector2 offset);
 
 		/// <summary>
-		/// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+		/// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions).
 		/// </summary>
 		private void SetProjectionOffset (Urho.Vector2 offset)
 		{
@@ -359,7 +335,7 @@ namespace Urho
 
 		/// <summary>
 		/// Set custom projection matrix, which should be specified in D3D convention with depth range 0 - 1. Disables auto aspect ratio.
-		/// Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection.
+		/// Change any of the standard view parameters (FOV, far clip, zoom, etc.) to revert to the standard projection.
 		/// Note that the custom projection is not serialized or replicated through the network.
 		/// </summary>
 		public void SetProjection (Urho.Matrix4 projection)
@@ -390,18 +366,6 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			return Camera_GetNearClip (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern float Camera_GetSkew (IntPtr handle);
-
-		/// <summary>
-		/// Return skew.
-		/// </summary>
-		private float GetSkew ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return Camera_GetSkew (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -474,18 +438,6 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			return Camera_GetViewMask (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern uint Camera_GetViewOverrideFlags (IntPtr handle);
-
-		/// <summary>
-		/// Return view override flags.
-		/// </summary>
-		private uint GetViewOverrideFlags ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return Camera_GetViewOverrideFlags (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -953,20 +905,6 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return skew.
-		/// Or
-		/// Set skew
-		/// </summary>
-		public float Skew {
-			get {
-				return GetSkew ();
-			}
-			set {
-				SetSkew (value);
-			}
-		}
-
-		/// <summary>
 		/// Return orthographic mode size.
 		/// Or
 		/// Set orthographic mode view uniform size.
@@ -1051,20 +989,6 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return view override flags.
-		/// Or
-		/// Set view override flags.
-		/// </summary>
-		public ViewOverrideFlags ViewOverrideFlags {
-			get {
-				return (ViewOverrideFlags)GetViewOverrideFlags ();
-			}
-			set {
-				SetViewOverrideFlags ((uint)value);
-			}
-		}
-
-		/// <summary>
 		/// Return orthographic flag.
 		/// Or
 		/// Set orthographic mode enabled/disabled.
@@ -1095,7 +1019,7 @@ namespace Urho
 		/// <summary>
 		/// Return projection offset.
 		/// Or
-		/// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions.)
+		/// Set projection offset. It needs to be calculated as (offset in pixels) / (viewport dimensions).
 		/// </summary>
 		public Urho.Vector2 ProjectionOffset {
 			get {

@@ -69,7 +69,7 @@ namespace Urho {
              {
                   Action<IntPtr> proxy = (x)=> { var d = new UpdateEventArgs () { EventData = new EventDataContainer(x) }; handler (d); };
                   var s = new Subscription (proxy);
-                  s.UnmanagedProxy = UrhoObject.urho_subscribe_event (handle, UrhoObject.ObjectCallbackInstance, GCHandle.ToIntPtr (s.gch), unchecked((int)915638697) /* Update (E_UPDATE) */);
+                  s.UnmanagedProxy = UrhoObject.urho_subscribe_event (handle, UrhoObject.ObjectCallbackInstance, GCHandle.ToIntPtr (s.gch), unchecked((int)1896309193) /* Update (E_UPDATE) */);
                   return s;
              }
 
@@ -731,6 +731,7 @@ namespace Urho {
             public int Button => EventData.get_int (unchecked((int)3601423954) /* Button (P_BUTTON) */);
             public int Buttons => EventData.get_int (unchecked((int)838874785) /* Buttons (P_BUTTONS) */);
             public int Qualifiers => EventData.get_int (unchecked((int)1438392841) /* Qualifiers (P_QUALIFIERS) */);
+            public int Clicks => EventData.get_int (unchecked((int)2170054603) /* Clicks (P_CLICKS) */);
         } /* struct MouseButtonDownEventArgs */
 
         public partial class Input {
@@ -1971,6 +1972,13 @@ namespace Urho.Network {
 
 } /* namespace */
 
+namespace Urho {
+        public partial struct ConnectionInProgressEventArgs {
+            public EventDataContainer EventData;
+        } /* struct ConnectionInProgressEventArgs */
+
+} /* namespace */
+
 namespace Urho.Network {
         public partial struct ClientConnectedEventArgs {
             public EventDataContainer EventData;
@@ -2225,6 +2233,60 @@ namespace Urho.Network {
             public EventDataContainer EventData;
             public Connection Connection => EventData.get_Connection (unchecked((int)2179499454) /* Connection (P_CONNECTION) */);
         } /* struct RemoteEventDataEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkBannedEventArgs {
+            public EventDataContainer EventData;
+        } /* struct NetworkBannedEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkInvalidPasswordEventArgs {
+            public EventDataContainer EventData;
+        } /* struct NetworkInvalidPasswordEventArgs */
+
+} /* namespace */
+
+
+namespace Urho {
+        public partial struct NetworkNatPunchtroughSucceededEventArgs {
+            public EventDataContainer EventData;
+            public String Address => EventData.get_String (unchecked((int)1109895060) /* Address (P_ADDRESS) */);
+            public int Port => EventData.get_int (unchecked((int)2450925825) /* Port (P_PORT) */);
+        } /* struct NetworkNatPunchtroughSucceededEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkNatPunchtroughFailedEventArgs {
+            public EventDataContainer EventData;
+            public String Address => EventData.get_String (unchecked((int)1109895060) /* Address (P_ADDRESS) */);
+            public int Port => EventData.get_int (unchecked((int)2450925825) /* Port (P_PORT) */);
+        } /* struct NetworkNatPunchtroughFailedEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkNatMasterConnectionFailedEventArgs {
+            public EventDataContainer EventData;
+        } /* struct NetworkNatMasterConnectionFailedEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkNatMasterConnectionSucceededEventArgs {
+            public EventDataContainer EventData;
+        } /* struct NetworkNatMasterConnectionSucceededEventArgs */
+
+} /* namespace */
+
+namespace Urho {
+        public partial struct NetworkNatMasterDisconnectedEventArgs {
+            public EventDataContainer EventData;
+        } /* struct NetworkNatMasterDisconnectedEventArgs */
 
 } /* namespace */
 
@@ -3627,6 +3689,8 @@ namespace Urho.Gui {
             public UIElement Element => EventData.get_UIElement (unchecked((int)2809902492) /* Element (P_ELEMENT) */);
             public int X => EventData.get_int (unchecked((int)120) /* X (P_X) */);
             public int Y => EventData.get_int (unchecked((int)121) /* Y (P_Y) */);
+            public int XBegin => EventData.get_int (unchecked((int)4087064177) /* XBegin (P_XBEGIN) */);
+            public int YBegin => EventData.get_int (unchecked((int)164104112) /* YBegin (P_YBEGIN) */);
             public int Button => EventData.get_int (unchecked((int)3601423954) /* Button (P_BUTTON) */);
             public int Buttons => EventData.get_int (unchecked((int)838874785) /* Buttons (P_BUTTONS) */);
             public int Qualifiers => EventData.get_int (unchecked((int)1438392841) /* Qualifiers (P_QUALIFIERS) */);
@@ -3667,6 +3731,8 @@ namespace Urho {
             public UIElement Element => EventData.get_UIElement (unchecked((int)2809902492) /* Element (P_ELEMENT) */);
             public int X => EventData.get_int (unchecked((int)120) /* X (P_X) */);
             public int Y => EventData.get_int (unchecked((int)121) /* Y (P_Y) */);
+            public int XBegin => EventData.get_int (unchecked((int)4087064177) /* XBegin (P_XBEGIN) */);
+            public int YBegin => EventData.get_int (unchecked((int)164104112) /* YBegin (P_YBEGIN) */);
             public int Button => EventData.get_int (unchecked((int)3601423954) /* Button (P_BUTTON) */);
             public int Buttons => EventData.get_int (unchecked((int)838874785) /* Buttons (P_BUTTONS) */);
             public int Qualifiers => EventData.get_int (unchecked((int)1438392841) /* Qualifiers (P_QUALIFIERS) */);
@@ -4642,7 +4708,7 @@ namespace Urho.Gui {
             public EventDataContainer EventData;
             public String FileName => EventData.get_String (unchecked((int)633459751) /* FileName (P_FILENAME) */);
             public String Filter => EventData.get_String (unchecked((int)2349197016) /* Filter (P_FILTER) */);
-            public bool Ok => EventData.get_bool (unchecked((int)7281596) /* Ok (P_OK) */);
+            public bool OK => EventData.get_bool (unchecked((int)7281596) /* OK (P_OK) */);
         } /* struct FileSelectedEventArgs */
 
         public partial class FileSelector {
@@ -4673,7 +4739,7 @@ namespace Urho.Gui {
 namespace Urho.Gui {
         public partial struct MessageACKEventArgs {
             public EventDataContainer EventData;
-            public bool Ok => EventData.get_bool (unchecked((int)7281596) /* Ok (P_OK) */);
+            public bool OK => EventData.get_bool (unchecked((int)7281596) /* OK (P_OK) */);
         } /* struct MessageACKEventArgs */
 
         public partial class MessageBox {

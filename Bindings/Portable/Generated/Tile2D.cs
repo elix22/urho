@@ -50,15 +50,51 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Tile2D_GetGid (IntPtr handle);
+		internal static extern uint Tile2D_GetGid (IntPtr handle);
 
 		/// <summary>
 		/// Return gid.
 		/// </summary>
-		private int GetGid ()
+		private uint GetGid ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Tile2D_GetGid (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Tile2D_GetFlipX (IntPtr handle);
+
+		/// <summary>
+		/// Return flip X.
+		/// </summary>
+		private bool GetFlipX ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Tile2D_GetFlipX (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Tile2D_GetFlipY (IntPtr handle);
+
+		/// <summary>
+		/// Return flip Y.
+		/// </summary>
+		private bool GetFlipY ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Tile2D_GetFlipY (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Tile2D_GetSwapXY (IntPtr handle);
+
+		/// <summary>
+		/// Return swap X and Y.
+		/// </summary>
+		private bool GetSwapXY ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Tile2D_GetSwapXY (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -100,9 +136,36 @@ namespace Urho.Urho2D
 		/// <summary>
 		/// Return gid.
 		/// </summary>
-		public int Gid {
+		public uint Gid {
 			get {
 				return GetGid ();
+			}
+		}
+
+		/// <summary>
+		/// Return flip X.
+		/// </summary>
+		public bool FlipX {
+			get {
+				return GetFlipX ();
+			}
+		}
+
+		/// <summary>
+		/// Return flip Y.
+		/// </summary>
+		public bool FlipY {
+			get {
+				return GetFlipY ();
+			}
+		}
+
+		/// <summary>
+		/// Return swap X and Y.
+		/// </summary>
+		public bool SwapXY {
+			get {
+				return GetSwapXY ();
 			}
 		}
 

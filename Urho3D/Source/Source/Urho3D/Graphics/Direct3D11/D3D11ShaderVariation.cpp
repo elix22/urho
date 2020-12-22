@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,10 +56,6 @@ void ShaderVariation::OnDeviceLost()
     // No-op on Direct3D11
 }
 
-#if UWP
-extern "C" const wchar_t* SDL_UWP_GetCacheDir();
-#endif
-
 bool ShaderVariation::Create()
 {
     Release();
@@ -78,11 +74,7 @@ bool ShaderVariation::Create()
     SplitPath(owner_->GetName(), path, name, extension);
     extension = type_ == VS ? ".vs4" : ".ps4";
 
-#if UWP
-    String binaryShaderName = String(SDL_UWP_GetCacheDir()) + "/" + name + "_" + StringHash(defines_).ToString() + extension;
-#else
-    String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
-#endif
+    String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
 
     if (!LoadByteCode(binaryShaderName))
     {
@@ -154,7 +146,7 @@ void ShaderVariation::Release()
     compilerOutput_.Clear();
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+        useTextureUnits_[i] = false;
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         constantBufferSizes_[i] = 0;
     parameters_.Clear();
@@ -206,13 +198,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter;
-        parameter.type_ = type_;
-        parameter.name_ = name;
-        parameter.buffer_ = buffer;
-        parameter.offset_ = offset;
-        parameter.size_ = size;
-        parameters_[StringHash(name)] = parameter;
+        parameters_[StringHash(name)] = ShaderParameter{type_, name, offset, size, buffer};
     }
 
     unsigned numTextureUnits = file->ReadUInt();
@@ -222,7 +208,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
 
         if (reg < MAX_TEXTURE_UNITS)
-            useTextureUnit_[reg] = true;
+            useTextureUnits_[reg] = true;
     }
 
     unsigned byteCodeSize = file->ReadUInt();
@@ -343,7 +329,7 @@ bool ShaderVariation::Compile()
 
     URHO3D_SAFE_RELEASE(shaderCode);
     URHO3D_SAFE_RELEASE(errorMsgs);
-    
+
     return !byteCode_.Empty();
 }
 
@@ -352,7 +338,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     ID3D11ShaderReflection* reflection = nullptr;
     D3D11_SHADER_DESC shaderDesc;
 
-    HRESULT hr = D3DReflect(bufData, bufSize, __uuidof(ID3D11ShaderReflection), (void**)&reflection);
+    HRESULT hr = D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
     if (FAILED(hr) || !reflection)
     {
         URHO3D_SAFE_RELEASE(reflection);
@@ -364,6 +350,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 
     if (type_ == VS)
     {
+        unsigned elementHash = 0;
         for (unsigned i = 0; i < shaderDesc.InputParameters; ++i)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
@@ -371,10 +358,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
             if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
-                elementHash_ <<= 4;
-                elementHash_ += ((int)semantic + 1) * (paramDesc.SemanticIndex + 1);
+                CombineHash(elementHash, semantic);
+                CombineHash(elementHash, paramDesc.SemanticIndex);
             }
         }
+        elementHash_ = elementHash;
         elementHash_ <<= 32;
     }
 
@@ -388,7 +376,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         if (resourceDesc.Type == D3D_SIT_CBUFFER)
             cbRegisterMap[resourceName] = resourceDesc.BindPoint;
         else if (resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
-            useTextureUnit_[resourceDesc.BindPoint] = true;
+            useTextureUnits_[resourceDesc.BindPoint] = true;
     }
 
     for (unsigned i = 0; i < shaderDesc.ConstantBuffers; ++i)
@@ -407,13 +395,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                ShaderParameter parameter;
-                parameter.type_ = type_;
-                parameter.name_ = varName;
-                parameter.buffer_ = cbRegister;
-                parameter.offset_ = varDesc.StartOffset;
-                parameter.size_ = varDesc.Size;
-                parameters_[varName] = parameter;
+                parameters_[varName] = ShaderParameter{type_, varName, varDesc.StartOffset, varDesc.Size, cbRegister};
             }
         }
     }
@@ -426,12 +408,17 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
-#if UWP
-    String path = String(SDL_UWP_GetCacheDir()) + "/";
-#else
-    String path = GetPath(cache->GetResourceFileName(owner_->GetName())) + "Cache/";
-#endif
-    String fullName = path + GetFileNameAndExtension(binaryShaderName);
+    // Filename may or may not be inside the resource system
+    String fullName = binaryShaderName;
+    if (!IsAbsolutePath(fullName))
+    {
+        // If not absolute, use the resource dir of the shader
+        String shaderFileName = cache->GetResourceFileName(owner_->GetName());
+        if (shaderFileName.Empty())
+            return;
+        fullName = shaderFileName.Substring(0, shaderFileName.Find(owner_->GetName())) + binaryShaderName;
+    }
+    String path = GetPath(fullName);
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 
@@ -456,13 +443,13 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     unsigned usedTextureUnits = 0;
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
     file->WriteUInt(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
             file->WriteUByte((unsigned char)i);

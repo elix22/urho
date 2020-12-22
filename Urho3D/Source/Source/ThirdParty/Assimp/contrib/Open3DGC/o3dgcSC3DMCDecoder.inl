@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2013 Khaled Mammou - Advanced Micro Devices, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -425,7 +425,7 @@ namespace o3dgc
         const AdjacencyInfo & v2T          = m_triangleListDecoder.GetVertexToTriangle();
         const T * const       triangles    = ifs.GetCoordIndex();        
         Vec3<long> p1, p2, p3, n0, nt;
-        long na0, nb0;
+        long na0 = 0, nb0 = 0;
         Real rna0, rnb0, norm0;
         char ni0 = 0, ni1 = 0;
         long a, b, c;

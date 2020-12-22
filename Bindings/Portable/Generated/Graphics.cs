@@ -151,10 +151,23 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Graphics_SetScreenMode (IntPtr handle, int width, int height);
+
+		/// <summary>
+		/// Set screen resolution only. Return true if successful.
+		/// Don't use SetScreenMode if ToggleFullscreen is used directly or indirectly.
+		/// </summary>
+		public bool SetScreenMode (int width, int height)
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_SetScreenMode (handle, width, height);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern bool Graphics_SetMode (IntPtr handle, int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate);
 
 		/// <summary>
-		/// Set screen mode. Return true if successful.
+		/// Set default window modes. Deprecated. Return true if successful.
 		/// </summary>
 		public bool SetMode (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 		{
@@ -166,7 +179,7 @@ namespace Urho
 		internal static extern bool Graphics_SetMode1 (IntPtr handle, int width, int height);
 
 		/// <summary>
-		/// Set screen resolution only. Return true if successful.
+		/// Set screen resolution only. Deprecated. Return true if successful.
 		/// </summary>
 		public bool SetMode (int width, int height)
 		{
@@ -280,18 +293,6 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			Graphics_EndFrame (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Graphics_Clear (IntPtr handle, uint flags, ref Urho.Color color, float depth, uint stencil);
-
-		/// <summary>
-		/// Clear any or all of rendertarget, depth buffer and stencil buffer.
-		/// </summary>
-		public void Clear (uint flags, Urho.Color color = default(Urho.Color), float depth = 1f, uint stencil = 0)
-		{
-			Runtime.ValidateRefCounted (this);
-			Graphics_Clear (handle, flags, ref color, depth, stencil);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -847,18 +848,6 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Graphics_SetStereo (IntPtr handle, bool stereo);
-
-		/// <summary>
-		/// Set stereo mode
-		/// </summary>
-		public void SetStereo (bool stereo)
-		{
-			Runtime.ValidateRefCounted (this);
-			Graphics_SetStereo (handle, stereo);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Graphics_SetLineAntiAlias (IntPtr handle, bool enable);
 
 		/// <summary>
@@ -1066,7 +1055,7 @@ namespace Urho
 		internal static extern int Graphics_GetMultiSample (IntPtr handle);
 
 		/// <summary>
-		/// Return multisample mode (1 = no multisampling.)
+		/// Return multisample mode (1 = no multisampling).
 		/// </summary>
 		private int GetMultiSample ()
 		{
@@ -1315,6 +1304,18 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Graphics_GetDrawBuffersSupport (IntPtr handle);
+
+		/// <summary>
+		/// Return whether multiple render targets are supported.
+		/// </summary>
+		private bool GetDrawBuffersSupport ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_GetDrawBuffersSupport (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern bool Graphics_GetLightPrepassSupport (IntPtr handle);
 
 		/// <summary>
@@ -1384,6 +1385,18 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			return Graphics_GetSRGBWriteSupport (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern uint Graphics_FindBestResolutionIndex (IntPtr handle, int monitor, int width, int height, int refreshRate);
+
+		/// <summary>
+		/// Return index of the best resolution for requested width, height and refresh rate.
+		/// </summary>
+		public uint FindBestResolutionIndex (int monitor, int width, int height, int refreshRate)
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_FindBestResolutionIndex (handle, monitor, width, height, refreshRate);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -2011,6 +2024,66 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Graphics_GetRendererName (IntPtr handle);
+
+		/// <summary>
+		/// Get Renderer name. Used on OpenGL
+		/// </summary>
+		private string GetRendererName ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Marshal.PtrToStringAnsi (Graphics_GetRendererName (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Graphics_GetVersionString (IntPtr handle);
+
+		/// <summary>
+		/// Get Version string. Used on OpenGL
+		/// </summary>
+		private string GetVersionString ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Marshal.PtrToStringAnsi (Graphics_GetVersionString (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Graphics_glOESStandardDerivativesSupport (IntPtr handle);
+
+		/// <summary>
+		/// Return whether  the extention GL_OES_standard_derivatives is supported
+		/// </summary>
+		public bool glOESStandardDerivativesSupport ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_glOESStandardDerivativesSupport (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Graphics_clipDistanceEXTSupport (IntPtr handle);
+
+		/// <summary>
+		/// Return whether GL_EXT_clip_cull_distance is supproted in shader
+		/// </summary>
+		public bool clipDistanceEXTSupport ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_clipDistanceEXTSupport (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Graphics_clipDistanceAPPLESupport (IntPtr handle);
+
+		/// <summary>
+		/// Return whether GL_APPLE_clip_distance is supported
+		/// </summary>
+		public bool clipDistanceAPPLESupport ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Graphics_clipDistanceAPPLESupport (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern uint Graphics_GetAlphaFormat ();
 
 		/// <summary>
@@ -2565,7 +2638,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return multisample mode (1 = no multisampling.)
+		/// Return multisample mode (1 = no multisampling).
 		/// </summary>
 		public int MultiSample {
 			get {
@@ -2714,6 +2787,15 @@ namespace Urho
 		public bool InstancingSupport {
 			get {
 				return GetInstancingSupport ();
+			}
+		}
+
+		/// <summary>
+		/// Return whether multiple render targets are supported.
+		/// </summary>
+		public bool DrawBuffersSupport {
+			get {
+				return GetDrawBuffersSupport ();
 			}
 		}
 
@@ -2957,6 +3039,24 @@ namespace Urho
 		public Urho.IntVector2 RenderTargetDimensions {
 			get {
 				return GetRenderTargetDimensions ();
+			}
+		}
+
+		/// <summary>
+		/// Get Renderer name. Used on OpenGL
+		/// </summary>
+		public string RendererName {
+			get {
+				return GetRendererName ();
+			}
+		}
+
+		/// <summary>
+		/// Get Version string. Used on OpenGL
+		/// </summary>
+		public string VersionString {
+			get {
+				return GetVersionString ();
 			}
 		}
 

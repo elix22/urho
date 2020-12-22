@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,6 @@ namespace Urho3D
 Viewport::Viewport(Context* context) :
     Object(context),
     rect_(IntRect::ZERO),
-    stereo_(false),
     drawDebug_(true)
 {
     SetRenderPath((RenderPath*)nullptr);
@@ -49,27 +48,23 @@ Viewport::Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* r
     Object(context),
     scene_(scene),
     camera_(camera),
-    stereo_(false),
     rect_(IntRect::ZERO),
     drawDebug_(true)
 {
     SetRenderPath(renderPath);
 }
 
-Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :
+Viewport::Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath) :   // NOLINT(modernize-pass-by-value)
     Object(context),
     scene_(scene),
     camera_(camera),
     rect_(rect),
-    stereo_(false),
     drawDebug_(true)
 {
     SetRenderPath(renderPath);
 }
 
-Viewport::~Viewport()
-{
-}
+Viewport::~Viewport() = default;
 
 void Viewport::SetScene(Scene* scene)
 {
@@ -102,17 +97,21 @@ void Viewport::SetRenderPath(RenderPath* renderPath)
         renderPath_ = renderPath;
     else
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderPath_ = renderer->GetDefaultRenderPath();
     }
 }
 
-void Viewport::SetRenderPath(XMLFile* file)
+bool Viewport::SetRenderPath(XMLFile* file)
 {
     SharedPtr<RenderPath> newRenderPath(new RenderPath());
     if (newRenderPath->Load(file))
+    {
         renderPath_ = newRenderPath;
+        return true;
+    }
+    return false;
 }
 
 Scene* Viewport::GetScene() const
@@ -150,7 +149,7 @@ Ray Viewport::GetScreenRay(int x, int y) const
 
     if (rect_ == IntRect::ZERO)
     {
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         screenX = (float)x / (float)graphics->GetWidth();
         screenY = (float)y / (float)graphics->GetHeight();
     }
@@ -175,7 +174,7 @@ IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
     if (rect_ == IntRect::ZERO)
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         x = (int)(screenPoint.x_ * graphics->GetWidth());
         y = (int)(screenPoint.y_ * graphics->GetHeight());
     }
@@ -199,7 +198,7 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
     if (rect_ == IntRect::ZERO)
     {
         /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
-        Graphics* graphics = GetSubsystem<Graphics>();
+        auto* graphics = GetSubsystem<Graphics>();
         screenX = (float)x / (float)graphics->GetWidth();
         screenY = (float)y / (float)graphics->GetHeight();
     }
@@ -215,7 +214,6 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
 void Viewport::AllocateView()
 {
     view_ = new View(context_);
-    view_->SetStereoMode(stereo_);
 }
 
 }

@@ -127,42 +127,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void LineEdit_OnClickBegin (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse click begin.
-		/// </summary>
-		public override void OnClickBegin (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			LineEdit_OnClickBegin (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void LineEdit_OnDoubleClick (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse doubleclick.
-		/// </summary>
-		public override void OnDoubleClick (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			LineEdit_OnDoubleClick (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void LineEdit_OnKey (IntPtr handle, int key, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to a key press.
-		/// </summary>
-		public override void OnKey (int key, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			LineEdit_OnKey (handle, key, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void LineEdit_OnTextInput (IntPtr handle, string text);
 
 		/// <summary>

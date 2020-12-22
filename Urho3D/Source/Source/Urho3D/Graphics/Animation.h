@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,11 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Container/Ptr.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Vector3.h"
@@ -29,6 +32,15 @@
 
 namespace Urho3D
 {
+
+enum AnimationChannel : unsigned char
+{
+    CHANNEL_NONE = 0x0,
+    CHANNEL_POSITION = 0x1,
+    CHANNEL_ROTATION = 0x2,
+    CHANNEL_SCALE = 0x4,
+};
+URHO3D_FLAGSET(AnimationChannel, AnimationChannelFlags);
 
 /// Skeletal animation keyframe.
 struct AnimationKeyFrame
@@ -54,13 +66,12 @@ struct AnimationKeyFrame
 struct URHO3D_API AnimationTrack
 {
     /// Construct.
-    AnimationTrack() :
-        channelMask_(0)
+    AnimationTrack()
     {
     }
 
     /// Assign keyframe at index.
-    void SetKeyFrame(unsigned index, const AnimationKeyFrame& command);
+    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
     /// Add a keyframe at the end.
     void AddKeyFrame(const AnimationKeyFrame& keyFrame);
     /// Insert a keyframe at index.
@@ -74,15 +85,15 @@ struct URHO3D_API AnimationTrack
     AnimationKeyFrame* GetKeyFrame(unsigned index);
     /// Return number of keyframes.
     unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
-    /// Return keyframe index based on time and previous index.
-    void GetKeyFrameIndex(float time, unsigned& index) const;
+    /// Return keyframe index based on time and previous index. Return false if animation is empty.
+    bool GetKeyFrameIndex(float time, unsigned& index) const;
 
     /// Bone or scene node name.
     String name_;
     /// Name hash.
     StringHash nameHash_;
-    /// Bitmask of included data (position, rotation, scale.)
-    unsigned char channelMask_;
+    /// Bitmask of included data (position, rotation, scale).
+    AnimationChannelFlags channelMask_{};
     /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };
@@ -102,10 +113,6 @@ struct AnimationTriggerPoint
     Variant data_;
 };
 
-static const unsigned char CHANNEL_POSITION = 0x1;
-static const unsigned char CHANNEL_ROTATION = 0x2;
-static const unsigned char CHANNEL_SCALE = 0x4;
-
 /// Skeletal animation resource.
 class URHO3D_API Animation : public ResourceWithMetadata
 {
@@ -113,16 +120,16 @@ class URHO3D_API Animation : public ResourceWithMetadata
 
 public:
     /// Construct.
-    Animation(Context* context);
+    explicit Animation(Context* context);
     /// Destruct.
-    virtual ~Animation() override;
+    ~Animation() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Set animation name.
     void SetAnimationName(const String& name);

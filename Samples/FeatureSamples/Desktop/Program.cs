@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Urho.Desktop;
 
 namespace Urho.Samples.Desktop
 {
@@ -34,7 +35,8 @@ namespace Urho.Samples.Desktop
 				selectedSampleType = typeof(Water);	
 			}
 
-			UrhoEngine.Init(pathToAssets: @"../../Assets");
+			DesktopUrhoInitializer.AssetsDirectory = @"../../Assets";
+
 			var game = (Application) Activator.CreateInstance(selectedSampleType);
 			var exitCode = game.Run();
 			WriteLine($"Exit code: {exitCode}. Press any key to exit...", ConsoleColor.DarkYellow);

@@ -29,6 +29,8 @@ namespace Urho.Resources
 		Dxt3,
 		Dxt5,
 		Etc1,
+		Etc2Rgb,
+		Etc2Rgba,
 		PvrtcRgbN2Bpp,
 		PvrtcRgbaN2Bpp,
 		PvrtcRgbN4Bpp,

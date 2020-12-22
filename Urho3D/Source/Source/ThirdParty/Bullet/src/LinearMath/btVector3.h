@@ -39,7 +39,7 @@ subject to the following restrictions:
 #pragma warning(disable: 4556) // value of intrinsic immediate argument '4294967239' is out of range '0 - 255'
 #endif
 
-
+//TBD ELI 
 //#define BT_SHUFFLE(x,y,z,w) ((w)<<6 | (z)<<4 | (y)<<2 | (x))
 #define BT_SHUFFLE(x, y, z, w) (((w) << 6 | (z) << 4 | (y) << 2 | (x)) & 0xff)
 //#define bt_pshufd_ps( _a, _mask ) (__m128) _mm_shuffle_epi32((__m128i)(_a), (_mask) )

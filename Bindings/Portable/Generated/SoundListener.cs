@@ -19,7 +19,7 @@ using Urho.Network;
 namespace Urho.Audio
 {
 	/// <summary>
-	/// %Sound listener component
+	/// %Sound listener component.
 	/// </summary>
 	public unsafe partial class SoundListener : Component
 	{

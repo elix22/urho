@@ -19,7 +19,7 @@ using Urho.Network;
 namespace Urho.Network
 {
 	/// <summary>
-	/// HTTP connection state
+	/// HTTP connection state.
 	/// </summary>
 	public enum HttpRequestState
 	{

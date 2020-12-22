@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@ class URHO3D_API Viewport : public Object
 
 public:
     /// Construct with defaults.
-    Viewport(Context* context);
+    explicit Viewport(Context* context);
     /// Construct with a full rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath = nullptr);
     /// Construct with a specified rectangle.
     Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = nullptr);
     /// Destruct.
-    virtual ~Viewport() override;
+    ~Viewport() override;
 
     /// Set scene.
     void SetScene(Scene* scene);
@@ -59,11 +59,9 @@ public:
     /// Set view rectangle. A zero rectangle (0 0 0 0) means to use the rendertarget's full dimensions.
     void SetRect(const IntRect& rect);
     /// Set rendering path.
-    void SetRenderPath(RenderPath* path);
-    /// Set stereo mode
-    void SetStereoMode(bool stereo) { stereo_ = stereo; }
+    void SetRenderPath(RenderPath* renderPath);
     /// Set rendering path from an XML file.
-    void SetRenderPath(XMLFile* file);
+    bool SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.
     void SetDrawDebug(bool enable);
     /// Set separate camera to use for culling. Sharing a culling camera between several viewports allows to prepare the view only once, saving in CPU use. The culling camera's frustum should cover all the viewport cameras' frusta or else objects may be missing from the rendered view.
@@ -85,7 +83,7 @@ public:
     /// Return whether to draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
 
-    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+    /// Return the culling camera. If null, the viewport camera will be used for culling (normal case).
     Camera* GetCullCamera() const;
 
     /// Return ray corresponding to normalized screen coordinates.
@@ -99,8 +97,6 @@ public:
     void AllocateView();
 
 private:
-    /// Stereo mode
-    bool stereo_;
     /// Scene pointer.
     WeakPtr<Scene> scene_;
     /// Camera pointer.

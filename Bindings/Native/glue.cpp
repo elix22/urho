@@ -447,4 +447,23 @@ extern "C" {
 	{
 		rpc->SetOutput(index, String(name));
 	}
+
+	DllExport int
+	Input_GetMouseButtonDown (Urho3D::Input *_target, int button)
+	{
+		return _target->GetMouseButtonDown (MouseButtonFlags(button));
+	}
+
+
+	DllExport int
+	Input_GetMouseButtonPress (Urho3D::Input *_target, int button)
+	{
+		return _target->GetMouseButtonPress (MouseButtonFlags(button));
+	}
+
+	DllExport Urho3D::Bone *
+	Skeleton_GetBone0 (Urho3D::Skeleton *_target, int boneNameHash)
+	{
+		return _target->GetBone (Urho3D::StringHash(boneNameHash));
+	}
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,6 +42,10 @@
 
 #include <Foundation/Foundation.h>
 
+#if URHO3D_ANGLE_METAL
+#include "SDL_uikitegl.h"
+#endif
+
 @implementation SDL_WindowData
 
 @synthesize uiwindow;
@@ -69,15 +73,23 @@
 
 - (void)layoutSubviews
 {
-    /* Workaround to fix window orientation issues in iOS 8+. */
-    self.frame = self.screen.bounds;
+    /* Workaround to fix window orientation issues in iOS 8. */
+    /* As of July 1 2019, I haven't been able to reproduce any orientation
+     * issues with this disabled on iOS 12. The issue this is meant to fix might
+     * only happen on iOS 8, or it might have been fixed another way with other
+     * code... This code prevents split view (iOS 9+) from working on iPads, so
+     * we want to avoid using it if possible. */
+    if (!UIKit_IsSystemVersionAtLeast(9.0)) {
+        self.frame = self.screen.bounds;
+    }
     [super layoutSubviews];
 }
 
 @end
 
 
-static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
+static int
+SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bool created)
 {
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     SDL_DisplayData *displaydata = (__bridge SDL_DisplayData *) display->driverdata;
@@ -107,6 +119,14 @@ static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bo
 
 #if !TARGET_OS_TV
     if (displaydata.uiscreen == [UIScreen mainScreen]) {
+        /* SDL_CreateWindow sets the window w&h to the display's bounds if the
+         * fullscreen flag is set. But the display bounds orientation might not
+         * match what we want, and GetSupportedOrientations call below uses the
+         * window w&h. They're overridden below anyway, so we'll just set them
+         * to the requested size for the purposes of determining orientation. */
+        window->w = window->windowed.w;
+        window->h = window->windowed.h;
+
         NSUInteger orients = UIKit_GetSupportedOrientations(window);
         BOOL supportsLandscape = (orients & UIInterfaceOrientationMaskLandscape) != 0;
         BOOL supportsPortrait = (orients & (UIInterfaceOrientationMaskPortrait|UIInterfaceOrientationMaskPortraitUpsideDown)) != 0;
@@ -137,12 +157,6 @@ static int SetupWindowData(_THIS, SDL_Window *window, UIWindow *uiwindow, SDL_bo
      * heirarchy. */
     [view setSDLWindow:window];
 
-    /* Make this window the current mouse focus for touch input */
-    if (displaydata.uiscreen == [UIScreen mainScreen]) {
-        SDL_SetMouseFocus(window);
-        SDL_SetKeyboardFocus(window);
-    }
-
     return 0;
 }
 
@@ -157,7 +171,7 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
         SDL_assert(_this->windows == window);
 
         /* We currently only handle a single window per display on iOS */
-        if (window->next != NULL && urhoPlaceholderWindow == NULL) {
+        if (window->next != NULL) {
             return SDL_SetError("Only one window allowed per display.");
         }
 
@@ -202,14 +216,14 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
 
         /* ignore the size user requested, and make a fullscreen window */
         /* !!! FIXME: can we have a smaller view? */
-        //UIWindow *uiwindow = [[SDL_uikitwindow alloc] initWithFrame:data.uiscreen.bounds];
-        UIWindow *uiwindow;
-        if (!urhoPlaceholderWindow){
-            uiwindow = [SDL_uikitwindow alloc];
-            uiwindow = [uiwindow initWithFrame:[data.uiscreen bounds]];
-        } else {
-            uiwindow = urhoPlaceholderWindow;
+        UIWindow *uiwindow = [[SDL_uikitwindow alloc] initWithFrame:data.uiscreen.bounds];
+
+#ifdef URHO3D_ANGLE_METAL
+        if(!(window->flags & SDL_WINDOW_ALLOW_HIGHDPI))
+        {
+            uiwindow.layer.contentsScale = 1;
         }
+#endif
         /* put the window on an external display if appropriate. */
         if (data.uiscreen != [UIScreen mainScreen]) {
             [uiwindow setScreen:data.uiscreen];
@@ -220,6 +234,17 @@ UIKit_CreateWindow(_THIS, SDL_Window *window)
         }
     }
 
+#if URHO3D_ANGLE_METAL
+        /* The rest of this macro mess is OpenGL ES windows */
+        if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES)
+        {
+            if (UIKIT_GLES_SetupWindow(_this, window) < 0) {
+                UIKit_DestroyWindow(_this, window);
+                return -1;
+            }
+            return 1;
+        }
+#endif
     return 1;
 }
 
@@ -238,6 +263,14 @@ UIKit_ShowWindow(_THIS, SDL_Window * window)
     @autoreleasepool {
         SDL_WindowData *data = (__bridge SDL_WindowData *) window->driverdata;
         [data.uiwindow makeKeyAndVisible];
+
+        /* Make this window the current mouse focus for touch input */
+        SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
+        SDL_DisplayData *displaydata = (__bridge SDL_DisplayData *) display->driverdata;
+        if (displaydata.uiscreen == [UIScreen mainScreen]) {
+            SDL_SetMouseFocus(window);
+            SDL_SetKeyboardFocus(window);
+        }
     }
 }
 
@@ -310,17 +343,6 @@ UIKit_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display
 }
 
 void
-UIKit_StopRenderLoop(SDL_Window * window)
-{
-    @autoreleasepool {
-        if (window->driverdata != NULL) {
-            SDL_WindowData *data = (SDL_WindowData *) CFBridgingRelease(window->driverdata);
-            [data.viewcontroller stopAnimation];
-        }
-    }
-}
-
-void
 UIKit_DestroyWindow(_THIS, SDL_Window * window)
 {
     @autoreleasepool {
@@ -361,6 +383,7 @@ UIKit_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
             info->subsystem = SDL_SYSWM_UIKIT;
             info->info.uikit.window = data.uiwindow;
 
+#ifndef URHO3D_ANGLE_METAL
             /* These struct members were added in SDL 2.0.4. */
             if (versionnum >= SDL_VERSIONNUM(2,0,4)) {
                 if ([data.viewcontroller.view isKindOfClass:[SDL_uikitopenglview class]]) {
@@ -374,10 +397,10 @@ UIKit_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
                     info->info.uikit.resolveFramebuffer = 0;
                 }
             }
-
+#endif
             return SDL_TRUE;
         } else {
-            SDL_SetError("Application not compiled with SDL %d.%d\n",
+            SDL_SetError("Application not compiled with SDL %d.%d",
                          SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
             return SDL_FALSE;
         }
@@ -472,10 +495,3 @@ SDL_iPhoneSetAnimationCallback(SDL_Window * window, int interval, void (*callbac
 #endif /* SDL_VIDEO_DRIVER_UIKIT */
 
 /* vi: set ts=4 sw=4 expandtab: */
-
-// UrhoSharp:
-void SDL_SetExternalViewPlaceholder(UIView* view, UIWindow* window){
-    urhoPlaceholderView = view;
-    urhoPlaceholderWindow = window;
-    //TODO: cleanup?
-}

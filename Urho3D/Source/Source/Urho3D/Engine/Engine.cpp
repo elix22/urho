@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -146,7 +146,7 @@ Engine::Engine(Context* context) :
 #ifdef URHO3D_IK
     RegisterIKLibrary(context_);
 #endif
-    
+
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif
@@ -158,9 +158,7 @@ Engine::Engine(Context* context) :
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
 }
 
-Engine::~Engine()
-{
-}
+Engine::~Engine() = default;
 
 bool Engine::Initialize(const VariantMap& parameters)
 {
@@ -190,7 +188,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
     // Start logging
-    Log* log = GetSubsystem<Log>();
+    auto* log = GetSubsystem<Log>();
     if (log)
     {
         if (HasParameter(parameters, EP_LOG_LEVEL))
@@ -222,14 +220,14 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (!InitializeResourceCache(parameters, false))
         return false;
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
 
     // Initialize graphics & audio output
     if (!headless_)
     {
-        Graphics* graphics = GetSubsystem<Graphics>();
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* graphics = GetSubsystem<Graphics>();
+        auto* renderer = GetSubsystem<Renderer>();
 
         if (HasParameter(parameters, EP_EXTERNAL_WINDOW))
             graphics->SetExternalWindow(GetParameter(parameters, EP_EXTERNAL_WINDOW).GetVoidPtr());
@@ -272,8 +270,8 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetDrawShadows(GetParameter(parameters, EP_SHADOWS, true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, EP_LOW_QUALITY_SHADOWS, false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality(GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality(GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetMaterialQuality((MaterialQuality)GetParameter(parameters, EP_MATERIAL_QUALITY, QUALITY_HIGH).GetInt());
+        renderer->SetTextureQuality((MaterialQuality)GetParameter(parameters, EP_TEXTURE_QUALITY, QUALITY_HIGH).GetInt());
         renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, EP_TEXTURE_FILTER_MODE, FILTER_TRILINEAR).GetInt());
         renderer->SetTextureAnisotropy(GetParameter(parameters, EP_TEXTURE_ANISOTROPY, 4).GetInt());
 
@@ -322,8 +320,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 
 bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOld /*= true*/)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
 
     // Remove all resource paths and packages
     if (removeOld)
@@ -470,7 +468,7 @@ bool Engine::InitializeResourceCache(const VariantMap& parameters, bool removeOl
     return true;
 }
 
-int Engine::RunFrame()
+void Engine::RunFrame()
 {
     assert(initialized_);
 
@@ -479,18 +477,18 @@ int Engine::RunFrame()
         exiting_ = true;
 
     if (exiting_)
-        return 0;
+        return;
 
     // Note: there is a minimal performance cost to looking up subsystems (uses a hashmap); if they would be looked up several
     // times per frame it would be better to cache the pointers
-    Time* time = GetSubsystem<Time>();
-    Input* input = GetSubsystem<Input>();
-    Audio* audio = GetSubsystem<Audio>();
+    auto* time = GetSubsystem<Time>();
+    auto* input = GetSubsystem<Input>();
+    auto* audio = GetSubsystem<Audio>();
 
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginFrame();
     }
@@ -506,9 +504,6 @@ int Engine::RunFrame()
             audio->Stop();
             audioPaused_ = true;
         }
-#ifdef IOS
-        return;
-#endif
     }
     else
     {
@@ -518,19 +513,14 @@ int Engine::RunFrame()
             audio->Play();
             audioPaused_ = false;
         }
-#if defined(IOS) || defined(ANDROID)
+
         Update();
-        Render();
     }
-#else
-    }
-    Update();
+
     Render();
-#endif
-    int elapsed = ApplyFrameLimit();
+    ApplyFrameLimit();
 
     time->EndFrame();
-    return elapsed;
 }
 
 Console* Engine::CreateConsole()
@@ -539,7 +529,7 @@ Console* Engine::CreateConsole()
         return nullptr;
 
     // Return existing console if possible
-    Console* console = GetSubsystem<Console>();
+    auto* console = GetSubsystem<Console>();
     if (!console)
     {
         console = new Console(context_);
@@ -555,7 +545,7 @@ DebugHud* Engine::CreateDebugHud()
         return nullptr;
 
     // Return existing debug HUD if possible
-    DebugHud* debugHud = GetSubsystem<DebugHud>();
+    auto* debugHud = GetSubsystem<DebugHud>();
     if (!debugHud)
     {
         debugHud = new DebugHud(context_);
@@ -619,7 +609,7 @@ void Engine::DumpProfiler()
     if (!Thread::IsMainThread())
         return;
 
-    Profiler* profiler = GetSubsystem<Profiler>();
+    auto* profiler = GetSubsystem<Profiler>();
     if (profiler)
         URHO3D_LOGRAW(profiler->PrintData(true, true) + "\n");
 #endif
@@ -631,7 +621,7 @@ void Engine::DumpResources(bool dumpFileName)
     if (!Thread::IsMainThread())
         return;
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     if (dumpFileName)
     {
@@ -720,7 +710,7 @@ void Engine::Render()
     URHO3D_PROFILE(Render);
 
     // If device is lost, BeginFrame will fail and we skip rendering
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics->BeginFrame())
         return;
 
@@ -729,13 +719,13 @@ void Engine::Render()
     graphics->EndFrame();
 }
 
-int Engine::ApplyFrameLimit()
+void Engine::ApplyFrameLimit()
 {
     if (!initialized_)
-        return 0;
+        return;
 
     unsigned maxFps = maxFps_;
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
     if (input && !input->HasFocus())
         maxFps = Min(maxInactiveFps_, maxFps);
 
@@ -764,7 +754,7 @@ int Engine::ApplyFrameLimit()
             // Sleep if 1 ms or more off the frame limiting goal
             if (targetMax - elapsed >= 1000LL)
             {
-                unsigned sleepTime = (unsigned)((targetMax - elapsed) / 1000LL);
+                auto sleepTime = (unsigned)((targetMax - elapsed) / 1000LL);
                 Time::Sleep(sleepTime);
             }
         }
@@ -802,18 +792,15 @@ int Engine::ApplyFrameLimit()
     }
     else
         timeStep_ = lastTimeSteps_.Back();
-    return elapsed;
 }
 
 VariantMap Engine::ParseParameters(const Vector<String>& arguments)
 {
     VariantMap ret;
 
-#ifndef UWP
-	// Pre-initialize the parameters with environment variable values when they are set
-	if (const char* paths = getenv("URHO3D_PREFIX_PATH"))
-		ret[EP_RESOURCE_PREFIX_PATHS] = paths;
-#endif // !UWP
+    // Pre-initialize the parameters with environment variable values when they are set
+    if (const char* paths = getenv("URHO3D_PREFIX_PATH"))
+        ret[EP_RESOURCE_PREFIX_PATHS] = paths;
 
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
@@ -826,8 +813,6 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_HEADLESS] = true;
             else if (argument == "nolimit")
                 ret[EP_FRAME_LIMITER] = false;
-            else if (argument == "delayedstart")
-                ret["DelayedStart"] = true;
             else if (argument == "flushgpu")
                 ret[EP_FLUSH_GPU] = true;
             else if (argument == "gl2")
@@ -999,7 +984,11 @@ void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void Engine::DoExit()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
+#if defined(URHO3D_ANGLE_METAL)
+        exiting_ = true;
+        Time::Sleep(250);
+#endif
+    auto* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();
 

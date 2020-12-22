@@ -1,4 +1,4 @@
-﻿/*
+/*
 ---------------------------------------------------------------------------
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
@@ -58,6 +58,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
 #endif
 
 // -------------------------------------------------------------------------------
@@ -163,6 +168,9 @@ struct ASSIMP_API aiNode
 #endif // __cplusplus
 };
 
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 // -------------------------------------------------------------------------------
 /**

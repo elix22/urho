@@ -187,6 +187,30 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void BorderImage_SetDisabledOffset (IntPtr handle, ref Urho.IntVector2 offset);
+
+		/// <summary>
+		/// Set offset to image rectangle used when disabled.
+		/// </summary>
+		private void SetDisabledOffset (Urho.IntVector2 offset)
+		{
+			Runtime.ValidateRefCounted (this);
+			BorderImage_SetDisabledOffset (handle, ref offset);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void BorderImage_SetDisabledOffset1 (IntPtr handle, int x, int y);
+
+		/// <summary>
+		/// Set offset to image rectangle used when disabled.
+		/// </summary>
+		public void SetDisabledOffset (int x, int y)
+		{
+			Runtime.ValidateRefCounted (this);
+			BorderImage_SetDisabledOffset1 (handle, x, y);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void BorderImage_SetBlendMode (IntPtr handle, BlendMode mode);
 
 		/// <summary>
@@ -208,6 +232,18 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			BorderImage_SetTiled (handle, enable);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void BorderImage_SetMaterial (IntPtr handle, IntPtr material);
+
+		/// <summary>
+		/// Set material for custom rendering.
+		/// </summary>
+		private void SetMaterial (Material material)
+		{
+			Runtime.ValidateRefCounted (this);
+			BorderImage_SetMaterial (handle, (object)material == null ? IntPtr.Zero : material.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -271,6 +307,18 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Urho.IntVector2 BorderImage_GetDisabledOffset (IntPtr handle);
+
+		/// <summary>
+		/// Return offset to image rectangle used when disabled.
+		/// </summary>
+		private Urho.IntVector2 GetDisabledOffset ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return BorderImage_GetDisabledOffset (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern BlendMode BorderImage_GetBlendMode (IntPtr handle);
 
 		/// <summary>
@@ -295,6 +343,18 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr BorderImage_GetMaterial (IntPtr handle);
+
+		/// <summary>
+		/// Get material used for custom rendering.
+		/// </summary>
+		private Material GetMaterial ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Runtime.LookupObject<Material> (BorderImage_GetMaterial (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern ResourceRef BorderImage_GetTextureAttr (IntPtr handle);
 
 		/// <summary>
@@ -304,6 +364,18 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return BorderImage_GetTextureAttr (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern ResourceRef BorderImage_GetMaterialAttr (IntPtr handle);
+
+		/// <summary>
+		/// Get material attribute.
+		/// </summary>
+		private ResourceRef GetMaterialAttr ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return BorderImage_GetMaterialAttr (handle);
 		}
 
 		public override StringHash Type {
@@ -402,6 +474,20 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
+		/// Return offset to image rectangle used when disabled.
+		/// Or
+		/// Set offset to image rectangle used when disabled.
+		/// </summary>
+		public Urho.IntVector2 DisabledOffset {
+			get {
+				return GetDisabledOffset ();
+			}
+			set {
+				SetDisabledOffset (value);
+			}
+		}
+
+		/// <summary>
 		/// Return blend mode.
 		/// Or
 		/// Set blend mode.
@@ -430,11 +516,34 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
+		/// Get material used for custom rendering.
+		/// Or
+		/// Set material for custom rendering.
+		/// </summary>
+		public Material Material {
+			get {
+				return GetMaterial ();
+			}
+			set {
+				SetMaterial (value);
+			}
+		}
+
+		/// <summary>
 		/// Return texture attribute.
 		/// </summary>
 		public ResourceRef TextureAttr {
 			get {
 				return GetTextureAttr ();
+			}
+		}
+
+		/// <summary>
+		/// Get material attribute.
+		/// </summary>
+		public ResourceRef MaterialAttr {
+			get {
+				return GetMaterialAttr ();
 			}
 		}
 	}

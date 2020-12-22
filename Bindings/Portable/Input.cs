@@ -1,6 +1,8 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Urho {
+	/* TBD ELI , generated
 	[Flags]
 	public enum MouseButton {
 		Left = 1 << 0,
@@ -9,7 +11,8 @@ namespace Urho {
 		X1 = 1 << 3,
 		X2 = 1 << 4,
 	}
-
+*/
+/* TBD ELI , generated
 	public enum Key {
 		A = 'a',
 		B = 'b',
@@ -123,6 +126,7 @@ namespace Urho {
 		LeftAlt = 0x400000e2,
 		RightAlt = 0x400000e6,
 	}
+	*/
 
 	public partial class Input {
 
@@ -138,5 +142,33 @@ namespace Urho {
 			state = new JoystickState();
 			return false;
 		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Input_GetMouseButtonDown (IntPtr handle, int button);
+
+		/// <summary>
+		/// Check if a mouse button is held down.
+		/// </summary>
+		public bool GetMouseButtonDown (MouseButton button)
+		{
+			Runtime.ValidateRefCounted (this);
+			return Input_GetMouseButtonDown (handle, (int)button);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Input_GetMouseButtonPress (IntPtr handle, int button);
+
+		/// <summary>
+		/// Check if a mouse button has been pressed on this frame.
+		/// </summary>
+		public bool GetMouseButtonPress (MouseButton button)
+		{
+			Runtime.ValidateRefCounted (this);
+			return Input_GetMouseButtonPress (handle, (int)button);
+		}
+
+		// Dummy
+		public bool Enabled;
+
 	}
 }

@@ -394,7 +394,7 @@ namespace Urho.Gui
 		internal static extern void Text3D_SetFaceCameraMode (IntPtr handle, FaceCameraMode mode);
 
 		/// <summary>
-		/// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
+		/// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE).
 		/// </summary>
 		private void SetFaceCameraMode (FaceCameraMode mode)
 		{
@@ -1061,7 +1061,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return how the text rotates in relation to the camera.
 		/// Or
-		/// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
+		/// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE).
 		/// </summary>
 		public FaceCameraMode FaceCameraMode {
 			get {

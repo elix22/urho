@@ -134,6 +134,42 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern uint Skeleton_GetBoneIndex (IntPtr handle, string boneName);
+
+		/// <summary>
+		/// Return index of the bone by name. Return M_MAX_UNSIGNED if not found.
+		/// </summary>
+		public uint GetBoneIndex (string boneName)
+		{
+			Runtime.ValidateObject (this);
+			return Skeleton_GetBoneIndex (handle, boneName);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern uint Skeleton_GetBoneIndex0 (IntPtr handle, Bone* bone);
+
+		/// <summary>
+		/// Return index of the bone by the bone pointer. Return M_MAX_UNSIGNED if not found.
+		/// </summary>
+		public uint GetBoneIndex (Bone* bone)
+		{
+			Runtime.ValidateObject (this);
+			return Skeleton_GetBoneIndex0 (handle, bone);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Bone* Skeleton_GetBoneParent (IntPtr handle, Bone* bone);
+
+		/// <summary>
+		/// Return parent of the given bone. Return null for root bones.
+		/// </summary>
+		public Bone* GetBoneParent (Bone* bone)
+		{
+			Runtime.ValidateObject (this);
+			return Skeleton_GetBoneParent (handle, bone);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern Bone* Skeleton_GetBone (IntPtr handle, uint index);
 
 		/// <summary>
@@ -143,18 +179,6 @@ namespace Urho
 		{
 			Runtime.ValidateObject (this);
 			return Skeleton_GetBone (handle, index);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Bone* Skeleton_GetBone0 (IntPtr handle, int boneNameHash);
-
-		/// <summary>
-		/// Return bone by name hash.
-		/// </summary>
-		public Bone* GetBone (StringHash boneNameHash)
-		{
-			Runtime.ValidateObject (this);
-			return Skeleton_GetBone0 (handle, boneNameHash.Code);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

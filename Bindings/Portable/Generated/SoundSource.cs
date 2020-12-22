@@ -454,7 +454,7 @@ namespace Urho.Audio
 		internal static extern void SoundSource_SetPlayingAttr (IntPtr handle, bool value);
 
 		/// <summary>
-		/// Set sound playing attribute
+		/// Set sound playing attribute.
 		/// </summary>
 		public void SetPlayingAttr (bool value)
 		{

@@ -127,15 +127,15 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void StaticSprite2D_SetFlip (IntPtr handle, bool flipX, bool flipY);
+		internal static extern void StaticSprite2D_SetFlip (IntPtr handle, bool flipX, bool flipY, bool swapXY);
 
 		/// <summary>
 		/// Set flip.
 		/// </summary>
-		public void SetFlip (bool flipX, bool flipY)
+		public void SetFlip (bool flipX, bool flipY, bool swapXY = false)
 		{
 			Runtime.ValidateRefCounted (this);
-			StaticSprite2D_SetFlip (handle, flipX, flipY);
+			StaticSprite2D_SetFlip (handle, flipX, flipY, swapXY);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -160,6 +160,18 @@ namespace Urho.Urho2D
 		{
 			Runtime.ValidateRefCounted (this);
 			StaticSprite2D_SetFlipY (handle, flipY);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void StaticSprite2D_SetSwapXY (IntPtr handle, bool swapXY);
+
+		/// <summary>
+		/// Set swap X and Y.
+		/// </summary>
+		private void SetSwapXY (bool swapXY)
+		{
+			Runtime.ValidateRefCounted (this);
+			StaticSprite2D_SetSwapXY (handle, swapXY);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -292,6 +304,18 @@ namespace Urho.Urho2D
 		{
 			Runtime.ValidateRefCounted (this);
 			return StaticSprite2D_GetFlipY (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool StaticSprite2D_GetSwapXY (IntPtr handle);
+
+		/// <summary>
+		/// Return swap X and Y.
+		/// </summary>
+		private bool GetSwapXY ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return StaticSprite2D_GetSwapXY (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -480,6 +504,20 @@ namespace Urho.Urho2D
 			}
 			set {
 				SetFlipY (value);
+			}
+		}
+
+		/// <summary>
+		/// Return swap X and Y.
+		/// Or
+		/// Set swap X and Y.
+		/// </summary>
+		public bool SwapXY {
+			get {
+				return GetSwapXY ();
+			}
+			set {
+				SetSwapXY (value);
 			}
 		}
 

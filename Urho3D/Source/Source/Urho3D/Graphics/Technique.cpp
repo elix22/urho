@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,9 +94,7 @@ Pass::Pass(const String& name) :
         lightingMode_ = LIGHTING_PERPIXEL;
 }
 
-Pass::~Pass()
-{
-}
+Pass::~Pass() = default;
 
 void Pass::SetBlendMode(BlendMode mode)
 {
@@ -250,9 +248,7 @@ Technique::Technique(Context* context) :
 #endif
 }
 
-Technique::~Technique()
-{
-}
+Technique::~Technique() = default;
 
 void Technique::RegisterObject(Context* context)
 {
@@ -391,6 +387,7 @@ SharedPtr<Technique> Technique::Clone(const String& cloneName) const
             continue;
 
         Pass* newPass = ret->CreatePass(srcPass->GetName());
+        newPass->SetCullMode(srcPass->GetCullMode());
         newPass->SetBlendMode(srcPass->GetBlendMode());
         newPass->SetDepthTestMode(srcPass->GetDepthTestMode());
         newPass->SetLightingMode(srcPass->GetLightingMode());

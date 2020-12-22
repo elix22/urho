@@ -322,18 +322,6 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern uint VertexBuffer_GetElementMask (IntPtr handle);
-
-		/// <summary>
-		/// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
-		/// </summary>
-		private uint GetElementMask ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return VertexBuffer_GetElementMask (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern byte* VertexBuffer_GetShadowData (IntPtr handle);
 
 		/// <summary>
@@ -441,15 +429,6 @@ namespace Urho
 		public uint VertexSize {
 			get {
 				return GetVertexSize ();
-			}
-		}
-
-		/// <summary>
-		/// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
-		/// </summary>
-		public ElementMask ElementMask {
-			get {
-				return (ElementMask)GetElementMask ();
 			}
 		}
 

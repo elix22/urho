@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,9 @@ namespace Urho3D
 
 void Texture3D::OnDeviceLost()
 {
+    if (object_.name_ && !graphics_->IsDeviceLost())
+        glDeleteTextures(1, &object_.name_);
+
     GPUObject::OnDeviceLost();
 }
 
@@ -49,7 +52,7 @@ void Texture3D::OnDeviceReset()
     if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
@@ -112,8 +115,8 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     if (IsCompressed())
     {
-        x &= ~3;
-        y &= ~3;
+        x &= ~3u;
+        y &= ~3u;
     }
 
     int levelWidth = GetLevelWidth(level);
@@ -128,7 +131,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     graphics_->SetTextureForUpdate(this);
 
-#ifndef GL_ES_VERSION_2_0
+#ifndef URHO3D_GLES2
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
 
@@ -164,8 +167,8 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
     // Use a shared ptr for managing the temporary mip images created during this function
     SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture3D);
-    int quality = QUALITY_HIGH;
-    Renderer* renderer = GetSubsystem<Renderer>();
+    MaterialQuality quality = QUALITY_HIGH;
+    auto* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();
 
@@ -251,20 +254,25 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         unsigned format = graphics_->GetFormat(image->GetCompressedFormat());
         bool needDecompress = false;
 
+#if defined(URHO3D_ANGLE_METAL)
+        format = Graphics::GetRGBAFormat();
+        needDecompress = true;
+#else
         if (!format)
         {
             format = Graphics::GetRGBAFormat();
             needDecompress = true;
         }
+#endif
 
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4 || depth / (1 << mipsToSkip) < 4))
+        while (mipsToSkip && (width / (1u << mipsToSkip) < 4 || height / (1u << mipsToSkip) < 4 || depth / (1u << mipsToSkip) < 4))
             --mipsToSkip;
-        width /= (1 << mipsToSkip);
-        height /= (1 << mipsToSkip);
-        depth /= (1 << mipsToSkip);
+        width /= (1u << mipsToSkip);
+        height /= (1u << mipsToSkip);
+        depth /= (1u << mipsToSkip);
 
         SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, depth, format);
@@ -279,7 +287,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
             }
             else
             {
-                unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * level.depth_ * 4];
+                auto* rgbaData = new unsigned char[level.width_ * level.height_ * level.depth_ * 4];
                 level.Decompress(rgbaData);
                 SetData(i, 0, 0, 0, level.width_, level.height_, level.depth_, rgbaData);
                 memoryUse += level.width_ * level.height_ * level.depth_ * 4;
@@ -338,7 +346,7 @@ bool Texture3D::Create()
 {
     Release();
 
-#ifdef GL_ES_VERSION_2_0
+#if defined(GL_ES_VERSION_2_0) && !defined(GL_ES_VERSION_3_0)
     URHO3D_LOGERROR("Failed to create 3D texture, currently unsupported on OpenGL ES 2");
     return false;
 #else
@@ -369,7 +377,7 @@ bool Texture3D::Create()
         glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, nullptr);
         if (glGetError())
         {
-            URHO3D_LOGERROR("Failed to create texture");
+            URHO3D_LOGERROR("Failed to create 3D texture");
             success = false;
         }
     }

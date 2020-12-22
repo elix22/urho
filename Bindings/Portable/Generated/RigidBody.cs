@@ -235,15 +235,15 @@ namespace Urho.Physics
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void RigidBody_SetAngularVelocity (IntPtr handle, ref Urho.Vector3 angularVelocity);
+		internal static extern void RigidBody_SetAngularVelocity (IntPtr handle, ref Urho.Vector3 velocity);
 
 		/// <summary>
 		/// Set angular velocity.
 		/// </summary>
-		public void SetAngularVelocity (Urho.Vector3 angularVelocity)
+		public void SetAngularVelocity (Urho.Vector3 velocity)
 		{
 			Runtime.ValidateRefCounted (this);
-			RigidBody_SetAngularVelocity (handle, ref angularVelocity);
+			RigidBody_SetAngularVelocity (handle, ref velocity);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -271,15 +271,15 @@ namespace Urho.Physics
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void RigidBody_SetAngularDamping (IntPtr handle, float factor);
+		internal static extern void RigidBody_SetAngularDamping (IntPtr handle, float damping);
 
 		/// <summary>
 		/// Set angular velocity damping factor.
 		/// </summary>
-		private void SetAngularDamping (float factor)
+		private void SetAngularDamping (float damping)
 		{
 			Runtime.ValidateRefCounted (this);
-			RigidBody_SetAngularDamping (handle, factor);
+			RigidBody_SetAngularDamping (handle, damping);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -898,7 +898,7 @@ namespace Urho.Physics
 		internal static extern bool RigidBody_IsActive (IntPtr handle);
 
 		/// <summary>
-		/// Return whether rigid body is active (not sleeping.)
+		/// Return whether rigid body is active (not sleeping).
 		/// </summary>
 		private bool IsActive ()
 		{
@@ -1373,7 +1373,7 @@ namespace Urho.Physics
 		}
 
 		/// <summary>
-		/// Return whether rigid body is active (not sleeping.)
+		/// Return whether rigid body is active (not sleeping).
 		/// </summary>
 		public bool Active {
 			get {

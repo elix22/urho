@@ -163,15 +163,15 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool AnimationSet2D_HasAnimation (IntPtr handle, string animation);
+		internal static extern bool AnimationSet2D_HasAnimation (IntPtr handle, string animationName);
 
 		/// <summary>
 		/// Check has animation.
 		/// </summary>
-		public bool HasAnimation (string animation)
+		public bool HasAnimation (string animationName)
 		{
 			Runtime.ValidateRefCounted (this);
-			return AnimationSet2D_HasAnimation (handle, animation);
+			return AnimationSet2D_HasAnimation (handle, animationName);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

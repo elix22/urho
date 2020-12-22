@@ -995,7 +995,7 @@ namespace Urho.Resources
 		/// <node
 		/// >value
 		/// </node
-		/// >
+		/// >.
 		/// </summary>
 		private string GetValue ()
 		{
@@ -1416,7 +1416,7 @@ namespace Urho.Resources
 		/// <node
 		/// >value
 		/// </node
-		/// >
+		/// >.
 		/// </summary>
 		public string Value {
 			get {

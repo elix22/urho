@@ -32,6 +32,9 @@ namespace Urho.Samples
 		Plane waterPlane;
 		Plane waterClipPlane;
 
+		[Preserve]
+		public Water() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+		
 		public Water(ApplicationOptions options = null) : base(options) {}
 
 		protected override void Start()

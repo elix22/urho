@@ -106,6 +106,9 @@ namespace Urho
 			const int FpsLimit = 60;
 			while (app.IsActive)
 			{
+				app.Engine.RunFrame();
+				await Task.Yield();
+				/* TBD ELI
 				var elapsed = app.Engine.RunFrame();
 				var targetMax = 1000000L / FpsLimit;
 				if (elapsed >= targetMax)
@@ -115,7 +118,9 @@ namespace Urho
 					var ts = TimeSpan.FromMilliseconds((targetMax - elapsed) / 1000d);
 					await Task.Delay(ts);
 				}
+				*/
 			}
+
 		}
 
 		public Node CameraNode { get; private set; }
@@ -186,7 +191,7 @@ namespace Urho
 			Input.SubscribeToMouseWheel(args => CameraNode.Translate(-Vector3.UnitZ * 1f * args.Wheel * -1));
 			Input.SetMouseVisible(true, true);
 			Input.SubscribeToKeyDown(args => {
-				if (args.Key == Key.Esc)
+				if (args.Key == Key.Escape)
 				{
 					Exit();
 				}

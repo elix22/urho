@@ -103,18 +103,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void ListView_OnKey (IntPtr handle, int key, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to a key press.
-		/// </summary>
-		public override void OnKey (int key, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			ListView_OnKey (handle, key, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void ListView_OnResize (IntPtr handle, ref Urho.IntVector2 newSize, ref Urho.IntVector2 delta);
 
 		/// <summary>
@@ -472,7 +460,7 @@ namespace Urho.Gui
 		internal static extern bool ListView_IsSelected (IntPtr handle, uint index);
 
 		/// <summary>
-		/// Return whether an item at index is seleccted.
+		/// Return whether an item at index is selected.
 		/// </summary>
 		public bool IsSelected (uint index)
 		{

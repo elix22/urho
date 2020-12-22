@@ -151,39 +151,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Viewport_SetRenderPath (IntPtr handle, IntPtr path);
+		internal static extern void Viewport_SetRenderPath (IntPtr handle, IntPtr renderPath);
 
 		/// <summary>
 		/// Set rendering path.
 		/// </summary>
-		private void SetRenderPath (RenderPath path)
+		private void SetRenderPath (RenderPath renderPath)
 		{
 			Runtime.ValidateRefCounted (this);
-			Viewport_SetRenderPath (handle, (object)path == null ? IntPtr.Zero : path.Handle);
+			Viewport_SetRenderPath (handle, (object)renderPath == null ? IntPtr.Zero : renderPath.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Viewport_SetStereoMode (IntPtr handle, bool stereo);
-
-		/// <summary>
-		/// Set stereo mode
-		/// </summary>
-		public void SetStereoMode (bool stereo)
-		{
-			Runtime.ValidateRefCounted (this);
-			Viewport_SetStereoMode (handle, stereo);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Viewport_SetRenderPath2 (IntPtr handle, IntPtr file);
+		internal static extern bool Viewport_SetRenderPath2 (IntPtr handle, IntPtr file);
 
 		/// <summary>
 		/// Set rendering path from an XML file.
 		/// </summary>
-		public void SetRenderPath (Urho.Resources.XmlFile file)
+		public bool SetRenderPath (Urho.Resources.XmlFile file)
 		{
 			Runtime.ValidateRefCounted (this);
-			Viewport_SetRenderPath2 (handle, (object)file == null ? IntPtr.Zero : file.Handle);
+			return Viewport_SetRenderPath2 (handle, (object)file == null ? IntPtr.Zero : file.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -286,7 +274,7 @@ namespace Urho
 		internal static extern IntPtr Viewport_GetCullCamera (IntPtr handle);
 
 		/// <summary>
-		/// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+		/// Return the culling camera. If null, the viewport camera will be used for culling (normal case).
 		/// </summary>
 		private Camera GetCullCamera ()
 		{
@@ -438,7 +426,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return the culling camera. If null, the viewport camera will be used for culling (normal case.)
+		/// Return the culling camera. If null, the viewport camera will be used for culling (normal case).
 		/// Or
 		/// Set separate camera to use for culling. Sharing a culling camera between several viewports allows to prepare the view only once, saving in CPU use. The culling camera's frustum should cover all the viewport cameras' frusta or else objects may be missing from the rendered view.
 		/// </summary>

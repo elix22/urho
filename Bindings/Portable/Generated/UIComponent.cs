@@ -138,6 +138,18 @@ namespace Urho
 			return Runtime.LookupObject<Texture2D> (UIComponent_GetTexture (handle));
 		}
 
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void UIComponent_SetViewportIndex (IntPtr handle, uint index);
+
+		/// <summary>
+		/// Set index of viewport to be used for screen coordinate translation.
+		/// </summary>
+		public void SetViewportIndex (uint index)
+		{
+			Runtime.ValidateRefCounted (this);
+			UIComponent_SetViewportIndex (handle, index);
+		}
+
 		public override StringHash Type {
 			get {
 				return UrhoGetType ();

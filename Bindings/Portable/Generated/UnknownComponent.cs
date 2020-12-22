@@ -91,39 +91,39 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool UnknownComponent_Load_File (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool UnknownComponent_Load_File (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from binary data. Return true if successful.
 		/// </summary>
-		public override bool Load (File source, bool setInstanceDefault = false)
+		public override bool Load (File source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return UnknownComponent_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return UnknownComponent_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool UnknownComponent_Load_MemoryBuffer (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool UnknownComponent_Load_MemoryBuffer (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from binary data. Return true if successful.
 		/// </summary>
-		public override bool Load (MemoryBuffer source, bool setInstanceDefault = false)
+		public override bool Load (MemoryBuffer source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return UnknownComponent_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return UnknownComponent_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool UnknownComponent_LoadXML (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool UnknownComponent_LoadXML (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from XML data. Return true if successful.
 		/// </summary>
-		public override bool LoadXml (XmlElement source, bool setInstanceDefault = false)
+		public override bool LoadXml (XmlElement source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return UnknownComponent_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return UnknownComponent_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

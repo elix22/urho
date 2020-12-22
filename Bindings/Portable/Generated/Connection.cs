@@ -218,6 +218,18 @@ namespace Urho.Network
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Connection_Ban (IntPtr handle);
+
+		/// <summary>
+		/// Ban this connections IP address.
+		/// </summary>
+		public void Ban ()
+		{
+			Runtime.ValidateRefCounted (this);
+			Connection_Ban (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr Connection_GetScene (IntPtr handle);
 
 		/// <summary>
@@ -362,12 +374,12 @@ namespace Urho.Network
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern float Connection_GetLastHeardTime (IntPtr handle);
+		internal static extern uint Connection_GetLastHeardTime (IntPtr handle);
 
 		/// <summary>
 		/// Return the time since last received data from the remote host in milliseconds.
 		/// </summary>
-		private float GetLastHeardTime ()
+		private uint GetLastHeardTime ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Connection_GetLastHeardTime (handle);
@@ -398,24 +410,24 @@ namespace Urho.Network
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern float Connection_GetPacketsInPerSec (IntPtr handle);
+		internal static extern int Connection_GetPacketsInPerSec (IntPtr handle);
 
 		/// <summary>
 		/// Return packets received per second.
 		/// </summary>
-		private float GetPacketsInPerSec ()
+		private int GetPacketsInPerSec ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Connection_GetPacketsInPerSec (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern float Connection_GetPacketsOutPerSec (IntPtr handle);
+		internal static extern int Connection_GetPacketsOutPerSec (IntPtr handle);
 
 		/// <summary>
 		/// Return packets sent per second.
 		/// </summary>
-		private float GetPacketsOutPerSec ()
+		private int GetPacketsOutPerSec ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Connection_GetPacketsOutPerSec (handle);
@@ -654,7 +666,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return the time since last received data from the remote host in milliseconds.
 		/// </summary>
-		public float LastHeardTime {
+		public uint LastHeardTime {
 			get {
 				return GetLastHeardTime ();
 			}
@@ -681,7 +693,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return packets received per second.
 		/// </summary>
-		public float PacketsInPerSec {
+		public int PacketsInPerSec {
 			get {
 				return GetPacketsInPerSec ();
 			}
@@ -690,7 +702,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return packets sent per second.
 		/// </summary>
-		public float PacketsOutPerSec {
+		public int PacketsOutPerSec {
 			get {
 				return GetPacketsOutPerSec ();
 			}

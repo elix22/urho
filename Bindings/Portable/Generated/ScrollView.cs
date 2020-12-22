@@ -127,30 +127,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void ScrollView_OnWheel (IntPtr handle, int delta, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to mouse wheel.
-		/// </summary>
-		public override void OnWheel (int delta, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			ScrollView_OnWheel (handle, delta, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void ScrollView_OnKey (IntPtr handle, int key, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to a key press.
-		/// </summary>
-		public override void OnKey (int key, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			ScrollView_OnKey (handle, key, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void ScrollView_OnResize (IntPtr handle, ref Urho.IntVector2 newSize, ref Urho.IntVector2 delta);
 
 		/// <summary>
@@ -298,7 +274,7 @@ namespace Urho.Gui
 		internal static extern void ScrollView_SetScrollSnapEpsilon (IntPtr handle, float snap);
 
 		/// <summary>
-		/// Set scroll snap epsilon
+		/// Set scroll snap epsilon.
 		/// </summary>
 		private void SetScrollSnapEpsilon (float snap)
 		{
@@ -466,7 +442,7 @@ namespace Urho.Gui
 		internal static extern float ScrollView_GetScrollSnapEpsilon (IntPtr handle);
 
 		/// <summary>
-		/// Return scroll snap epsilon
+		/// Return scroll snap epsilon.
 		/// </summary>
 		private float GetScrollSnapEpsilon ()
 		{
@@ -657,9 +633,9 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
-		/// Return scroll snap epsilon
+		/// Return scroll snap epsilon.
 		/// Or
-		/// Set scroll snap epsilon
+		/// Set scroll snap epsilon.
 		/// </summary>
 		public float ScrollSnapEpsilon {
 			get {

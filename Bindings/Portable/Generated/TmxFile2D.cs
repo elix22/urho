@@ -175,24 +175,24 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr TmxFile2D_GetTileSprite (IntPtr handle, int gid);
+		internal static extern IntPtr TmxFile2D_GetTileSprite (IntPtr handle, uint gid);
 
 		/// <summary>
 		/// Return tile sprite by gid, if not exist return 0.
 		/// </summary>
-		public Sprite2D GetTileSprite (int gid)
+		public Sprite2D GetTileSprite (uint gid)
 		{
 			Runtime.ValidateRefCounted (this);
 			return Runtime.LookupObject<Sprite2D> (TmxFile2D_GetTileSprite (handle, gid));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr TmxFile2D_GetTilePropertySet (IntPtr handle, int gid);
+		internal static extern IntPtr TmxFile2D_GetTilePropertySet (IntPtr handle, uint gid);
 
 		/// <summary>
 		/// Return tile property set by gid, if not exist return 0.
 		/// </summary>
-		public PropertySet2D GetTilePropertySet (int gid)
+		public PropertySet2D GetTilePropertySet (uint gid)
 		{
 			Runtime.ValidateRefCounted (this);
 			return Runtime.LookupRefCounted<PropertySet2D> (TmxFile2D_GetTilePropertySet (handle, gid));
@@ -220,6 +220,30 @@ namespace Urho.Urho2D
 		{
 			Runtime.ValidateRefCounted (this);
 			return Runtime.LookupRefCounted<TmxLayer2D> (TmxFile2D_GetLayer (handle, index));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void TmxFile2D_SetSpriteTextureEdgeOffset (IntPtr handle, float offset);
+
+		/// <summary>
+		/// Set texture edge offset for all sprites, in pixels.
+		/// </summary>
+		private void SetSpriteTextureEdgeOffset (float offset)
+		{
+			Runtime.ValidateRefCounted (this);
+			TmxFile2D_SetSpriteTextureEdgeOffset (handle, offset);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float TmxFile2D_GetSpriteTextureEdgeOffset (IntPtr handle);
+
+		/// <summary>
+		/// Return texture edge offset, in pixels.
+		/// </summary>
+		private float GetSpriteTextureEdgeOffset ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return TmxFile2D_GetSpriteTextureEdgeOffset (handle);
 		}
 
 		public override StringHash Type {
@@ -262,6 +286,20 @@ namespace Urho.Urho2D
 		public uint NumLayers {
 			get {
 				return GetNumLayers ();
+			}
+		}
+
+		/// <summary>
+		/// Return texture edge offset, in pixels.
+		/// Or
+		/// Set texture edge offset for all sprites, in pixels.
+		/// </summary>
+		public float SpriteTextureEdgeOffset {
+			get {
+				return GetSpriteTextureEdgeOffset ();
+			}
+			set {
+				SetSpriteTextureEdgeOffset (value);
 			}
 		}
 	}

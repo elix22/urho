@@ -103,18 +103,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Window_OnHover (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse hover.
-		/// </summary>
-		public override void OnHover (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			Window_OnHover (handle, ref position, ref screenPosition, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Window_SetMovable (IntPtr handle, bool enable);
 
 		/// <summary>

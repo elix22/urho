@@ -79,27 +79,27 @@ namespace Urho.Navigation
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr Obstacle_Obstacle (IntPtr param1);
+		internal static extern IntPtr Obstacle_Obstacle (IntPtr context);
 
 		[Preserve]
-		public Obstacle (Context param1) : base (UrhoObjectFlag.Empty)
+		public Obstacle (Context context) : base (UrhoObjectFlag.Empty)
 		{
 			Runtime.Validate (typeof(Obstacle));
-			handle = Obstacle_Obstacle ((object)param1 == null ? IntPtr.Zero : param1.Handle);
+			handle = Obstacle_Obstacle ((object)context == null ? IntPtr.Zero : context.Handle);
 			Runtime.RegisterObject (this);
 			OnObstacleCreated ();
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Obstacle_RegisterObject (IntPtr param1);
+		internal static extern void Obstacle_RegisterObject (IntPtr context);
 
 		/// <summary>
 		/// Register Obstacle with engine context.
 		/// </summary>
-		public new static void RegisterObject (Context param1)
+		public new static void RegisterObject (Context context)
 		{
 			Runtime.Validate (typeof(Obstacle));
-			Obstacle_RegisterObject ((object)param1 == null ? IntPtr.Zero : param1.Handle);
+			Obstacle_RegisterObject ((object)context == null ? IntPtr.Zero : context.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

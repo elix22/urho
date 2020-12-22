@@ -266,6 +266,7 @@ namespace Urho.Samples
 			var renderer = Renderer;
 			switch (e.Key)
 			{
+				/* TBD ELI
 				case Key.N1:
 					var quality = renderer.TextureQuality;
 					++quality;
@@ -281,7 +282,7 @@ namespace Urho.Samples
 						mquality = 0;
 					renderer.MaterialQuality = mquality;
 					break;
-
+				*/
 				case Key.N3:
 					renderer.SpecularLighting = !renderer.SpecularLighting;
 					break;

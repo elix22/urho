@@ -208,7 +208,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_0 (IntPtr handle, int key, ref Vector3 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Vector3 value)
 		{
@@ -220,7 +220,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_1 (IntPtr handle, int key, ref IntRect value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, IntRect value)
 		{
@@ -232,7 +232,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_2 (IntPtr handle, int key, ref Color value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Color value)
 		{
@@ -244,7 +244,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_3 (IntPtr handle, int key, ref Vector2 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Vector2 value)
 		{
@@ -256,7 +256,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_4 (IntPtr handle, int key, ref Vector4 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Vector4 value)
 		{
@@ -268,7 +268,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_5 (IntPtr handle, int key, ref IntVector2 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, IntVector2 value)
 		{
@@ -280,7 +280,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_6 (IntPtr handle, int key, ref Quaternion value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Quaternion value)
 		{
@@ -292,7 +292,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_7 (IntPtr handle, int key, ref Matrix4 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Matrix4 value)
 		{
@@ -304,7 +304,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_8 (IntPtr handle, int key, ref Matrix3x4 value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, Matrix3x4 value)
 		{
@@ -316,7 +316,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_9 (IntPtr handle, int key, int value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, int value)
 		{
@@ -328,7 +328,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_10 (IntPtr handle, int key, float value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, float value)
 		{
@@ -340,7 +340,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_11 (IntPtr handle, int key, string value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, string value)
 		{
@@ -352,7 +352,7 @@ namespace Urho
 		internal static extern void UrhoObject_SetGlobalVar_12 (IntPtr handle, int key, bool value);
 
 		/// <summary>
-		/// Set global variable with the respective key and value
+		/// Set global variable with the respective key and value.
 		/// </summary>
 		public void SetGlobalVar (StringHash key, bool value)
 		{

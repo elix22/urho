@@ -379,15 +379,15 @@ namespace Urho.Navigation
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern BoundingBox NavigationMesh_GetTileBoudningBox (IntPtr handle, ref Urho.IntVector2 tile);
+		internal static extern BoundingBox NavigationMesh_GetTileBoundingBox (IntPtr handle, ref Urho.IntVector2 tile);
 
 		/// <summary>
 		/// Return bounding box of the tile in the node space.
 		/// </summary>
-		public BoundingBox GetTileBoudningBox (Urho.IntVector2 tile)
+		public BoundingBox GetTileBoundingBox (Urho.IntVector2 tile)
 		{
 			Runtime.ValidateRefCounted (this);
-			return NavigationMesh_GetTileBoudningBox (handle, ref tile);
+			return NavigationMesh_GetTileBoundingBox (handle, ref tile);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -682,7 +682,7 @@ namespace Urho.Navigation
 		internal static extern float NavigationMesh_GetAreaCost (IntPtr handle, uint areaID);
 
 		/// <summary>
-		/// Get the current cost of an area
+		/// Get the current cost of an area.
 		/// </summary>
 		public float GetAreaCost (uint areaID)
 		{
@@ -739,15 +739,15 @@ namespace Urho.Navigation
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void NavigationMesh_SetPartitionType (IntPtr handle, NavmeshPartitionType aType);
+		internal static extern void NavigationMesh_SetPartitionType (IntPtr handle, NavmeshPartitionType partitionType);
 
 		/// <summary>
 		/// Set the partition type used for polygon generation.
 		/// </summary>
-		private void SetPartitionType (NavmeshPartitionType aType)
+		private void SetPartitionType (NavmeshPartitionType partitionType)
 		{
 			Runtime.ValidateRefCounted (this);
-			NavigationMesh_SetPartitionType (handle, aType);
+			NavigationMesh_SetPartitionType (handle, partitionType);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

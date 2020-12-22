@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -140,7 +140,7 @@ WINRT_CreateDevice(int devindex)
     /* Set the function pointers */
     device->VideoInit = WINRT_VideoInit;
     device->VideoQuit = WINRT_VideoQuit;
-    device->CreateWindow = WINRT_CreateWindow;
+    device->CreateSDLWindow = WINRT_CreateWindow;
     device->SetWindowSize = WINRT_SetWindowSize;
     device->SetWindowFullscreen = WINRT_SetWindowFullscreen;
     device->DestroyWindow = WINRT_DestroyWindow;
@@ -621,7 +621,7 @@ WINRT_CreateWindow(_THIS, SDL_Window * window)
                 _this->egl_data->egl_config,
                 cpp_winrtEglWindow, NULL);
             if (data->egl_surface == NULL) {
-                return SDL_SetError("eglCreateWindowSurface failed");
+                return SDL_EGL_SetError("unable to create EGL native-window surface", "eglCreateWindowSurface");
             }
         } else if (data->coreWindow.Get() != nullptr) {
             /* Attempt to create a window surface using newer versions of
@@ -634,7 +634,7 @@ WINRT_CreateWindow(_THIS, SDL_Window * window)
                 coreWindowAsIInspectable,
                 NULL);
             if (data->egl_surface == NULL) {
-                return SDL_SetError("eglCreateWindowSurface failed");
+                return SDL_EGL_SetError("unable to create EGL native-window surface", "eglCreateWindowSurface");
             }
         } else {
             return SDL_SetError("No supported means to create an EGL window surface are available");
@@ -680,7 +680,7 @@ WINRT_CreateWindow(_THIS, SDL_Window * window)
         if (!(requestedFlags & SDL_WINDOW_FULLSCREEN)) {
             const Windows::Foundation::Size size(WINRT_PHYSICAL_PIXELS_TO_DIPS(window->w),
                                                  WINRT_PHYSICAL_PIXELS_TO_DIPS(window->h));
-            //didSetSize = data->appView->TryResizeView(size);
+            didSetSize = data->appView->TryResizeView(size);
         }
         if (!didSetSize) {
             /* We either weren't able to set the window size, or a request for
@@ -719,7 +719,7 @@ WINRT_SetWindowSize(_THIS, SDL_Window * window)
     SDL_WindowData * data = (SDL_WindowData *)window->driverdata;
     const Windows::Foundation::Size size(WINRT_PHYSICAL_PIXELS_TO_DIPS(window->w),
                                          WINRT_PHYSICAL_PIXELS_TO_DIPS(window->h));
-    //data->appView->TryResizeView(size); // TODO, WinRT: return failure (to caller?) from TryResizeView()
+    data->appView->TryResizeView(size); // TODO, WinRT: return failure (to caller?) from TryResizeView()
 #endif
 }
 
@@ -771,7 +771,7 @@ WINRT_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
         info->info.winrt.window = reinterpret_cast<IInspectable *>(data->coreWindow.Get());
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d\n",
+        SDL_SetError("Application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }

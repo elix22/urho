@@ -218,15 +218,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Rect Frustum_Projected (IntPtr handle, ref Urho.Matrix4 transform);
+		internal static extern Rect Frustum_Projected (IntPtr handle, ref Urho.Matrix4 projection);
 
 		/// <summary>
 		/// Return projected by a 4x4 projection matrix.
 		/// </summary>
-		public Rect Projected (Urho.Matrix4 transform)
+		public Rect Projected (Urho.Matrix4 projection)
 		{
 			Runtime.ValidateObject (this);
-			return Frustum_Projected (handle, ref transform);
+			return Frustum_Projected (handle, ref projection);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

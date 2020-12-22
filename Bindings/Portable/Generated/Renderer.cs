@@ -127,27 +127,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Renderer_SetDefaultRenderPath0 (IntPtr handle, IntPtr file);
+		internal static extern void Renderer_SetDefaultRenderPath0 (IntPtr handle, IntPtr xmlFile);
 
 		/// <summary>
 		/// Set default renderpath from an XML file.
 		/// </summary>
-		public void SetDefaultRenderPath (Urho.Resources.XmlFile file)
+		public void SetDefaultRenderPath (Urho.Resources.XmlFile xmlFile)
 		{
 			Runtime.ValidateRefCounted (this);
-			Renderer_SetDefaultRenderPath0 (handle, (object)file == null ? IntPtr.Zero : file.Handle);
+			Renderer_SetDefaultRenderPath0 (handle, (object)xmlFile == null ? IntPtr.Zero : xmlFile.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Renderer_SetDefaultTechnique (IntPtr handle, IntPtr tech);
+		internal static extern void Renderer_SetDefaultTechnique (IntPtr handle, IntPtr technique);
 
 		/// <summary>
 		/// Set default non-textured material technique.
 		/// </summary>
-		private void SetDefaultTechnique (Technique tech)
+		private void SetDefaultTechnique (Technique technique)
 		{
 			Runtime.ValidateRefCounted (this);
-			Renderer_SetDefaultTechnique (handle, (object)tech == null ? IntPtr.Zero : tech.Handle);
+			Renderer_SetDefaultTechnique (handle, (object)technique == null ? IntPtr.Zero : technique.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -199,24 +199,24 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Renderer_SetTextureQuality (IntPtr handle, int quality);
+		internal static extern void Renderer_SetTextureQuality (IntPtr handle, MaterialQuality quality);
 
 		/// <summary>
 		/// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
 		/// </summary>
-		private void SetTextureQuality (int quality)
+		private void SetTextureQuality (MaterialQuality quality)
 		{
 			Runtime.ValidateRefCounted (this);
 			Renderer_SetTextureQuality (handle, quality);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Renderer_SetMaterialQuality (IntPtr handle, int quality);
+		internal static extern void Renderer_SetMaterialQuality (IntPtr handle, MaterialQuality quality);
 
 		/// <summary>
 		/// Set material quality level. See the QUALITY constants in GraphicsDefs.h.
 		/// </summary>
-		private void SetMaterialQuality (int quality)
+		private void SetMaterialQuality (MaterialQuality quality)
 		{
 			Runtime.ValidateRefCounted (this);
 			Renderer_SetMaterialQuality (handle, quality);
@@ -274,7 +274,7 @@ namespace Urho
 		internal static extern void Renderer_SetVSMShadowParameters (IntPtr handle, float minVariance, float lightBleedingReduction);
 
 		/// <summary>
-		/// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+		/// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1].
 		/// </summary>
 		public void SetVSMShadowParameters (float minVariance, float lightBleedingReduction)
 		{
@@ -286,7 +286,7 @@ namespace Urho
 		internal static extern void Renderer_SetVSMMultiSample (IntPtr handle, int multiSample);
 
 		/// <summary>
-		/// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+		/// Set VSM shadow map multisampling level. Default 1 (no multisampling).
 		/// </summary>
 		private void SetVSMMultiSample (int multiSample)
 		{
@@ -418,7 +418,7 @@ namespace Urho
 		internal static extern void Renderer_SetMobileShadowBiasMul (IntPtr handle, float mul);
 
 		/// <summary>
-		/// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+		/// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
 		/// </summary>
 		private void SetMobileShadowBiasMul (float mul)
 		{
@@ -430,7 +430,7 @@ namespace Urho
 		internal static extern void Renderer_SetMobileShadowBiasAdd (IntPtr handle, float add);
 
 		/// <summary>
-		/// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect.)
+		/// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect).
 		/// </summary>
 		private void SetMobileShadowBiasAdd (float add)
 		{
@@ -442,7 +442,7 @@ namespace Urho
 		internal static extern void Renderer_SetMobileNormalOffsetMul (IntPtr handle, float mul);
 
 		/// <summary>
-		/// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+		/// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
 		/// </summary>
 		private void SetMobileNormalOffsetMul (float mul)
 		{
@@ -595,24 +595,24 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Renderer_GetTextureQuality (IntPtr handle);
+		internal static extern MaterialQuality Renderer_GetTextureQuality (IntPtr handle);
 
 		/// <summary>
 		/// Return texture quality level.
 		/// </summary>
-		private int GetTextureQuality ()
+		private MaterialQuality GetTextureQuality ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Renderer_GetTextureQuality (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Renderer_GetMaterialQuality (IntPtr handle);
+		internal static extern MaterialQuality Renderer_GetMaterialQuality (IntPtr handle);
 
 		/// <summary>
 		/// Return material quality level.
 		/// </summary>
-		private int GetMaterialQuality ()
+		private MaterialQuality GetMaterialQuality ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return Renderer_GetMaterialQuality (handle);
@@ -994,7 +994,7 @@ namespace Urho
 		internal static extern IntPtr Renderer_GetInstancingBuffer (IntPtr handle);
 
 		/// <summary>
-		/// Return the instancing vertex buffer
+		/// Return the instancing vertex buffer.
 		/// </summary>
 		private VertexBuffer GetInstancingBuffer ()
 		{
@@ -1147,27 +1147,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Renderer_StorePreparedView (IntPtr handle, IntPtr view, IntPtr cullCamera);
+		internal static extern void Renderer_StorePreparedView (IntPtr handle, IntPtr view, IntPtr camera);
 
 		/// <summary>
 		/// Mark a view as prepared by the specified culling camera.
 		/// </summary>
-		public void StorePreparedView (View view, Camera cullCamera)
+		public void StorePreparedView (View view, Camera camera)
 		{
 			Runtime.ValidateRefCounted (this);
-			Renderer_StorePreparedView (handle, (object)view == null ? IntPtr.Zero : view.Handle, (object)cullCamera == null ? IntPtr.Zero : cullCamera.Handle);
+			Renderer_StorePreparedView (handle, (object)view == null ? IntPtr.Zero : view.Handle, (object)camera == null ? IntPtr.Zero : camera.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr Renderer_GetPreparedView (IntPtr handle, IntPtr cullCamera);
+		internal static extern IntPtr Renderer_GetPreparedView (IntPtr handle, IntPtr camera);
 
 		/// <summary>
 		/// Return a prepared view if exists for the specified camera. Used to avoid duplicate view preparation CPU work.
 		/// </summary>
-		public View GetPreparedView (Camera cullCamera)
+		public View GetPreparedView (Camera camera)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupObject<View> (Renderer_GetPreparedView (handle, (object)cullCamera == null ? IntPtr.Zero : cullCamera.Handle));
+			return Runtime.LookupObject<View> (Renderer_GetPreparedView (handle, (object)camera == null ? IntPtr.Zero : camera.Handle));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -1358,7 +1358,7 @@ namespace Urho
 		/// Or
 		/// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
 		/// </summary>
-		public int TextureQuality {
+		public MaterialQuality TextureQuality {
 			get {
 				return GetTextureQuality ();
 			}
@@ -1372,7 +1372,7 @@ namespace Urho
 		/// Or
 		/// Set material quality level. See the QUALITY constants in GraphicsDefs.h.
 		/// </summary>
-		public int MaterialQuality {
+		public MaterialQuality MaterialQuality {
 			get {
 				return GetMaterialQuality ();
 			}
@@ -1440,7 +1440,7 @@ namespace Urho
 		/// <summary>
 		/// Return VSM shadow multisample level.
 		/// Or
-		/// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+		/// Set VSM shadow map multisampling level. Default 1 (no multisampling).
 		/// </summary>
 		public int VSMMultiSample {
 			get {
@@ -1594,7 +1594,7 @@ namespace Urho
 		/// <summary>
 		/// Return shadow depth bias multiplier for mobile platforms.
 		/// Or
-		/// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+		/// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
 		/// </summary>
 		public float MobileShadowBiasMul {
 			get {
@@ -1608,7 +1608,7 @@ namespace Urho
 		/// <summary>
 		/// Return shadow depth bias addition for mobile platforms.
 		/// Or
-		/// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect.)
+		/// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect).
 		/// </summary>
 		public float MobileShadowBiasAdd {
 			get {
@@ -1622,7 +1622,7 @@ namespace Urho
 		/// <summary>
 		/// Return shadow normal offset multiplier for mobile platforms.
 		/// Or
-		/// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+		/// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
 		/// </summary>
 		public float MobileNormalOffsetMul {
 			get {
@@ -1724,7 +1724,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return the instancing vertex buffer
+		/// Return the instancing vertex buffer.
 		/// </summary>
 		public VertexBuffer InstancingBuffer {
 			get {

@@ -130,7 +130,7 @@ namespace Urho
 		internal static extern void Zone_SetAmbientColor (IntPtr handle, ref Urho.Color color);
 
 		/// <summary>
-		/// Set ambient color
+		/// Set ambient color.
 		/// </summary>
 		private void SetAmbientColor (Urho.Color color)
 		{
@@ -478,7 +478,7 @@ namespace Urho
 		/// <summary>
 		/// Return zone's own ambient color, disregarding gradient mode.
 		/// Or
-		/// Set ambient color
+		/// Set ambient color.
 		/// </summary>
 		public Urho.Color AmbientColor {
 			get {

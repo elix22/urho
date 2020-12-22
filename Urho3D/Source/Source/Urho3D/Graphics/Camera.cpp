@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,6 @@ Camera::Camera(Context* context) :
     orthoSize_(DEFAULT_ORTHOSIZE),
     aspectRatio_(1.0f),
     zoom_(1.0f),
-	skew_(0.0f),
     lodBias_(1.0f),
     viewMask_(DEFAULT_VIEWMASK),
     viewOverrideFlags_(VO_NONE),
@@ -79,9 +78,7 @@ Camera::Camera(Context* context) :
     reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 void Camera::RegisterObject(Context* context)
 {
@@ -99,7 +96,7 @@ void Camera::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Zoom", GetZoom, SetZoom, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Override Flags", int, viewOverrideFlags_, VO_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Override Flags", unsigned, viewOverrideFlags_.AsInteger(), VO_NONE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Projection Offset", GetProjectionOffset, SetProjectionOffset, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Reflection Plane", GetReflectionPlaneAttr, SetReflectionPlaneAttr, Vector4,
         Vector4(0.0f, 1.0f, 0.0f, 0.0f), AM_DEFAULT);
@@ -133,14 +130,6 @@ void Camera::SetFarClip(float farClip)
 void Camera::SetFov(float fov)
 {
     fov_ = Clamp(fov, 0.0f, M_MAX_FOV);
-    frustumDirty_ = true;
-    projectionDirty_ = true;
-    MarkNetworkUpdate();
-}
-
-void Camera::SetSkew(float skew)
-{
-    skew_ = skew;
     frustumDirty_ = true;
     projectionDirty_ = true;
     MarkNetworkUpdate();
@@ -191,7 +180,7 @@ void Camera::SetViewMask(unsigned mask)
     MarkNetworkUpdate();
 }
 
-void Camera::SetViewOverrideFlags(unsigned flags)
+void Camera::SetViewOverrideFlags(ViewOverrideFlags flags)
 {
     viewOverrideFlags_ = flags;
     MarkNetworkUpdate();
@@ -669,7 +658,6 @@ void Camera::UpdateProjection() const
         float r = -q * nearClip_;
 
         projection_.m00_ = w;
-        projection_.m01_ = skew_;
         projection_.m02_ = projectionOffset_.x_ * 2.0f;
         projection_.m11_ = h;
         projection_.m12_ = projectionOffset_.y_ * 2.0f;

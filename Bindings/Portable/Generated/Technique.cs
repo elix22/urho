@@ -139,27 +139,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr Technique_CreatePass (IntPtr handle, string passName);
+		internal static extern IntPtr Technique_CreatePass (IntPtr handle, string name);
 
 		/// <summary>
 		/// Create a new pass.
 		/// </summary>
-		public Pass CreatePass (string passName)
+		public Pass CreatePass (string name)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupRefCounted<Pass> (Technique_CreatePass (handle, passName));
+			return Runtime.LookupRefCounted<Pass> (Technique_CreatePass (handle, name));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Technique_RemovePass (IntPtr handle, string passName);
+		internal static extern void Technique_RemovePass (IntPtr handle, string name);
 
 		/// <summary>
 		/// Remove a pass.
 		/// </summary>
-		public void RemovePass (string passName)
+		public void RemovePass (string name)
 		{
 			Runtime.ValidateRefCounted (this);
-			Technique_RemovePass (handle, passName);
+			Technique_RemovePass (handle, name);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -223,15 +223,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Technique_HasPass0 (IntPtr handle, string passName);
+		internal static extern bool Technique_HasPass0 (IntPtr handle, string name);
 
 		/// <summary>
 		/// Return whether has a pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
 		/// </summary>
-		public bool HasPass (string passName)
+		public bool HasPass (string name)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Technique_HasPass0 (handle, passName);
+			return Technique_HasPass0 (handle, name);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -247,15 +247,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr Technique_GetPass1 (IntPtr handle, string passName);
+		internal static extern IntPtr Technique_GetPass1 (IntPtr handle, string name);
 
 		/// <summary>
 		/// Return a pass by name, or null if not found. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
 		/// </summary>
-		public Pass GetPass (string passName)
+		public Pass GetPass (string name)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupRefCounted<Pass> (Technique_GetPass1 (handle, passName));
+			return Runtime.LookupRefCounted<Pass> (Technique_GetPass1 (handle, name));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -271,15 +271,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr Technique_GetSupportedPass2 (IntPtr handle, string passName);
+		internal static extern IntPtr Technique_GetSupportedPass2 (IntPtr handle, string name);
 
 		/// <summary>
 		/// Return a supported pass by name. This overload should not be called in time-critical rendering loops; use a pre-acquired pass index instead.
 		/// </summary>
-		public Pass GetSupportedPass (string passName)
+		public Pass GetSupportedPass (string name)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupRefCounted<Pass> (Technique_GetSupportedPass2 (handle, passName));
+			return Runtime.LookupRefCounted<Pass> (Technique_GetSupportedPass2 (handle, name));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

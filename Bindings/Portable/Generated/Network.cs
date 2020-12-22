@@ -91,6 +91,42 @@ namespace Urho.Network
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Network_DiscoverHosts (IntPtr handle, uint port);
+
+		/// <summary>
+		/// Scan the LAN/subnet for available hosts.
+		/// </summary>
+		public void DiscoverHosts (uint port)
+		{
+			Runtime.ValidateRefCounted (this);
+			Network_DiscoverHosts (handle, port);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Network_SetPassword (IntPtr handle, string password);
+
+		/// <summary>
+		/// Set password for the client/server communcation.
+		/// </summary>
+		public void SetPassword (string password)
+		{
+			Runtime.ValidateRefCounted (this);
+			Network_SetPassword (handle, password);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Network_SetNATServerInfo (IntPtr handle, string address, ushort port);
+
+		/// <summary>
+		/// Set NAT server information.
+		/// </summary>
+		public void SetNATServerInfo (string address, ushort port)
+		{
+			Runtime.ValidateRefCounted (this);
+			Network_SetNATServerInfo (handle, address, port);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Network_Disconnect (IntPtr handle, int waitMSec);
 
 		/// <summary>
@@ -103,15 +139,15 @@ namespace Urho.Network
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Network_StartServer (IntPtr handle, ushort port);
+		internal static extern bool Network_StartServer (IntPtr handle, ushort port, uint maxConnections);
 
 		/// <summary>
 		/// Start a server on a port using UDP protocol. Return true if successful.
 		/// </summary>
-		public bool StartServer (ushort port)
+		public bool StartServer (ushort port, uint maxConnections = 128)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Network_StartServer (handle, port);
+			return Network_StartServer (handle, port, maxConnections);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -124,6 +160,30 @@ namespace Urho.Network
 		{
 			Runtime.ValidateRefCounted (this);
 			Network_StopServer (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Network_StartNATClient (IntPtr handle);
+
+		/// <summary>
+		/// Start NAT punchtrough client to allow remote connections.
+		/// </summary>
+		public void StartNATClient ()
+		{
+			Runtime.ValidateRefCounted (this);
+			Network_StartNATClient (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Network_GetGUID (IntPtr handle);
+
+		/// <summary>
+		/// Get local server GUID.
+		/// </summary>
+		private string GetGUID ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Marshal.PtrToStringAnsi (Network_GetGUID (handle));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -232,6 +292,18 @@ namespace Urho.Network
 		{
 			Runtime.ValidateRefCounted (this);
 			Network_SendPackageToClients (handle, (object)scene == null ? IntPtr.Zero : scene.Handle, (object)package == null ? IntPtr.Zero : package.Handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Network_BanAddress (IntPtr handle, string address);
+
+		/// <summary>
+		/// Ban specific IP addresses.
+		/// </summary>
+		public void BanAddress (string address)
+		{
+			Runtime.ValidateRefCounted (this);
+			Network_BanAddress (handle, address);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -364,6 +436,15 @@ namespace Urho.Network
 		public static string TypeNameStatic {
 			get {
 				return GetTypeNameStatic ();
+			}
+		}
+
+		/// <summary>
+		/// Get local server GUID.
+		/// </summary>
+		public string GUID {
+			get {
+				return GetGUID ();
 			}
 		}
 

@@ -77,6 +77,7 @@ namespace Urho
 
 		Application(Context context, ApplicationOptions options = null) : base(UrhoObjectFlag.Empty)
 		{
+
 			//Workbooks specific:
 			CancelActiveActionsOnStop = this is SimpleApplication;
 			if (context == null)
@@ -250,7 +251,7 @@ namespace Urho
 			Org.Libsdl.App.SDLActivity.OnDestroy();
 			return;
 #endif
-			Current.Input.Enabled = false;
+			// TBD ELI , removed Current.Input.Enabled = false;
 			isExiting = true;
 #if __IOS__
 			iOS.UrhoSurface.StopRendering(current);

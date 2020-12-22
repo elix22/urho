@@ -223,15 +223,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr StaticModel_GetMaterial (IntPtr handle, uint index);
+		internal static extern IntPtr StaticModel_GetMaterial (IntPtr handle);
+
+		/// <summary>
+		/// Return material from the first geometry, assuming all the geometries use the same material.
+		/// </summary>
+		private Material GetMaterial ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Runtime.LookupObject<Material> (StaticModel_GetMaterial (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr StaticModel_GetMaterial1 (IntPtr handle, uint index);
 
 		/// <summary>
 		/// Return material by geometry index.
 		/// </summary>
-		public Material GetMaterial (uint index = 0)
+		public Material GetMaterial (uint index)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupObject<Material> (StaticModel_GetMaterial (handle, index));
+			return Runtime.LookupObject<Material> (StaticModel_GetMaterial1 (handle, index));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -327,6 +339,20 @@ namespace Urho
 			}
 			set {
 				SetModel (value);
+			}
+		}
+
+		/// <summary>
+		/// Return material from the first geometry, assuming all the geometries use the same material.
+		/// Or
+		/// Set material on all geometries.
+		/// </summary>
+		public Material Material {
+			get {
+				return GetMaterial ();
+			}
+			set {
+				SetMaterial (value);
 			}
 		}
 

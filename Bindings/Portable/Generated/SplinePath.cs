@@ -238,7 +238,7 @@ namespace Urho
 		internal static extern float SplinePath_GetLength (IntPtr handle);
 
 		/// <summary>
-		/// Get the length of SplinePath;
+		/// Get the length of SplinePath.
 		/// </summary>
 		private float GetLength ()
 		{
@@ -419,7 +419,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Get the length of SplinePath;
+		/// Get the length of SplinePath.
 		/// </summary>
 		public float Length {
 			get {

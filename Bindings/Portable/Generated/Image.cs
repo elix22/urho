@@ -655,6 +655,18 @@ namespace Urho.Resources
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Image_GetDecompressedImage (IntPtr handle);
+
+		/// <summary>
+		/// Return decompressed image data in RGBA format.
+		/// </summary>
+		private Image GetDecompressedImage ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Runtime.LookupRefCounted<Image> (Image_GetDecompressedImage (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr Image_GetSubimage (IntPtr handle, ref Urho.IntRect rect);
 
 		/// <summary>
@@ -682,7 +694,7 @@ namespace Urho.Resources
 		internal static extern bool Image_HasAlphaChannel (IntPtr handle);
 
 		/// <summary>
-		/// Whether this texture has an alpha channel
+		/// Whether this texture has an alpha channel.
 		/// </summary>
 		public bool HasAlphaChannel ()
 		{
@@ -853,6 +865,15 @@ namespace Urho.Resources
 		public Image NextSibling {
 			get {
 				return GetNextSibling ();
+			}
+		}
+
+		/// <summary>
+		/// Return decompressed image data in RGBA format.
+		/// </summary>
+		public Image DecompressedImage {
+			get {
+				return GetDecompressedImage ();
 			}
 		}
 	}

@@ -115,15 +115,15 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void RigidBody2D_SetBodyType (IntPtr handle, BodyType2D bodyType);
+		internal static extern void RigidBody2D_SetBodyType (IntPtr handle, BodyType2D type);
 
 		/// <summary>
 		/// Set body type.
 		/// </summary>
-		private void SetBodyType (BodyType2D bodyType)
+		private void SetBodyType (BodyType2D type)
 		{
 			Runtime.ValidateRefCounted (this);
-			RigidBody2D_SetBodyType (handle, bodyType);
+			RigidBody2D_SetBodyType (handle, type);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

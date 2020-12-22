@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,9 @@ class URHO3D_API DebugHud : public Object
 
 public:
     /// Construct.
-    DebugHud(Context* context);
+    explicit DebugHud(Context* context);
     /// Destruct.
-    virtual ~DebugHud() override;
+    ~DebugHud() override;
 
     /// Update. Called by HandlePostUpdate().
     void Update();
@@ -90,7 +90,7 @@ public:
     /// Return maximum profiler block depth.
     unsigned GetProfilerMaxDepth() const { return profilerMaxDepth_; }
 
-    /// Return profiler accumulation interval in seconds
+    /// Return profiler accumulation interval in seconds.
     float GetProfilerInterval() const;
 
     /// Return whether showing 3D geometry primitive/batch count only.

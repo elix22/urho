@@ -103,27 +103,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Scene_Load_File (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Scene_Load_File (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
 		/// </summary>
-		public override bool Load (File source, bool setInstanceDefault = false)
+		public override bool Load (File source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Scene_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Scene_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Scene_Load_MemoryBuffer (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Scene_Load_MemoryBuffer (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
 		/// </summary>
-		public override bool Load (MemoryBuffer source, bool setInstanceDefault = false)
+		public override bool Load (MemoryBuffer source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Scene_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Scene_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -151,15 +151,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Scene_LoadXML (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Scene_LoadXML (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
 		/// </summary>
-		public override bool LoadXml (XmlElement source, bool setInstanceDefault = false)
+		public override bool LoadXml (XmlElement source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Scene_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Scene_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -442,7 +442,7 @@ namespace Urho
 		internal static extern void Scene_SetTimeScale (IntPtr handle, float scale);
 
 		/// <summary>
-		/// Set update time scale. 1.0 = real time (default.)
+		/// Set update time scale. 1.0 = real time (default).
 		/// </summary>
 		private void SetTimeScale (float scale)
 		{
@@ -526,7 +526,7 @@ namespace Urho
 		internal static extern void Scene_RegisterVar (IntPtr handle, string name);
 
 		/// <summary>
-		/// Register a node user variable hash reverse mapping (for editing.)
+		/// Register a node user variable hash reverse mapping (for editing).
 		/// </summary>
 		public void RegisterVar (string name)
 		{
@@ -825,6 +825,18 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool Scene_IsReplicatedID (uint id);
+
+		/// <summary>
+		/// Return whether the specified id is a replicated id.
+		/// </summary>
+		public static bool IsReplicatedID (uint id)
+		{
+			Runtime.Validate (typeof(Scene));
+			return Scene_IsReplicatedID (id);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Scene_NodeTagAdded (IntPtr handle, IntPtr node, string tag);
 
 		/// <summary>
@@ -974,7 +986,7 @@ namespace Urho
 		/// <summary>
 		/// Return update time scale.
 		/// Or
-		/// Set update time scale. 1.0 = real time (default.)
+		/// Set update time scale. 1.0 = real time (default).
 		/// </summary>
 		public float TimeScale {
 			get {

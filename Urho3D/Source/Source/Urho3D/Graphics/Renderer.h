@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+/// \file
 
 #pragma once
 
@@ -178,9 +180,9 @@ public:
     using ShadowMapFilter = void(Object::*)(View* view, Texture2D* shadowMap, float blurScale);
 
     /// Construct.
-    Renderer(Context* context);
+    explicit Renderer(Context* context);
     /// Destruct.
-    virtual ~Renderer() override;
+    ~Renderer() override;
 
     /// Set number of backbuffer viewports to render.
     void SetNumViewports(unsigned num);
@@ -189,9 +191,9 @@ public:
     /// Set default renderpath.
     void SetDefaultRenderPath(RenderPath* renderPath);
     /// Set default renderpath from an XML file.
-    void SetDefaultRenderPath(XMLFile* file);
+    void SetDefaultRenderPath(XMLFile* xmlFile);
     /// Set default non-textured material technique.
-    void SetDefaultTechnique(Technique* tech);
+    void SetDefaultTechnique(Technique* technique);
     /// Set HDR rendering on/off.
     void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
@@ -201,9 +203,9 @@ public:
     /// Set default texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
     /// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
-    void SetTextureQuality(int quality);
+    void SetTextureQuality(MaterialQuality quality);
     /// Set material quality level. See the QUALITY constants in GraphicsDefs.h.
-    void SetMaterialQuality(int quality);
+    void SetMaterialQuality(MaterialQuality quality);
     /// Set shadows on/off.
     void SetDrawShadows(bool enable);
     /// Set shadow map resolution.
@@ -212,11 +214,11 @@ public:
     void SetShadowQuality(ShadowQuality quality);
     /// Set shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
     void SetShadowSoftness(float shadowSoftness);
-    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1].
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
-    /// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+    /// Set VSM shadow map multisampling level. Default 1 (no multisampling).
     void SetVSMMultiSample(int multiSample);
-    /// Set post processing filter to the shadow map
+    /// Set post processing filter to the shadow map.
     void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
@@ -238,11 +240,11 @@ public:
     void SetOccluderSizeThreshold(float screenSize);
     /// Set whether to thread occluder rendering. Default false.
     void SetThreadedOcclusion(bool enable);
-    /// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+    /// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
     void SetMobileShadowBiasMul(float mul);
-    /// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect.)
+    /// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect).
     void SetMobileShadowBiasAdd(float add);
-    /// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
+    /// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect).
     void SetMobileNormalOffsetMul(float mul);
     /// Force reload of shaders.
     void ReloadShaders();
@@ -278,10 +280,10 @@ public:
     TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
 
     /// Return texture quality level.
-    int GetTextureQuality() const { return textureQuality_; }
+    MaterialQuality GetTextureQuality() const { return textureQuality_; }
 
     /// Return material quality level.
-    int GetMaterialQuality() const { return materialQuality_; }
+    MaterialQuality GetMaterialQuality() const { return materialQuality_; }
 
     /// Return shadow map resolution.
     int GetShadowMapSize() const { return shadowMapSize_; }
@@ -373,7 +375,7 @@ public:
     /// Return the shadowed pointlight indirection cube map.
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
 
-    /// Return the instancing vertex buffer
+    /// Return the instancing vertex buffer.
     VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_.Get() : nullptr; }
 
     /// Return the frame update parameters.
@@ -406,9 +408,9 @@ public:
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
     Camera* GetShadowCamera();
     /// Mark a view as prepared by the specified culling camera.
-    void StorePreparedView(View* view, Camera* cullCamera);
+    void StorePreparedView(View* view, Camera* camera);
     /// Return a prepared view if exists for the specified camera. Used to avoid duplicate view preparation CPU work.
-    View* GetPreparedView(Camera* cullCamera);
+    View* GetPreparedView(Camera* camera);
     /// Choose shaders for a forward rendering batch. The related batch queue is provided in case it has extra shader compilation defines.
     void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows, const BatchQueue& queue);
     /// Choose shaders for a deferred light volume batch.
@@ -459,7 +461,7 @@ private:
     void ResetShadowMaps();
     /// Remove all occlusion and screen buffers.
     void ResetBuffers();
-    /// Find variations for shadow shaders
+    /// Find variations for shadow shaders.
     String GetShadowVariations() const;
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -504,16 +506,14 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
-    /// Instance of shadow map filter
-    Object* shadowMapFilterInstance_;
-    /// Function pointer of shadow map filter
-    ShadowMapFilter shadowMapFilter_;
+    /// Instance of shadow map filter.
+    Object* shadowMapFilterInstance_{};
+    /// Function pointer of shadow map filter.
+    ShadowMapFilter shadowMapFilter_{};
     /// Screen buffers by resolution and format.
-    HashMap<long long, Vector<SharedPtr<Texture> > > screenBuffers_;
+    HashMap<unsigned long long, Vector<SharedPtr<Texture> > > screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
-    HashMap<long long, unsigned> screenBufferAllocations_;
-    /// Saved status of screen buffer allocations for restoring.
-    HashMap<long long, unsigned> savedScreenBufferAllocations_;
+    HashMap<unsigned long long, unsigned> screenBufferAllocations_;
     /// Cache for light scissor queries.
     HashMap<Pair<Light*, Camera*>, Rect> lightScissorCache_;
     /// Backbuffer viewports.
@@ -535,73 +535,73 @@ private:
     /// Frame info for rendering.
     FrameInfo frame_;
     /// Texture anisotropy level.
-    int textureAnisotropy_;
+    int textureAnisotropy_{4};
     /// Texture filtering mode.
-    TextureFilterMode textureFilterMode_;
+    TextureFilterMode textureFilterMode_{FILTER_TRILINEAR};
     /// Texture quality level.
-    int textureQuality_;
+    MaterialQuality textureQuality_{QUALITY_HIGH};
     /// Material quality level.
-    int materialQuality_;
+    MaterialQuality materialQuality_{QUALITY_HIGH};
     /// Shadow map resolution.
-    int shadowMapSize_;
+    int shadowMapSize_{1024};
     /// Shadow quality.
-    ShadowQuality shadowQuality_;
+    ShadowQuality shadowQuality_{SHADOWQUALITY_PCF_16BIT};
     /// Shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
-    float shadowSoftness_;
+    float shadowSoftness_{1.0f};
     /// Shadow parameters when VSM is used, they help to reduce light bleeding.
-    Vector2 vsmShadowParams_;
+    Vector2 vsmShadowParams_{0.0000001f, 0.9f};
     /// Multisample level for VSM shadows.
-    int vsmMultiSample_;
+    int vsmMultiSample_{1};
     /// Maximum number of shadow maps per resolution.
-    int maxShadowMaps_;
+    int maxShadowMaps_{1};
     /// Minimum number of instances required in a batch group to render as instanced.
-    int minInstances_;
+    int minInstances_{2};
     /// Maximum sorted instances per batch group.
-    int maxSortedInstances_;
+    int maxSortedInstances_{1000};
     /// Maximum occluder triangles.
-    int maxOccluderTriangles_;
+    int maxOccluderTriangles_{5000};
     /// Occlusion buffer width.
-    int occlusionBufferSize_;
+    int occlusionBufferSize_{256};
     /// Occluder screen size threshold.
-    float occluderSizeThreshold_;
+    float occluderSizeThreshold_{0.025f};
     /// Mobile platform shadow depth bias multiplier.
-    float mobileShadowBiasMul_;
+    float mobileShadowBiasMul_{1.0f};
     /// Mobile platform shadow depth bias addition.
-    float mobileShadowBiasAdd_;
+    float mobileShadowBiasAdd_{};
     /// Mobile platform shadow normal offset multiplier.
-    float mobileNormalOffsetMul_;
+    float mobileNormalOffsetMul_{1.0f};
     /// Number of occlusion buffers in use.
-    unsigned numOcclusionBuffers_;
+    unsigned numOcclusionBuffers_{};
     /// Number of temporary shadow cameras in use.
-    unsigned numShadowCameras_;
-    /// Number of primitives (3D geometry only.)
-    unsigned numPrimitives_;
-    /// Number of batches (3D geometry only.)
-    unsigned numBatches_;
+    unsigned numShadowCameras_{};
+    /// Number of primitives (3D geometry only).
+    unsigned numPrimitives_{};
+    /// Number of batches (3D geometry only).
+    unsigned numBatches_{};
     /// Frame number on which shaders last changed.
-    unsigned shadersChangedFrameNumber_;
+    unsigned shadersChangedFrameNumber_{M_MAX_UNSIGNED};
     /// Current stencil value for light optimization.
-    unsigned char lightStencilValue_;
+    unsigned char lightStencilValue_{};
     /// HDR rendering flag.
-    bool hdrRendering_;
+    bool hdrRendering_{};
     /// Specular lighting flag.
-    bool specularLighting_;
+    bool specularLighting_{true};
     /// Draw shadows flag.
-    bool drawShadows_;
+    bool drawShadows_{true};
     /// Shadow map reuse flag.
-    bool reuseShadowMaps_;
+    bool reuseShadowMaps_{true};
     /// Dynamic instancing flag.
-    bool dynamicInstancing_;
+    bool dynamicInstancing_{true};
     /// Number of extra instancing data elements.
-    int numExtraInstancingBufferElements_;
+    int numExtraInstancingBufferElements_{};
     /// Threaded occlusion rendering flag.
-    bool threadedOcclusion_;
+    bool threadedOcclusion_{};
     /// Shaders need reloading flag.
-    bool shadersDirty_;
+    bool shadersDirty_{true};
     /// Initialized flag.
-    bool initialized_;
+    bool initialized_{};
     /// Flag for views needing reset.
-    bool resetViews_;
+    bool resetViews_{};
 };
 
 }

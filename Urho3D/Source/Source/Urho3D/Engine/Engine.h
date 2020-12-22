@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,17 +38,17 @@ class URHO3D_API Engine : public Object
 
 public:
     /// Construct.
-    Engine(Context* context);
+    explicit Engine(Context* context);
     /// Destruct. Free all subsystems.
-    virtual ~Engine() override;
+    ~Engine() override;
 
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);
     /// Reinitialize resource cache subsystem using parameters given. Implicitly called by Initialize. Return true if successful.
     bool InitializeResourceCache(const VariantMap& parameters, bool removeOld = true);
     /// Run one frame.
-    int RunFrame();
-    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
+    void RunFrame();
+    /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode).
     Console* CreateConsole();
     /// Create the debug hud.
     DebugHud* CreateDebugHud();
@@ -62,7 +62,7 @@ public:
     void SetTimeStepSmoothing(int frames);
     /// Set whether to pause update events and audio when minimized.
     void SetPauseMinimized(bool enable);
-    /// Set whether to exit automatically on exit request (window close button.)
+    /// Set whether to exit automatically on exit request (window close button).
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
@@ -110,7 +110,7 @@ public:
     /// Render after frame update.
     void Render();
     /// Get the timestep for the next frame and sleep for frame limiting if necessary.
-    int ApplyFrameLimit();
+    void ApplyFrameLimit();
 
     /// Parse the engine startup parameters map from command line arguments.
     static VariantMap ParseParameters(const Vector<String>& arguments);

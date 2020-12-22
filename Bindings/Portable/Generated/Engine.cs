@@ -91,22 +91,22 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Engine_RunFrame (IntPtr handle);
+		internal static extern void Engine_RunFrame (IntPtr handle);
 
 		/// <summary>
 		/// Run one frame.
 		/// </summary>
-		public int RunFrame ()
+		public void RunFrame ()
 		{
 			Runtime.ValidateRefCounted (this);
-			return Engine_RunFrame (handle);
+			Engine_RunFrame (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern IntPtr Engine_CreateConsole (IntPtr handle);
 
 		/// <summary>
-		/// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
+		/// Create the console and return it. May return null if engine configuration does not allow creation (headless mode).
 		/// </summary>
 		public Urho.UrhoConsole CreateConsole ()
 		{
@@ -190,7 +190,7 @@ namespace Urho
 		internal static extern void Engine_SetAutoExit (IntPtr handle, bool enable);
 
 		/// <summary>
-		/// Set whether to exit automatically on exit request (window close button.)
+		/// Set whether to exit automatically on exit request (window close button).
 		/// </summary>
 		private void SetAutoExit (bool enable)
 		{
@@ -403,15 +403,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Engine_ApplyFrameLimit (IntPtr handle);
+		internal static extern void Engine_ApplyFrameLimit (IntPtr handle);
 
 		/// <summary>
 		/// Get the timestep for the next frame and sleep for frame limiting if necessary.
 		/// </summary>
-		public int ApplyFrameLimit ()
+		public void ApplyFrameLimit ()
 		{
 			Runtime.ValidateRefCounted (this);
-			return Engine_ApplyFrameLimit (handle);
+			Engine_ApplyFrameLimit (handle);
 		}
 
 		public override StringHash Type {
@@ -512,7 +512,7 @@ namespace Urho
 		/// <summary>
 		/// Return whether to exit automatically on exit request.
 		/// Or
-		/// Set whether to exit automatically on exit request (window close button.)
+		/// Set whether to exit automatically on exit request (window close button).
 		/// </summary>
 		public bool AutoExit {
 			get {

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,11 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
+#include "../Container/FlagSet.h"
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
@@ -70,15 +73,18 @@ struct TouchState
     WeakPtr<UIElement> touchedElement_;
 };
 
+
+/// Screen joystick axis button
+struct ScreenJoystickAxis
+{
+    IntVector2  buttonOffset_;
+    unsigned    arrayIdx_;
+    float       innerRadius_;
+};
+
 /// %Input state for a joystick.
 struct JoystickState
 {
-    /// Construct with defaults.
-    JoystickState() :
-        joystick_(nullptr), controller_(nullptr), screenJoystick_(nullptr)
-    {
-    }
-
     /// Initialize the number of buttons, axes and hats and set them to neutral state.
     void Initialize(unsigned numButtons, unsigned numAxes, unsigned numHats);
     /// Reset button, axis and hat states to neutral.
@@ -106,16 +112,16 @@ struct JoystickState
     float GetAxisPosition(unsigned index) const { return index < axes_.Size() ? axes_[index] : 0.0f; }
 
     /// Return hat position.
-    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : HAT_CENTER; }
+    int GetHatPosition(unsigned index) const { return index < hats_.Size() ? hats_[index] : int(HAT_CENTER); }
 
     /// SDL joystick.
-    SDL_Joystick* joystick_;
+    SDL_Joystick* joystick_{};
     /// SDL joystick instance ID.
-    SDL_JoystickID joystickID_;
+    SDL_JoystickID joystickID_{};
     /// SDL game controller.
-    SDL_GameController* controller_;
+    SDL_GameController* controller_{};
     /// UI element containing the screen joystick.
-    UIElement* screenJoystick_;
+    UIElement* screenJoystick_{};
     /// Joystick name.
     String name_;
     /// Button up/down state.
@@ -126,6 +132,8 @@ struct JoystickState
     PODVector<float> axes_;
     /// POV hat bits.
     PODVector<int> hats_;
+    /// Screen joystick axis buttons
+    PODVector<ScreenJoystickAxis> screenJoystickAxisList_;
 };
 
 #ifdef __EMSCRIPTEN__
@@ -143,9 +151,9 @@ class URHO3D_API Input : public Object
 
 public:
     /// Construct.
-    Input(Context* context);
+    explicit Input(Context* context);
     /// Destruct.
-    virtual ~Input() override;
+    ~Input() override;
 
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
@@ -157,7 +165,7 @@ public:
     void ResetMouseVisible();
     /// Set whether the mouse is currently being grabbed by an operation.
     void SetMouseGrabbed(bool grab, bool suppressEvent = false);
-    /// Reset the mouse grabbed to the last unsuppressed SetMouseGrabbed call
+    /// Reset the mouse grabbed to the last unsuppressed SetMouseGrabbed call.
     void ResetMouseGrabbed();
     /// Set the mouse mode.
     /** Set the mouse mode behaviour.
@@ -178,7 +186,7 @@ public:
      *  outside the window, and perform custom rendering (with SetMouseVisible(false)) inside.
     */
     void SetMouseMode(MouseMode mode, bool suppressEvent = false);
-    /// Reset the last mouse mode that wasn't suppressed in SetMouseMode
+    /// Reset the last mouse mode that wasn't suppressed in SetMouseMode.
     void ResetMouseMode();
     /// Add screen joystick.
     /** Return the joystick instance ID when successful or negative on error.
@@ -200,8 +208,6 @@ public:
     void SetScreenKeyboardVisible(bool enable);
     /// Set touch emulation by mouse. Only available on desktop platforms. When enabled, actual mouse events are no longer sent and the mouse cursor is forced visible.
     void SetTouchEmulation(bool enable);
-    /// Enabled or disable Input
-    void SetEnabled(bool enable);
     /// Begin recording a touch gesture. Return true if successful. The E_GESTURERECORDED event (which contains the ID for the new gesture) will be sent when recording finishes.
     bool RecordGesture();
     /// Save all in-memory touch gestures. Return true if successful.
@@ -220,35 +226,35 @@ public:
     void CenterMousePosition();
 
     /// Return keycode from key name.
-    int GetKeyFromName(const String& name) const;
+    Key GetKeyFromName(const String& name) const;
     /// Return keycode from scancode.
-    int GetKeyFromScancode(int scancode) const;
+    Key GetKeyFromScancode(Scancode scancode) const;
     /// Return name of key from keycode.
-    String GetKeyName(int key) const;
+    String GetKeyName(Key key) const;
     /// Return scancode from keycode.
-    int GetScancodeFromKey(int key) const;
+    Scancode GetScancodeFromKey(Key key) const;
     /// Return scancode from key name.
-    int GetScancodeFromName(const String& name) const;
+    Scancode GetScancodeFromName(const String& name) const;
     /// Return name of key from scancode.
-    String GetScancodeName(int scancode) const;
+    String GetScancodeName(Scancode scancode) const;
     /// Check if a key is held down.
-    bool GetKeyDown(int key) const;
+    bool GetKeyDown(Key key) const;
     /// Check if a key has been pressed on this frame.
-    bool GetKeyPress(int key) const;
+    bool GetKeyPress(Key key) const;
     /// Check if a key is held down by scancode.
-    bool GetScancodeDown(int scancode) const;
+    bool GetScancodeDown(Scancode scancode) const;
     /// Check if a key has been pressed on this frame by scancode.
-    bool GetScancodePress(int scancode) const;
+    bool GetScancodePress(Scancode scancode) const;
     /// Check if a mouse button is held down.
-    bool GetMouseButtonDown(int button) const;
+    bool GetMouseButtonDown(MouseButtonFlags button) const;
     /// Check if a mouse button has been pressed on this frame.
-    bool GetMouseButtonPress(int button) const;
+    bool GetMouseButtonPress(MouseButtonFlags button) const;
     /// Check if a qualifier key is held down.
-    bool GetQualifierDown(int qualifier) const;
+    bool GetQualifierDown(Qualifier qualifier) const;
     /// Check if a qualifier key has been pressed on this frame.
-    bool GetQualifierPress(int qualifier) const;
+    bool GetQualifierPress(Qualifier qualifier) const;
     /// Return the currently held down qualifiers.
-    int GetQualifiers() const;
+    QualifierFlags GetQualifiers() const;
     /// Return mouse position within window. Should only be used with a visible mouse cursor. Uses the backbuffer (Graphics width/height) coordinates.
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
@@ -293,7 +299,7 @@ public:
     bool IsMouseVisible() const { return mouseVisible_; }
     /// Return whether the mouse is currently being grabbed by an operation.
     bool IsMouseGrabbed() const { return mouseGrabbed_; }
-    /// Return whether the mouse is locked to the window
+    /// Return whether the mouse is locked to the window.
     bool IsMouseLocked() const;
 
     /// Return the mouse mode.
@@ -301,10 +307,7 @@ public:
 
     /// Return whether application window has input focus.
     bool HasFocus() { return inputFocus_; }
-    
-    /// Return whether Input is enabled.
-    bool IsEnabled() { return enabled_; }
-    
+
     /// Return whether application window is minimized.
     bool IsMinimized() const;
 
@@ -334,9 +337,9 @@ private:
     /// Send an input focus or window minimization change event.
     void SendInputFocusEvent();
     /// Handle a mouse button change.
-    void SetMouseButton(int button, bool newState);
+    void SetMouseButton(MouseButton button, bool newState, int clicks);
     /// Handle a key change.
-    void SetKey(int key, int scancode, bool newState);
+    void SetKey(Key key, Scancode scancode, bool newState);
     /// Handle mouse wheel change.
     void SetMouseWheel(int delta);
     /// Suppress next mouse movement.
@@ -349,6 +352,8 @@ private:
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle touch events from the controls of screen joystick(s).
     void HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData);
+    /// Handle drag events from the controls of screen joystick(s).
+    void HandleScreenJoystickDrag(StringHash eventType, VariantMap& eventData);
     /// Handle SDL event.
     void HandleSDLEvent(void* sdlEvent);
 
@@ -380,18 +385,18 @@ private:
     HashSet<int> scancodePress_;
     /// Active finger touches.
     HashMap<int, TouchState> touches_;
-    /// List that maps between event touch IDs and normalised touch IDs
+    /// List that maps between event touch IDs and normalised touch IDs.
     List<int> availableTouchIDs_;
-    /// Mapping of touch indices
+    /// Mapping of touch indices.
     HashMap<int, int> touchIDMap_;
     /// String for text input.
     String textInput_;
     /// Opened joysticks.
     HashMap<SDL_JoystickID, JoystickState> joysticks_;
     /// Mouse buttons' down state.
-    unsigned mouseButtonDown_;
+    MouseButtonFlags mouseButtonDown_;
     /// Mouse buttons' pressed state.
-    unsigned mouseButtonPress_;
+    MouseButtonFlags mouseButtonPress_;
     /// Last mouse position for calculating movement.
     IntVector2 lastMousePosition_;
     /// Last mouse position before being set to not visible.
@@ -400,7 +405,7 @@ private:
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
-    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display.)
+    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display).
     Vector2 inputScale_;
     /// SDL window ID.
     unsigned windowID_;
@@ -424,8 +429,6 @@ private:
 #endif
     /// Touch emulation mode flag.
     bool touchEmulation_;
-    /// Input enabled flag
-    bool enabled_;
     /// Input focus flag.
     bool inputFocus_;
     /// Minimized flag.

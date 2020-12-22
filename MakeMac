@@ -6,11 +6,11 @@ TOOLS_DIR=../../Bin/Tools/macOS
 SDK_PATH=`xcrun --show-sdk-path`
 
 URHO_FLAGS=-I$(URHO3D_MAC_DIR)/include -I$(URHO3D_MAC_DIR)/include/kNet -I$(URHO3D_MAC_DIR)/include/Urho3D/ThirdParty -DURHO3D_OPENGL
-URHO_LIBS=-L$(URHO3D_MAC_DIR)/lib -framework SystemConfiguration -framework AudioToolbox -framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -lUrho3D -ldl -lpthread 
+URHO_LIBS=-L$(URHO3D_MAC_DIR)/lib -framework SystemConfiguration -framework AudioToolbox -framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -lUrho3D -ldl -lpthread -liconv
 CXXFLAGS=-g $(ARCH) -isysroot$(SDK_PATH) -stdlib=libc++ -std=c++0x -Wno-address-of-temporary -Wno-return-type-c-linkage -Wno-clang++11-extensions $(URHO_FLAGS)
 
 Urho3D_Mac:
-	$(URHO3D_SRC_DIR)/./cmake_xcode.sh $(URHO3D_MAC_DIR) -DURHO3D_PCH=0  -DURHO3D_WEBP=0 -DURHO3D_LUA=0 -DURHO3D_ANGELSCRIPT=0 -DURHO3D_TOOLS=1 -DURHO3D_CXX11=1 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+	$(URHO3D_SRC_DIR)/./script/cmake_xcode.sh $(URHO3D_MAC_DIR) -DURHO3D_PCH=0  -DURHO3D_WEBP=0 -DURHO3D_LUA=0 -DURHO3D_ANGELSCRIPT=0 -DURHO3D_TOOLS=1 -DURHO3D_CXX11=1 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
 
 libUrho3D_32.a: Urho3D_Mac
 	cd $(URHO3D_MAC_DIR) && xcodebuild ARCHS=i386 ONLY_ACTIVE_ARCH=NO -target Urho3D -configuration Release && mv lib/libUrho3D.a lib/libUrho3D_32.a

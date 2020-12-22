@@ -223,6 +223,18 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void RibbonTrail_SetBaseVelocity (IntPtr handle, ref Urho.Vector3 baseVelocity);
+
+		/// <summary>
+		/// Set base velocity applied to the trail.
+		/// </summary>
+		private void SetBaseVelocity (Urho.Vector3 baseVelocity)
+		{
+			Runtime.ValidateRefCounted (this);
+			RibbonTrail_SetBaseVelocity (handle, ref baseVelocity);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void RibbonTrail_SetSorted (IntPtr handle, bool enable);
 
 		/// <summary>
@@ -262,7 +274,7 @@ namespace Urho
 		internal static extern void RibbonTrail_SetUpdateInvisible (IntPtr handle, bool enable);
 
 		/// <summary>
-		/// Set whether to update when trail emiiter are not visible.
+		/// Set whether to update when trail emitter are not visible.
 		/// </summary>
 		private void SetUpdateInvisible (bool enable)
 		{
@@ -451,10 +463,22 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Urho.Vector3 RibbonTrail_GetBaseVelocity (IntPtr handle);
+
+		/// <summary>
+		/// Return base trail velocity.
+		/// </summary>
+		private Urho.Vector3 GetBaseVelocity ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return RibbonTrail_GetBaseVelocity (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern uint RibbonTrail_GetTailColumn (IntPtr handle);
 
 		/// <summary>
-		/// Get number of column for tails.
+		/// Return number of column for tails.
 		/// </summary>
 		private uint GetTailColumn ()
 		{
@@ -642,6 +666,20 @@ namespace Urho
 		}
 
 		/// <summary>
+		/// Return base trail velocity.
+		/// Or
+		/// Set base velocity applied to the trail.
+		/// </summary>
+		public Urho.Vector3 BaseVelocity {
+			get {
+				return GetBaseVelocity ();
+			}
+			set {
+				SetBaseVelocity (value);
+			}
+		}
+
+		/// <summary>
 		/// Return whether tails are sorted.
 		/// Or
 		/// Set whether tails are sorted by distance. Default false.
@@ -686,7 +724,7 @@ namespace Urho
 		/// <summary>
 		/// Return whether to update when trail emitter are not visible.
 		/// Or
-		/// Set whether to update when trail emiiter are not visible.
+		/// Set whether to update when trail emitter are not visible.
 		/// </summary>
 		public bool UpdateInvisible {
 			get {
@@ -698,7 +736,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Get number of column for tails.
+		/// Return number of column for tails.
 		/// Or
 		/// Set number of column for every tails. Can be useful for fixing distortion at high angle.
 		/// </summary>

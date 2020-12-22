@@ -199,15 +199,15 @@ namespace Urho.Resources
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Localization_LoadJSONFile (IntPtr handle, string name);
+		internal static extern void Localization_LoadJSONFile (IntPtr handle, string name, string language);
 
 		/// <summary>
 		/// Load strings from JSONFile. The file should be UTF8 without BOM.
 		/// </summary>
-		public void LoadJsonFile (string name)
+		public void LoadJsonFile (string name, string language = "")
 		{
 			Runtime.ValidateRefCounted (this);
-			Localization_LoadJSONFile (handle, name);
+			Localization_LoadJSONFile (handle, name, language);
 		}
 
 		public override StringHash Type {

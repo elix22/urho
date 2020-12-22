@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -243,10 +243,10 @@ static PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxD
     return result;
 }
 
-static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask, PhysicsWorld* ptr)
+static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask, float overlapDistance, PhysicsWorld* ptr)
 {
     PhysicsRaycastResult result;
-    ptr->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask);
+    ptr->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask, overlapDistance);
     return result;
 }
 
@@ -312,7 +312,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void UpdateCollisions()", asMETHOD(PhysicsWorld, UpdateCollisions), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingle(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingleSegmented(const Ray&in, float, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingleSegmented), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingleSegmented(const Ray&in, float, float, uint collisionMask = 0xffff, float overlapDistance = 0.1f)", asFUNCTION(PhysicsWorldRaycastSingleSegmented), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult SphereCast(const Ray&in, float, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST);
     // There seems to be a bug in AngelScript resulting in a crash if we use an auto handle with this function.
     // Work around by manually releasing the CollisionShape handle
@@ -351,6 +351,7 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "void UpdateWheelTransform(int, bool)", asMETHOD(RaycastVehicle, UpdateWheelTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetSteeringValue(int, float)", asMETHOD(RaycastVehicle, SetSteeringValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelSuspensionStiffness(int, float)", asMETHOD(RaycastVehicle, SetWheelSuspensionStiffness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelMaxSuspensionForce(int, float)", asMETHOD(RaycastVehicle, SetWheelMaxSuspensionForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelDampingRelaxation(int, float)", asMETHOD(RaycastVehicle, SetWheelDampingRelaxation), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelDampingCompression(int, float)", asMETHOD(RaycastVehicle, SetWheelDampingCompression), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void SetWheelFrictionSlip(int, float)", asMETHOD(RaycastVehicle, SetWheelFrictionSlip), asCALL_THISCALL);
@@ -373,6 +374,7 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "Node@+ GetWheelNode(int)", asMETHOD(RaycastVehicle, GetWheelNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetSteeringValue(int)", asMETHOD(RaycastVehicle, GetSteeringValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelSuspensionStiffness(int)", asMETHOD(RaycastVehicle, GetWheelSuspensionStiffness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelMaxSuspensionForce(int)", asMETHOD(RaycastVehicle, GetWheelMaxSuspensionForce), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelDampingRelaxation(int)", asMETHOD(RaycastVehicle, GetWheelDampingRelaxation), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelDampingCompression(int)", asMETHOD(RaycastVehicle, GetWheelDampingCompression), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float GetWheelFrictionSlip(int)", asMETHOD(RaycastVehicle, GetWheelFrictionSlip), asCALL_THISCALL);
@@ -394,7 +396,18 @@ void RegisterRaycastVehicleAPI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RaycastVehicle", "Vector3 GetContactNormal(int)", asMETHOD(RaycastVehicle, GetContactNormal), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "void set_inAirRPM(float)", asMETHOD(RaycastVehicle, SetInAirRPM), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "float get_inAirRPM()", asMETHOD(RaycastVehicle, GetInAirRPM), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "void set_coordinateSystem(const IntVector3&in = RIGHT_UP_FORWARD)", asMETHOD(RaycastVehicle, SetCoordinateSystem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RaycastVehicle", "IntVector3 get_coordinateSystem() const", asMETHOD(RaycastVehicle, GetCoordinateSystem), asCALL_THISCALL);
     engine->RegisterObjectMethod("RaycastVehicle", "int get_numWheels()", asMETHOD(RaycastVehicle, GetNumWheels), asCALL_THISCALL);
+
+    engine->SetDefaultNamespace("RaycastVehicle");
+    engine->RegisterGlobalProperty("const IntVector3 RIGHT_UP_FORWARD", (void*)&RaycastVehicle::RIGHT_UP_FORWARD);
+    engine->RegisterGlobalProperty("const IntVector3 RIGHT_FORWARD_UP", (void*)&RaycastVehicle::RIGHT_FORWARD_UP);
+    engine->RegisterGlobalProperty("const IntVector3 UP_FORWARD_RIGHT", (void*)&RaycastVehicle::UP_FORWARD_RIGHT);
+    engine->RegisterGlobalProperty("const IntVector3 UP_RIGHT_FORWARD", (void*)&RaycastVehicle::UP_RIGHT_FORWARD);
+    engine->RegisterGlobalProperty("const IntVector3 FORWARD_RIGHT_UP", (void*)&RaycastVehicle::FORWARD_RIGHT_UP);
+    engine->RegisterGlobalProperty("const IntVector3 FORWARD_UP_RIGHT", (void*)&RaycastVehicle::FORWARD_UP_RIGHT);
+    engine->SetDefaultNamespace("");
 }
 
 void RegisterPhysicsAPI(asIScriptEngine* engine)

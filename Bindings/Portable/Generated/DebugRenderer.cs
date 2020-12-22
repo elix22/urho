@@ -274,7 +274,7 @@ namespace Urho
 		internal static extern void DebugRenderer_AddSphereSector (IntPtr handle, IntPtr sphere, ref Urho.Quaternion rotation, float angle, bool drawLines, ref Urho.Color color, bool depthTest);
 
 		/// <summary>
-		/// Add a sphere sector.
+		/// Add a sphere sector. Angle ranges from 0 to 360. Identity Quaternion yields the filled portion of the sector upwards.
 		/// </summary>
 		public void AddSphereSector (Sphere sphere, Urho.Quaternion rotation, float angle, bool drawLines, Urho.Color color, bool depthTest = true)
 		{
@@ -286,7 +286,7 @@ namespace Urho
 		internal static extern void DebugRenderer_AddCylinder (IntPtr handle, ref Urho.Vector3 position, float radius, float height, ref Urho.Color color, bool depthTest);
 
 		/// <summary>
-		/// Add a cylinder
+		/// Add a cylinder.
 		/// </summary>
 		public void AddCylinder (Urho.Vector3 position, float radius, float height, Urho.Color color, bool depthTest = true)
 		{

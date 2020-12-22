@@ -169,7 +169,7 @@ namespace Urho
 		internal static extern bool ShaderVariation_HasTextureUnit (IntPtr handle, TextureUnit unit);
 
 		/// <summary>
-		/// Return whether uses a texture unit (only for pixel shaders.) Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
+		/// Return whether uses a texture unit (only for pixel shaders). Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
 		/// </summary>
 		public bool HasTextureUnit (TextureUnit unit)
 		{

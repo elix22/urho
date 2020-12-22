@@ -19,7 +19,7 @@ using Urho.Network;
 namespace Urho
 {
 	/// <summary>
-	/// %Octree component. Should be added only to the root scene node
+	/// %Octree component. Should be added only to the root scene node.
 	/// </summary>
 	public unsafe partial class Octree : Component
 	{

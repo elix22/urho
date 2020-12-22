@@ -27,6 +27,9 @@ namespace Urho.Samples
 	{
 		Scene scene;
 
+		[Preserve]
+		public AnimatingScene() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+
 		public AnimatingScene(ApplicationOptions options = null) : base(options) { }
 
 		void CreateScene ()

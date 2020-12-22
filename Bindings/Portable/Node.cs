@@ -134,7 +134,7 @@ namespace Urho {
 			var element = file.GetRoot("node");
 			if (element == null || element.Null)
 				throw new Exception("'node' root element was not found");
-			return LoadXml(element, true);
+			return LoadXml(element);
 		}
 	}
 }

@@ -142,15 +142,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Polyhedron_Clip6 (IntPtr handle, IntPtr box);
+		internal static extern void Polyhedron_Clip6 (IntPtr handle, IntPtr frustum);
 
 		/// <summary>
 		/// Clip with a frustum.
 		/// </summary>
-		public void Clip (Frustum box)
+		public void Clip (Frustum frustum)
 		{
 			Runtime.ValidateObject (this);
-			Polyhedron_Clip6 (handle, (object)box == null ? IntPtr.Zero : box.Handle);
+			Polyhedron_Clip6 (handle, (object)frustum == null ? IntPtr.Zero : frustum.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

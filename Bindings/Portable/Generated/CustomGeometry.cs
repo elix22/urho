@@ -139,6 +139,40 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomGeometry_MakeCircle (IntPtr handle, float radius, uint iterations, float startTheta, float endTheta, bool clear, int geomNum);
+
+		/// <summary>
+		/// Make the custom geometry into a circle, change start and stop to make a segment instead
+		/// Set clear=false and geomNum for making multiple circle segments
+		/// </summary>
+		public void MakeCircle (float radius = 1, uint iterations = 300, float startTheta = 0, float endTheta = 6.283185f, bool clear = true, int geomNum = 0)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomGeometry_MakeCircle (handle, radius, iterations, startTheta, endTheta, clear, geomNum);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomGeometry_MakeSquare (IntPtr handle, float size);
+
+		/// <summary>
+		/// Makes this custom geometry into a square shape
+		/// </summary>
+		public void MakeSquare (float size)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomGeometry_MakeSquare (handle, size);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomGeometry_MakeSphere (IntPtr handle, float radius, uint iterations);
+
+		public void MakeSphere (float radius = 1, uint iterations = 200)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomGeometry_MakeSphere (handle, radius, iterations);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void CustomGeometry_Clear (IntPtr handle);
 
 		/// <summary>

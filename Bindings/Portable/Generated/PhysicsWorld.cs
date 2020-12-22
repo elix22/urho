@@ -79,13 +79,13 @@ namespace Urho.Physics
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr PhysicsWorld_PhysicsWorld (IntPtr scontext);
+		internal static extern IntPtr PhysicsWorld_PhysicsWorld (IntPtr context);
 
 		[Preserve]
-		public PhysicsWorld (Context scontext) : base (UrhoObjectFlag.Empty)
+		public PhysicsWorld (Context context) : base (UrhoObjectFlag.Empty)
 		{
 			Runtime.Validate (typeof(PhysicsWorld));
-			handle = PhysicsWorld_PhysicsWorld ((object)scontext == null ? IntPtr.Zero : scontext.Handle);
+			handle = PhysicsWorld_PhysicsWorld ((object)context == null ? IntPtr.Zero : context.Handle);
 			Runtime.RegisterObject (this);
 			OnPhysicsWorldCreated ();
 		}
@@ -283,15 +283,16 @@ namespace Urho.Physics
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void PhysicsWorld_RaycastSingleSegmented (IntPtr handle, ref PhysicsRaycastResult result, ref Urho.Ray ray, float maxDistance, float segmentDistance, uint collisionMask);
+		internal static extern void PhysicsWorld_RaycastSingleSegmented (IntPtr handle, ref PhysicsRaycastResult result, ref Urho.Ray ray, float maxDistance, float segmentDistance, uint collisionMask, float overlapDistance);
 
 		/// <summary>
 		/// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
+		/// overlapDistance is used to make sure there are no gap between segments, and must be smaller than segmentDistance.
 		/// </summary>
-		public void RaycastSingleSegmented (ref PhysicsRaycastResult result, Urho.Ray ray, float maxDistance, float segmentDistance, uint collisionMask = uint.MaxValue)
+		public void RaycastSingleSegmented (ref PhysicsRaycastResult result, Urho.Ray ray, float maxDistance, float segmentDistance, uint collisionMask = uint.MaxValue, float overlapDistance = 0.1f)
 		{
 			Runtime.ValidateRefCounted (this);
-			PhysicsWorld_RaycastSingleSegmented (handle, ref result, ref ray, maxDistance, segmentDistance, collisionMask);
+			PhysicsWorld_RaycastSingleSegmented (handle, ref result, ref ray, maxDistance, segmentDistance, collisionMask, overlapDistance);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -487,27 +488,27 @@ namespace Urho.Physics
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void PhysicsWorld_AddConstraint (IntPtr handle, IntPtr joint);
+		internal static extern void PhysicsWorld_AddConstraint (IntPtr handle, IntPtr constraint);
 
 		/// <summary>
 		/// Add a constraint to keep track of. Called by Constraint.
 		/// </summary>
-		public void AddConstraint (Constraint joint)
+		public void AddConstraint (Constraint constraint)
 		{
 			Runtime.ValidateRefCounted (this);
-			PhysicsWorld_AddConstraint (handle, (object)joint == null ? IntPtr.Zero : joint.Handle);
+			PhysicsWorld_AddConstraint (handle, (object)constraint == null ? IntPtr.Zero : constraint.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void PhysicsWorld_RemoveConstraint (IntPtr handle, IntPtr joint);
+		internal static extern void PhysicsWorld_RemoveConstraint (IntPtr handle, IntPtr constraint);
 
 		/// <summary>
 		/// Remove a constraint. Called by Constraint.
 		/// </summary>
-		public void RemoveConstraint (Constraint joint)
+		public void RemoveConstraint (Constraint constraint)
 		{
 			Runtime.ValidateRefCounted (this);
-			PhysicsWorld_RemoveConstraint (handle, (object)joint == null ? IntPtr.Zero : joint.Handle);
+			PhysicsWorld_RemoveConstraint (handle, (object)constraint == null ? IntPtr.Zero : constraint.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

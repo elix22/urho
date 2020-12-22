@@ -19,7 +19,7 @@ using Urho.Network;
 namespace Urho
 {
 	/// <summary>
-	/// Font hinting level (only used for FreeType fonts)
+	/// Font hinting level (only used for FreeType fonts).
 	/// </summary>
 	public enum FontHintLevel
 	{

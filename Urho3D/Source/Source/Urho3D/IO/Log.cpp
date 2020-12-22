@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ Log::~Log()
 
 void Log::Open(const String& fileName)
 {
-#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS) && !defined(UWP)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     if (fileName.Empty())
         return;
     if (logFile_ && logFile_->IsOpen())
@@ -149,7 +149,7 @@ void Log::Write(int level, const String& message)
     {
         Mono::Callback(Log_Write, 0, 0, level, stringdup(message.CString()));
     }
-
+    
     // No-op if illegal level
     if (level < LOG_TRACE || level >= LOG_NONE)
         return;

@@ -91,27 +91,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Serializable_Load_File (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Serializable_Load_File (IntPtr handle, IntPtr source);
 
 		/// <summary>
-		/// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+		/// Load from binary data. Return true if successful.
 		/// </summary>
-		public virtual bool Load (File source, bool setInstanceDefault = false)
+		public virtual bool Load (File source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Serializable_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Serializable_Load_File (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Serializable_Load_MemoryBuffer (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Serializable_Load_MemoryBuffer (IntPtr handle, IntPtr source);
 
 		/// <summary>
-		/// Load from binary data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+		/// Load from binary data. Return true if successful.
 		/// </summary>
-		public virtual bool Load (MemoryBuffer source, bool setInstanceDefault = false)
+		public virtual bool Load (MemoryBuffer source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Serializable_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Serializable_Load_MemoryBuffer (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -139,15 +139,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Serializable_LoadXML (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool Serializable_LoadXML (IntPtr handle, IntPtr source);
 
 		/// <summary>
-		/// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
+		/// Load from XML data. Return true if successful.
 		/// </summary>
-		public virtual bool LoadXml (XmlElement source, bool setInstanceDefault = false)
+		public virtual bool LoadXml (XmlElement source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Serializable_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return Serializable_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -508,6 +508,18 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			return Serializable_SetAttribute0_12 (handle, name, value);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void Serializable_SetInstanceDefault (IntPtr handle, bool enable);
+
+		/// <summary>
+		/// Set instance-level default flag.
+		/// </summary>
+		public void SetInstanceDefault (bool enable)
+		{
+			Runtime.ValidateRefCounted (this);
+			Serializable_SetInstanceDefault (handle, enable);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

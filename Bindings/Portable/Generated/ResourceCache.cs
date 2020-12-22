@@ -370,7 +370,7 @@ namespace Urho.Resources
 		internal static extern IntPtr ResourceCache_GetTempResource (IntPtr handle, int type, string name, bool sendEventOnFailure);
 
 		/// <summary>
-		/// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
+		/// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data).
 		/// </summary>
 		public Resource GetTempResource (StringHash type, string name, bool sendEventOnFailure = true)
 		{

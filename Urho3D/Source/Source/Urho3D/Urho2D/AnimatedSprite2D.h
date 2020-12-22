@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #include "../Urho2D/StaticSprite2D.h"
@@ -29,6 +31,9 @@ struct spAnimationState;
 struct spAnimationStateData;
 struct spSkeleton;
 #endif
+
+namespace Urho3D
+{
 
 /// Loop mode.
 enum LoopMode2D
@@ -40,9 +45,6 @@ enum LoopMode2D
     /// Force clamped.
     LM_FORCE_CLAMPED
 };
-
-namespace Urho3D
-{
 
 namespace Spriter
 {
@@ -58,19 +60,19 @@ class URHO3D_API AnimatedSprite2D : public StaticSprite2D
 
 public:
     /// Construct.
-    AnimatedSprite2D(Context* context);
+    explicit AnimatedSprite2D(Context* context);
     /// Destruct.
-    virtual ~AnimatedSprite2D() override;
+    ~AnimatedSprite2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Set animation set.
     void SetAnimationSet(AnimationSet2D* animationSet);
     /// Set entity name (skin name for spine, entity name for spriter).
-    void SetEntity(const String& name);
+    void SetEntity(const String& entity);
     /// Set animation by name and loop mode.
     void SetAnimation(const String& name, LoopMode2D loopMode = LM_DEFAULT);
     /// Set loop mode.
@@ -98,9 +100,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle update vertices.
-    virtual void UpdateSourceBatches() override;
+    void UpdateSourceBatches() override;
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Update animation.
@@ -110,7 +112,7 @@ protected:
     void SetSpineAnimation();
     /// Update spine animation.
     void UpdateSpineAnimation(float timeStep);
-    /// Update vertices for spine animation;
+    /// Update vertices for spine animation.
     void UpdateSourceBatchesSpine();
 #endif
     /// Handle set spriter animation.
@@ -141,7 +143,7 @@ protected:
     /// Animation state.
     spAnimationState* animationState_;
 #endif
-    
+
     /// Spriter instance.
     UniquePtr<Spriter::SpriterInstance> spriterInstance_;
 };

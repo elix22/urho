@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ Application::Application(Context* context) :
 {
     engineParameters_ = Engine::ParseParameters(GetArguments());
 
-    // Create the Engine, but do not initialize it yet. Sub¸systems except Graphics & Renderer are registered at this point
+    // Create the Engine, but do not initialize it yet. Subsystems except Graphics & Renderer are registered at this point
     engine_ = new Engine(context);
 
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
@@ -77,11 +77,11 @@ int Application::Run()
         }
 
         Start();
-        if (exitCode_ || Engine::GetParameter(engineParameters_, "DelayedStart", false).GetBool())
+        if (exitCode_)
             return exitCode_;
 
         // Platforms other than iOS/tvOS and Emscripten run a blocking main loop
-#if !defined(IOS) && !defined(TVOS) && !defined(__EMSCRIPTEN__) && !defined(UWP)
+#if !defined(IOS) && !defined(TVOS) && !defined(__EMSCRIPTEN__)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 

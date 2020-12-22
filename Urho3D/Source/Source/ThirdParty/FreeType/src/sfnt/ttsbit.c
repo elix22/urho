@@ -1148,7 +1148,7 @@
       goto Fail;
 
     {
-      TT_SBitDecoder_LoadFunc  loader = NULL;
+      TT_SBitDecoder_LoadFunc  loader;
 
 
       switch ( glyph_format )

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,12 @@
 // THE SOFTWARE.
 //
 
+/// \file
+
 #pragma once
 
 #include "../Math/Vector2.h"
+#include "../Input/InputConstants.h"
 #include "../Resource/XMLFile.h"
 #include "../Scene/Animatable.h"
 #include "../UI/UIBatch.h"
@@ -98,17 +101,22 @@ enum TraversalMode
     TM_DEPTH_FIRST
 };
 
-/// Drag and drop disabled.
-static const unsigned DD_DISABLED = 0x0;
-/// Drag and drop source flag.
-static const unsigned DD_SOURCE = 0x1;
-/// Drag and drop target flag.
-static const unsigned DD_TARGET = 0x2;
-/// Drag and drop source and target.
-static const unsigned DD_SOURCE_AND_TARGET = 0x3;
+enum DragAndDropMode : unsigned
+{
+    /// Drag and drop disabled.
+    DD_DISABLED = 0x0,
+    /// Drag and drop source flag.
+    DD_SOURCE = 0x1,
+    /// Drag and drop target flag.
+    DD_TARGET = 0x2,
+    /// Drag and drop source and target.
+    DD_SOURCE_AND_TARGET = 0x3,
+};
+URHO3D_FLAGSET(DragAndDropMode, DragAndDropModeFlags);
 
 class Cursor;
 class ResourceCache;
+class Texture2D;
 
 /// Base class for %UI elements.
 class URHO3D_API UIElement : public Animatable
@@ -117,22 +125,22 @@ class URHO3D_API UIElement : public Animatable
 
 public:
     /// Construct.
-    UIElement(Context* context);
+    explicit UIElement(Context* context);
     /// Destruct.
-    virtual ~UIElement() override;
+    ~UIElement() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source) override;
     /// Load from XML data with style. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile);
     /// Create a child by loading from XML data with style. Returns the child element if successful, null if otherwise.
-    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = nullptr, bool setInstanceDefault = false);
+    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile);
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
+    bool SaveXML(XMLElement& dest) const override;
 
     /// Perform UI element update.
     virtual void Update(float timeStep);
@@ -145,38 +153,38 @@ public:
     /// Return UI rendering batches for debug draw.
     virtual void GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to mouse hover.
-    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor);
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) { }
     /// React to mouse click end.
     virtual void OnClickEnd
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor,
             UIElement* beginElement) { }
     /// React to double mouse click.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButton button, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor) { }
     /// React to mouse drag begin.
     virtual void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags buttons, QualifierFlags qualifiers, Cursor* cursor);
     /// React to mouse drag motion.
     virtual void OnDragMove
-        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
+        (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, MouseButtonFlags buttons, QualifierFlags qualifiers,
             Cursor* cursor);
     /// React to mouse drag end.
     virtual void
-        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int releaseButton, Cursor* cursor);
-    /// React to a mouse drag cancel event (ie, when an extra button is pressed)
+        OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags releaseButtons, Cursor* cursor);
+    /// React to a mouse drag cancel event (ie, when an extra button is pressed).
     virtual void OnDragCancel
-        (const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int cancelButton, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, MouseButtonFlags dragButtons, MouseButtonFlags cancelButtons, Cursor* cursor);
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers) { }
+    virtual void OnWheel(int delta, MouseButtonFlags buttons, QualifierFlags qualifiers) { }
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers) { }
+    virtual void OnKey(Key key, MouseButtonFlags buttons, QualifierFlags qualifiers) { }
     /// React to text input event.
     virtual void OnTextInput(const String& text) { }
 
@@ -253,11 +261,11 @@ public:
     void SetVerticalAlignment(VerticalAlignment align);
     /// Enable automatic positioning & sizing of the element relative to its parent using min/max anchor and min/max offset. Default false.
     void SetEnableAnchor(bool enable);
-    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
     void SetMinAnchor(const Vector2& anchor);
     /// Set minimum anchor.
     void SetMinAnchor(float x, float y);
-    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
     void SetMaxAnchor(const Vector2& anchor);
     /// Set maximum anchor.
     void SetMaxAnchor(float x, float y);
@@ -265,9 +273,9 @@ public:
     void SetMinOffset(const IntVector2& offset);
     /// Set offset of element's bottom right from the maximum anchor in pixels. No effect when anchor is not enabled.
     void SetMaxOffset(const IntVector2& offset);
-    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal & vertical alignment.
     void SetPivot(const Vector2& pivot);
-    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal & vertical alignment.
     void SetPivot(float x, float y);
     /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
@@ -308,12 +316,12 @@ public:
     /// Set focus mode.
     void SetFocusMode(FocusMode mode);
     /// Set drag and drop flags.
-    void SetDragDropMode(unsigned mode);
-    /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+    void SetDragDropMode(DragAndDropModeFlags mode);
+    /// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully. See also \ref UI_Programmatic.
     bool SetStyle(const String& styleName, XMLFile* file = nullptr);
     /// Set style from an XML element. Return true if the style is applied successfully.
     bool SetStyle(const XMLElement& element);
-    /// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+    /// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully. See also \ref UI_Programmatic.
     bool SetStyleAuto(XMLFile* file = nullptr);
     /// Set default style file for later use by children elements.
     void SetDefaultStyle(XMLFile* style);
@@ -370,7 +378,7 @@ public:
     void SetTags(const StringVector& tags);
     /// Add a tag.
     void AddTag(const String& tag);
-    /// Add tags with the specified separator, by default ;
+    /// Add tags with the specified separator (; by default).
     void AddTags(const String& tags, char separator = ';');
     /// Add tags.
     void AddTags(const StringVector& tags);
@@ -467,7 +475,7 @@ public:
     const IntRect& GetClipBorder() const { return clipBorder_; }
 
     /// Return corner color.
-    const Color& GetColor(Corner corner) const { return color_[corner]; }
+    const Color& GetColor(Corner corner) const { return colors_[corner]; }
 
     /// Return priority.
     int GetPriority() const { return priority_; }
@@ -475,7 +483,7 @@ public:
     /// Return opacity.
     float GetOpacity() const { return opacity_; }
 
-    /// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
+    /// Return derived opacity (affected by parent elements). If UseDerivedOpacity is false, returns same as element's own opacity.
     float GetDerivedOpacity() const;
 
     /// Return whether should be brought to front when focused.
@@ -514,7 +522,7 @@ public:
     /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
 
-    /// Return whether element is effectively visible (parent element chain is visible.)
+    /// Return whether element is effectively visible (parent element chain is visible).
     bool IsVisibleEffective() const;
 
     /// Return whether the cursor is hovering on this element.
@@ -530,7 +538,7 @@ public:
     FocusMode GetFocusMode() const { return focusMode_; }
 
     /// Return drag and drop flags.
-    unsigned GetDragDropMode() const { return dragDropMode_; }
+    DragAndDropModeFlags GetDragDropMode() const { return dragDropMode_; }
 
     /// Return applied style name. Return an empty string when the applied style is an 'auto' style (i.e. style derived from instance's type).
     const String& GetAppliedStyle() const;
@@ -590,7 +598,7 @@ public:
     PODVector<UIElement*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return the drag button combo if this element is being dragged.
-    int GetDragButtonCombo() const { return dragButtonCombo_; }
+    MouseButtonFlags GetDragButtonCombo() const { return dragButtonCombo_; }
 
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
@@ -626,7 +634,7 @@ public:
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
 
     /// Return color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return color_[0]; }
+    const Color& GetColorAttr() const { return colors_[0]; }
 
     /// Return traversal mode for rendering.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
@@ -640,13 +648,16 @@ public:
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
 
+    /// Set texture to which element will be rendered.
+    void SetRenderTexture(Texture2D* texture);
+
 protected:
     /// Handle attribute animation added.
-    virtual void OnAttributeAnimationAdded() override;
+    void OnAttributeAnimationAdded() override;
     /// Handle attribute animation removed.
-    virtual void OnAttributeAnimationRemoved() override;
+    void OnAttributeAnimationRemoved() override;
     /// Find target of an attribute animation from object hierarchy by name.
-    virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
+    Animatable* FindAttributeAnimationTarget(const String& name, String& outName) override;
     /// Mark screen position as needing an update.
     void MarkDirty();
     /// Remove child XML element by matching attribute name.
@@ -665,73 +676,73 @@ protected:
     /// Child elements.
     Vector<SharedPtr<UIElement> > children_;
     /// Parent element.
-    UIElement* parent_;
+    UIElement* parent_{};
     /// Child element clipping border.
     IntRect clipBorder_;
     /// Colors.
-    Color color_[MAX_UIELEMENT_CORNERS];
+    Color colors_[MAX_UIELEMENT_CORNERS];
     /// User variables.
     VariantMap vars_;
     /// Priority.
-    int priority_;
+    int priority_{};
     /// Bring to front when focused flag.
-    bool bringToFront_;
+    bool bringToFront_{};
     /// Bring to back when defocused flag.
-    bool bringToBack_;
+    bool bringToBack_{true};
     /// Clip children flag.
-    bool clipChildren_;
+    bool clipChildren_{};
     /// Sort children according to priority flag.
-    bool sortChildren_;
+    bool sortChildren_{true};
     /// Use derived opacity flag.
-    bool useDerivedOpacity_;
+    bool useDerivedOpacity_{true};
     /// Input enabled flag.
-    bool enabled_;
+    bool enabled_{};
     /// Last SetEnabled flag before any SetDeepEnabled.
-    bool enabledPrev_;
+    bool enabledPrev_{};
     /// Value editable flag.
-    bool editable_;
+    bool editable_{true};
     /// Selected flag.
-    bool selected_;
+    bool selected_{};
     /// Visible flag.
-    bool visible_;
+    bool visible_{true};
     /// Hovering flag.
-    bool hovering_;
+    bool hovering_{};
     /// Internally created flag.
-    bool internal_;
+    bool internal_{};
     /// Focus mode.
-    FocusMode focusMode_;
+    FocusMode focusMode_{FM_NOTFOCUSABLE};
     /// Drag and drop flags.
-    unsigned dragDropMode_;
+    DragAndDropModeFlags dragDropMode_{DD_DISABLED};
     /// Layout mode.
-    LayoutMode layoutMode_;
+    LayoutMode layoutMode_{LM_FREE};
     /// Layout spacing.
-    int layoutSpacing_;
+    int layoutSpacing_{};
     /// Layout borders.
-    IntRect layoutBorder_;
+    IntRect layoutBorder_{};
     /// Layout flex scale.
-    Vector2 layoutFlexScale_;
+    Vector2 layoutFlexScale_{Vector2::ONE};
     /// Resize nesting level to prevent multiple events and endless loop.
-    unsigned resizeNestingLevel_;
+    unsigned resizeNestingLevel_{};
     /// Layout update nesting level to prevent endless loop.
-    unsigned layoutNestingLevel_;
+    unsigned layoutNestingLevel_{};
     /// Layout element maximum size in layout direction.
-    int layoutElementMaxSize_;
+    int layoutElementMaxSize_{};
     /// Horizontal indentation.
-    int indent_;
+    int indent_{};
     /// Indent spacing (number of pixels per indentation level).
-    int indentSpacing_;
+    int indentSpacing_{16};
     /// Position.
-    IntVector2 position_;
+    IntVector2 position_{};
     /// Screen position.
     mutable IntVector2 screenPosition_;
     /// Screen position dirty flag.
-    mutable bool positionDirty_;
+    mutable bool positionDirty_{true};
     /// Applied style.
     String appliedStyle_;
     /// Drag button combo.
-    int dragButtonCombo_;
+    MouseButtonFlags dragButtonCombo_{};
     /// Drag button count.
-    unsigned dragButtonCount_;
+    unsigned dragButtonCount_{};
 
 private:
     /// Return child elements recursively.
@@ -745,7 +756,7 @@ private:
     /// Calculate child widths/positions in the layout.
     void CalculateLayout
         (PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes,
-            const PODVector<float>& flexScales, int targetWidth, int begin, int end, int spacing);
+            const PODVector<float>& flexScales, int targetSize, int begin, int end, int spacing);
     /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
     /// Detach from parent.
@@ -760,7 +771,7 @@ private:
     /// Minimum size.
     IntVector2 minSize_;
     /// Maximum size.
-    IntVector2 maxSize_;
+    IntVector2 maxSize_{M_MAX_INT, M_MAX_INT};
     /// Child elements' offset. Used internally.
     IntVector2 childOffset_;
     /// Parent's minimum size calculated by layout. Used internally.
@@ -770,37 +781,37 @@ private:
     /// Maximum offset.
     IntVector2 maxOffset_;
     /// Use min/max anchor & min/max offset for position & size instead of setting explicitly.
-    bool enableAnchor_;
+    bool enableAnchor_{};
     /// Has pivot changed manually.
-    bool pivotSet_;
+    bool pivotSet_{};
     /// Anchor minimum position.
     Vector2 anchorMin_;
     /// Anchor maximum position.
     Vector2 anchorMax_;
-    /// Pivot Position
+    /// Pivot Position.
     Vector2 pivot_;
     /// Opacity.
-    float opacity_;
+    float opacity_{1.0f};
     /// Derived opacity.
-    mutable float derivedOpacity_;
+    mutable float derivedOpacity_{};
     /// Derived color. Only valid when no gradient.
     mutable Color derivedColor_;
     /// Derived opacity dirty flag.
-    mutable bool opacityDirty_;
-    /// Derived color dirty flag (only used when no gradient.)
-    mutable bool derivedColorDirty_;
+    mutable bool opacityDirty_{true};
+    /// Derived color dirty flag (only used when no gradient).
+    mutable bool derivedColorDirty_{true};
     /// Child priority sorting dirty flag.
-    bool sortOrderDirty_;
+    bool sortOrderDirty_{};
     /// Has color gradient flag.
-    bool colorGradient_;
+    bool colorGradient_{};
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
     /// Last applied style file.
     WeakPtr<XMLFile> appliedStyleFile_;
     /// Traversal mode for rendering.
-    TraversalMode traversalMode_;
+    TraversalMode traversalMode_{TM_BREADTH_FIRST};
     /// Flag whether node should send child added / removed events by itself.
-    bool elementEventSender_;
+    bool elementEventSender_{};
     /// XPath query for selecting UI-style.
     static XPathQuery styleXPathQuery_;
     /// Tag list.

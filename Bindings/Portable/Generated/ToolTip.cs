@@ -115,6 +115,30 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void ToolTip_Reset (IntPtr handle);
+
+		/// <summary>
+		/// Hide tooltip if visible and reset parentage.
+		/// </summary>
+		public void Reset ()
+		{
+			Runtime.ValidateRefCounted (this);
+			ToolTip_Reset (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void ToolTip_AddAltTarget (IntPtr handle, IntPtr target);
+
+		/// <summary>
+		/// Add an alternative hover target.
+		/// </summary>
+		public void AddAltTarget (UIElement target)
+		{
+			Runtime.ValidateRefCounted (this);
+			ToolTip_AddAltTarget (handle, (object)target == null ? IntPtr.Zero : target.Handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void ToolTip_SetDelay (IntPtr handle, float delay);
 
 		/// <summary>

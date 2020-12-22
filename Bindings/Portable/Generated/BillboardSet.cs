@@ -190,7 +190,7 @@ namespace Urho
 		internal static extern void BillboardSet_SetFaceCameraMode (IntPtr handle, FaceCameraMode mode);
 
 		/// <summary>
-		/// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+		/// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
 		/// </summary>
 		private void SetFaceCameraMode (FaceCameraMode mode)
 		{
@@ -487,7 +487,7 @@ namespace Urho
 		/// <summary>
 		/// Return how the billboards rotate in relation to the camera.
 		/// Or
-		/// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+		/// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ).
 		/// </summary>
 		public FaceCameraMode FaceCameraMode {
 			get {

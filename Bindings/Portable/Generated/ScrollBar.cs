@@ -154,7 +154,7 @@ namespace Urho.Gui
 		internal static extern void ScrollBar_SetRange (IntPtr handle, float range);
 
 		/// <summary>
-		/// Set slider range maximum value (minimum value is always 0.)
+		/// Set slider range maximum value (minimum value is always 0).
 		/// </summary>
 		private void SetRange (float range)
 		{
@@ -384,7 +384,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return slider range.
 		/// Or
-		/// Set slider range maximum value (minimum value is always 0.)
+		/// Set slider range maximum value (minimum value is always 0).
 		/// </summary>
 		public float Range {
 			get {

@@ -166,7 +166,7 @@ namespace Urho.Navigation
 		internal static extern void OffMeshConnection_SetMask (IntPtr handle, uint newMask);
 
 		/// <summary>
-		/// Set a user assigned mask
+		/// Set a user assigned mask.
 		/// </summary>
 		private void SetMask (uint newMask)
 		{
@@ -178,7 +178,7 @@ namespace Urho.Navigation
 		internal static extern void OffMeshConnection_SetAreaID (IntPtr handle, uint newAreaID);
 
 		/// <summary>
-		/// Sets the assigned area Id for the connection
+		/// Sets the assigned area Id for the connection.
 		/// </summary>
 		private void SetAreaID (uint newAreaID)
 		{
@@ -226,7 +226,7 @@ namespace Urho.Navigation
 		internal static extern uint OffMeshConnection_GetMask (IntPtr handle);
 
 		/// <summary>
-		/// Return the user assigned mask
+		/// Return the user assigned mask.
 		/// </summary>
 		private uint GetMask ()
 		{
@@ -238,7 +238,7 @@ namespace Urho.Navigation
 		internal static extern uint OffMeshConnection_GetAreaID (IntPtr handle);
 
 		/// <summary>
-		/// Return the user assigned area ID
+		/// Return the user assigned area ID.
 		/// </summary>
 		private uint GetAreaID ()
 		{
@@ -314,9 +314,9 @@ namespace Urho.Navigation
 		}
 
 		/// <summary>
-		/// Return the user assigned mask
+		/// Return the user assigned mask.
 		/// Or
-		/// Set a user assigned mask
+		/// Set a user assigned mask.
 		/// </summary>
 		public uint Mask {
 			get {
@@ -328,9 +328,9 @@ namespace Urho.Navigation
 		}
 
 		/// <summary>
-		/// Return the user assigned area ID
+		/// Return the user assigned area ID.
 		/// Or
-		/// Sets the assigned area Id for the connection
+		/// Sets the assigned area Id for the connection.
 		/// </summary>
 		public uint AreaID {
 			get {

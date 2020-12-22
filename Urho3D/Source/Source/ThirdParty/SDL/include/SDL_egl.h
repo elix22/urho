@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,12 +19,16 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+#if defined (URHO3D_ANGLE_METAL)
+#define SDL_VIDEO_STATIC_ANGLE 1
+#endif
+
 /**
  *  \file SDL_egl.h
  *
  *  This is a simple file to encapsulate the EGL API headers.
  */
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__ANDROID__)
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -132,7 +136,7 @@
 *-------------------------------------------------------------------------
 * This precedes the return type of the function in the function prototype.
 */
-#if defined(_WIN32) && !defined(__SCITECH_SNAP__)
+#if defined(_WIN32) && !defined(__SCITECH_SNAP__) && !defined(SDL_VIDEO_STATIC_ANGLE)
 #   define KHRONOS_APICALL __declspec(dllimport)
 #elif defined (__SYMBIAN32__)
 #   define KHRONOS_APICALL IMPORT_C

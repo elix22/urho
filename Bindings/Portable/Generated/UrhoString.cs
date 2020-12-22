@@ -23,8 +23,8 @@ namespace Urho
 	/// </summary>
 	public unsafe partial class UrhoString
 	{
-		private IntPtr handle ;
 
+		private IntPtr handle ;
 		unsafe partial void OnUrhoStringCreated ();
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -70,6 +70,7 @@ namespace Urho
 			handle = UrhoString_String2 (value);
 			OnUrhoStringCreated ();
 		}
+
 
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]

@@ -134,15 +134,51 @@ namespace Urho.Urho2D
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int TileMapObject2D_GetTileGid (IntPtr handle);
+		internal static extern uint TileMapObject2D_GetTileGid (IntPtr handle);
 
 		/// <summary>
 		/// Return tile Gid.
 		/// </summary>
-		private int GetTileGid ()
+		private uint GetTileGid ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return TileMapObject2D_GetTileGid (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool TileMapObject2D_GetTileFlipX (IntPtr handle);
+
+		/// <summary>
+		/// Return tile flip X.
+		/// </summary>
+		private bool GetTileFlipX ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return TileMapObject2D_GetTileFlipX (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool TileMapObject2D_GetTileFlipY (IntPtr handle);
+
+		/// <summary>
+		/// Return tile flip Y.
+		/// </summary>
+		private bool GetTileFlipY ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return TileMapObject2D_GetTileFlipY (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool TileMapObject2D_GetTileSwapXY (IntPtr handle);
+
+		/// <summary>
+		/// Return tile swap X and Y.
+		/// </summary>
+		private bool GetTileSwapXY ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return TileMapObject2D_GetTileSwapXY (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -238,9 +274,36 @@ namespace Urho.Urho2D
 		/// <summary>
 		/// Return tile Gid.
 		/// </summary>
-		public int TileGid {
+		public uint TileGid {
 			get {
 				return GetTileGid ();
+			}
+		}
+
+		/// <summary>
+		/// Return tile flip X.
+		/// </summary>
+		public bool TileFlipX {
+			get {
+				return GetTileFlipX ();
+			}
+		}
+
+		/// <summary>
+		/// Return tile flip Y.
+		/// </summary>
+		public bool TileFlipY {
+			get {
+				return GetTileFlipY ();
+			}
+		}
+
+		/// <summary>
+		/// Return tile swap X and Y.
+		/// </summary>
+		public bool TileSwapXY {
+			get {
+				return GetTileSwapXY ();
 			}
 		}
 

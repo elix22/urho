@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2017 the Urho3D project.
+// Copyright (c) 2008-2020 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ class Octree;
 static const int NUM_OCTANTS = 8;
 static const unsigned ROOT_INDEX = M_MAX_UNSIGNED;
 
-/// %Octree octant
+/// %Octree octant.
 class URHO3D_API Octant
 {
 public:
@@ -139,7 +139,7 @@ protected:
     /// Drawable objects.
     PODVector<Drawable*> drawables_;
     /// Child octants.
-    Octant* children_[NUM_OCTANTS];
+    Octant* children_[NUM_OCTANTS]{};
     /// World bounding box center.
     Vector3 center_;
     /// World bounding box half size.
@@ -147,32 +147,30 @@ protected:
     /// Subdivision level.
     unsigned level_;
     /// Number of drawable objects in this octant and child octants.
-    unsigned numDrawables_;
+    unsigned numDrawables_{};
     /// Parent octant.
     Octant* parent_;
     /// Octree root.
     Octree* root_;
-    /// Octant index relative to its siblings or ROOT_INDEX for root octant
+    /// Octant index relative to its siblings or ROOT_INDEX for root octant.
     unsigned index_;
 };
 
-/// %Octree component. Should be added only to the root scene node
+/// %Octree component. Should be added only to the root scene node.
 class URHO3D_API Octree : public Component, public Octant
 {
-    friend void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex);
-
     URHO3D_OBJECT(Octree, Component);
 
 public:
     /// Construct.
-    Octree(Context* context);
+    explicit Octree(Context* context);
     /// Destruct.
-    virtual ~Octree() override;
+    ~Octree() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set size and maximum subdivision levels. If octree is not empty, drawable objects will be temporarily moved to the root.
     void SetSize(const BoundingBox& box, unsigned numLevels);

@@ -418,7 +418,7 @@ namespace Urho.Audio
 		internal static extern void Sound_FixInterpolation (IntPtr handle);
 
 		/// <summary>
-		/// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.) Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.
+		/// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot). Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.
 		/// </summary>
 		public void FixInterpolation ()
 		{

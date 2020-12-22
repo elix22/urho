@@ -45,6 +45,42 @@ namespace Urho
 			return new GPUObject (Texture_CastToGPUObject (handle));
 		}
 
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern int Texture_GetType (IntPtr handle);
+
+		private StringHash UrhoGetType ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return new StringHash (Texture_GetType (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Texture_GetTypeName (IntPtr handle);
+
+		private string GetTypeName ()
+		{
+			Runtime.ValidateRefCounted (this);
+			return Marshal.PtrToStringAnsi (Texture_GetTypeName (handle));
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern int Texture_GetTypeStatic ();
+
+		private static StringHash GetTypeStatic ()
+		{
+			Runtime.Validate (typeof(Texture));
+			return new StringHash (Texture_GetTypeStatic ());
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern IntPtr Texture_GetTypeNameStatic ();
+
+		private static string GetTypeNameStatic ()
+		{
+			Runtime.Validate (typeof(Texture));
+			return Marshal.PtrToStringAnsi (Texture_GetTypeNameStatic ());
+		}
+
 		[Preserve]
 		public Texture () : this (Application.CurrentContext)
 		{
@@ -78,27 +114,27 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Texture_SetFilterMode (IntPtr handle, TextureFilterMode filter);
+		internal static extern void Texture_SetFilterMode (IntPtr handle, TextureFilterMode mode);
 
 		/// <summary>
 		/// Set filtering mode.
 		/// </summary>
-		private void SetFilterMode (TextureFilterMode filter)
+		private void SetFilterMode (TextureFilterMode mode)
 		{
 			Runtime.ValidateRefCounted (this);
-			Texture_SetFilterMode (handle, filter);
+			Texture_SetFilterMode (handle, mode);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Texture_SetAddressMode (IntPtr handle, TextureCoordinate coord, TextureAddressMode address);
+		internal static extern void Texture_SetAddressMode (IntPtr handle, TextureCoordinate coord, TextureAddressMode mode);
 
 		/// <summary>
 		/// Set addressing mode by texture coordinate.
 		/// </summary>
-		public void SetAddressMode (TextureCoordinate coord, TextureAddressMode address)
+		public void SetAddressMode (TextureCoordinate coord, TextureAddressMode mode)
 		{
 			Runtime.ValidateRefCounted (this);
-			Texture_SetAddressMode (handle, coord, address);
+			Texture_SetAddressMode (handle, coord, mode);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -162,12 +198,12 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Texture_SetMipsToSkip (IntPtr handle, int quality, int toSkip);
+		internal static extern void Texture_SetMipsToSkip (IntPtr handle, MaterialQuality quality, int toSkip);
 
 		/// <summary>
 		/// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
 		/// </summary>
-		public void SetMipsToSkip (int quality, int toSkip)
+		public void SetMipsToSkip (MaterialQuality quality, int toSkip)
 		{
 			Runtime.ValidateRefCounted (this);
 			Texture_SetMipsToSkip (handle, quality, toSkip);
@@ -378,12 +414,12 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int Texture_GetMipsToSkip (IntPtr handle, int quality);
+		internal static extern int Texture_GetMipsToSkip (IntPtr handle, MaterialQuality quality);
 
 		/// <summary>
 		/// Return mip levels to skip on a quality setting when loading.
 		/// </summary>
-		public int GetMipsToSkip (int quality)
+		public int GetMipsToSkip (MaterialQuality quality)
 		{
 			Runtime.ValidateRefCounted (this);
 			return Texture_GetMipsToSkip (handle, quality);
@@ -498,15 +534,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Texture_SetParameters (IntPtr handle, IntPtr xml);
+		internal static extern void Texture_SetParameters (IntPtr handle, IntPtr file);
 
 		/// <summary>
 		/// Set additional parameters from an XML file.
 		/// </summary>
-		public void SetParameters (Urho.Resources.XmlFile xml)
+		public void SetParameters (Urho.Resources.XmlFile file)
 		{
 			Runtime.ValidateRefCounted (this);
-			Texture_SetParameters (handle, (object)xml == null ? IntPtr.Zero : xml.Handle);
+			Texture_SetParameters (handle, (object)file == null ? IntPtr.Zero : file.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -651,6 +687,31 @@ namespace Urho
 		{
 			Runtime.Validate (typeof(Texture));
 			return Texture_CheckMaxLevels2 (width, height, depth, requestedLevels);
+		}
+
+		public override StringHash Type {
+			get {
+				return UrhoGetType ();
+			}
+		}
+
+		public override string TypeName {
+			get {
+				return GetTypeName ();
+			}
+		}
+
+		[Preserve]
+		public new static StringHash TypeStatic {
+			get {
+				return GetTypeStatic ();
+			}
+		}
+
+		public new static string TypeNameStatic {
+			get {
+				return GetTypeNameStatic ();
+			}
 		}
 
 		/// <summary>

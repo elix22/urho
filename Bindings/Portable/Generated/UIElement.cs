@@ -115,39 +115,39 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool UIElement_LoadXML (IntPtr handle, IntPtr source, bool setInstanceDefault);
+		internal static extern bool UIElement_LoadXML (IntPtr handle, IntPtr source);
 
 		/// <summary>
 		/// Load from XML data. Return true if successful.
 		/// </summary>
-		public override bool LoadXml (XmlElement source, bool setInstanceDefault = false)
+		public override bool LoadXml (XmlElement source)
 		{
 			Runtime.ValidateRefCounted (this);
-			return UIElement_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, setInstanceDefault);
+			return UIElement_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool UIElement_LoadXML0 (IntPtr handle, IntPtr source, IntPtr styleFile, bool setInstanceDefault);
+		internal static extern bool UIElement_LoadXML0 (IntPtr handle, IntPtr source, IntPtr styleFile);
 
 		/// <summary>
 		/// Load from XML data with style. Return true if successful.
 		/// </summary>
-		public virtual bool LoadXml (XmlElement source, Urho.Resources.XmlFile styleFile, bool setInstanceDefault = false)
+		public virtual bool LoadXml (XmlElement source, Urho.Resources.XmlFile styleFile)
 		{
 			Runtime.ValidateRefCounted (this);
-			return UIElement_LoadXML0 (handle, (object)source == null ? IntPtr.Zero : source.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle, setInstanceDefault);
+			return UIElement_LoadXML0 (handle, (object)source == null ? IntPtr.Zero : source.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern IntPtr UIElement_LoadChildXML (IntPtr handle, IntPtr childElem, IntPtr styleFile, bool setInstanceDefault);
+		internal static extern IntPtr UIElement_LoadChildXML (IntPtr handle, IntPtr childElem, IntPtr styleFile);
 
 		/// <summary>
 		/// Create a child by loading from XML data with style. Returns the child element if successful, null if otherwise.
 		/// </summary>
-		public UIElement LoadChildXml (XmlElement childElem, Urho.Resources.XmlFile styleFile = null, bool setInstanceDefault = false)
+		public UIElement LoadChildXml (XmlElement childElem, Urho.Resources.XmlFile styleFile)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Runtime.LookupObject<UIElement> (UIElement_LoadChildXML (handle, (object)childElem == null ? IntPtr.Zero : childElem.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle, setInstanceDefault));
+			return Runtime.LookupObject<UIElement> (UIElement_LoadChildXML (handle, (object)childElem == null ? IntPtr.Zero : childElem.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle));
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -196,78 +196,6 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return UIElement_GetScreenPosition (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnHover (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse hover.
-		/// </summary>
-		public virtual void OnHover (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnHover (handle, ref position, ref screenPosition, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnClickBegin (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse click begin.
-		/// </summary>
-		public virtual void OnClickBegin (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnClickBegin (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnClickEnd (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor, IntPtr beginElement);
-
-		/// <summary>
-		/// React to mouse click end.
-		/// </summary>
-		public virtual void OnClickEnd (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor, UIElement beginElement)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnClickEnd (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle, (object)beginElement == null ? IntPtr.Zero : beginElement.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnDoubleClick (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to double mouse click.
-		/// </summary>
-		public virtual void OnDoubleClick (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int button, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnDoubleClick (handle, ref position, ref screenPosition, button, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnWheel (IntPtr handle, int delta, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to mouse wheel.
-		/// </summary>
-		public virtual void OnWheel (int delta, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnWheel (handle, delta, buttons, qualifiers);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_OnKey (IntPtr handle, int key, int buttons, int qualifiers);
-
-		/// <summary>
-		/// React to a key press.
-		/// </summary>
-		public virtual void OnKey (int key, int buttons, int qualifiers)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_OnKey (handle, key, buttons, qualifiers);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -708,7 +636,7 @@ namespace Urho.Gui
 		internal static extern void UIElement_SetMinAnchor (IntPtr handle, ref Urho.Vector2 anchor);
 
 		/// <summary>
-		/// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+		/// Set minimum (top left) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
 		/// </summary>
 		private void SetMinAnchor (Urho.Vector2 anchor)
 		{
@@ -732,7 +660,7 @@ namespace Urho.Gui
 		internal static extern void UIElement_SetMaxAnchor (IntPtr handle, ref Urho.Vector2 anchor);
 
 		/// <summary>
-		/// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+		/// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
 		/// </summary>
 		private void SetMaxAnchor (Urho.Vector2 anchor)
 		{
@@ -780,7 +708,7 @@ namespace Urho.Gui
 		internal static extern void UIElement_SetPivot (IntPtr handle, ref Urho.Vector2 pivot);
 
 		/// <summary>
-		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal
+		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal
 		/// &
 		/// vertical alignment.
 		/// </summary>
@@ -794,7 +722,7 @@ namespace Urho.Gui
 		internal static extern void UIElement_SetPivot10 (IntPtr handle, float x, float y);
 
 		/// <summary>
-		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal
+		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal
 		/// &
 		/// vertical alignment.
 		/// </summary>
@@ -1033,22 +961,10 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void UIElement_SetDragDropMode (IntPtr handle, uint mode);
-
-		/// <summary>
-		/// Set drag and drop flags.
-		/// </summary>
-		private void SetDragDropMode (uint mode)
-		{
-			Runtime.ValidateRefCounted (this);
-			UIElement_SetDragDropMode (handle, mode);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern bool UIElement_SetStyle (IntPtr handle, string styleName, IntPtr file);
 
 		/// <summary>
-		/// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+		/// Set style from an XML file. Find the style element by name. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully. See also
 		/// </summary>
 		public bool SetStyle (string styleName, Urho.Resources.XmlFile file = null)
 		{
@@ -1072,7 +988,7 @@ namespace Urho.Gui
 		internal static extern bool UIElement_SetStyleAuto (IntPtr handle, IntPtr file);
 
 		/// <summary>
-		/// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+		/// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully. See also
 		/// </summary>
 		public bool SetStyleAuto (Urho.Resources.XmlFile file = null)
 		{
@@ -1884,7 +1800,7 @@ namespace Urho.Gui
 		internal static extern float UIElement_GetDerivedOpacity (IntPtr handle);
 
 		/// <summary>
-		/// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
+		/// Return derived opacity (affected by parent elements). If UseDerivedOpacity is false, returns same as element's own opacity.
 		/// </summary>
 		private float GetDerivedOpacity ()
 		{
@@ -2040,7 +1956,7 @@ namespace Urho.Gui
 		internal static extern bool UIElement_IsVisibleEffective (IntPtr handle);
 
 		/// <summary>
-		/// Return whether element is effectively visible (parent element chain is visible.)
+		/// Return whether element is effectively visible (parent element chain is visible).
 		/// </summary>
 		private bool IsVisibleEffective ()
 		{
@@ -2094,18 +2010,6 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return UIElement_GetFocusMode (handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern uint UIElement_GetDragDropMode (IntPtr handle);
-
-		/// <summary>
-		/// Return drag and drop flags.
-		/// </summary>
-		private uint GetDragDropMode ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return UIElement_GetDragDropMode (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -2276,18 +2180,6 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return UIElement_HasTag (handle, tag);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern int UIElement_GetDragButtonCombo (IntPtr handle);
-
-		/// <summary>
-		/// Return the drag button combo if this element is being dragged.
-		/// </summary>
-		private int GetDragButtonCombo ()
-		{
-			Runtime.ValidateRefCounted (this);
-			return UIElement_GetDragButtonCombo (handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -2480,6 +2372,18 @@ namespace Urho.Gui
 		{
 			Runtime.ValidateRefCounted (this);
 			return UIElement_GetEffectiveMinSize (handle);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void UIElement_SetRenderTexture (IntPtr handle, IntPtr texture);
+
+		/// <summary>
+		/// Set texture to which element will be rendered.
+		/// </summary>
+		public void SetRenderTexture (Texture2D texture)
+		{
+			Runtime.ValidateRefCounted (this);
+			UIElement_SetRenderTexture (handle, (object)texture == null ? IntPtr.Zero : texture.Handle);
 		}
 
 		public override StringHash Type {
@@ -2755,7 +2659,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return minimum anchor.
 		/// Or
-		/// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+		/// Set minimum (top left) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
 		/// </summary>
 		public Urho.Vector2 MinAnchor {
 			get {
@@ -2769,7 +2673,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return maximum anchor.
 		/// Or
-		/// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+		/// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1). No effect when anchor is not enabled.
 		/// </summary>
 		public Urho.Vector2 MaxAnchor {
 			get {
@@ -2809,7 +2713,7 @@ namespace Urho.Gui
 		/// <summary>
 		/// Return pivot.
 		/// Or
-		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal
+		/// Set pivot relative to element's size (from 0 to 1, where 0.5 is center). Overrides horizontal
 		/// &
 		/// vertical alignment.
 		/// </summary>
@@ -3005,20 +2909,6 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
-		/// Return drag and drop flags.
-		/// Or
-		/// Set drag and drop flags.
-		/// </summary>
-		public uint DragDropMode {
-			get {
-				return GetDragDropMode ();
-			}
-			set {
-				SetDragDropMode (value);
-			}
-		}
-
-		/// <summary>
 		/// Return layout mode.
 		/// Or
 		/// Set layout mode only.
@@ -3154,7 +3044,7 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
-		/// Return derived opacity (affected by parent elements.) If UseDerivedOpacity is false, returns same as element's own opacity.
+		/// Return derived opacity (affected by parent elements). If UseDerivedOpacity is false, returns same as element's own opacity.
 		/// </summary>
 		public float DerivedOpacity {
 			get {
@@ -3172,7 +3062,7 @@ namespace Urho.Gui
 		}
 
 		/// <summary>
-		/// Return whether element is effectively visible (parent element chain is visible.)
+		/// Return whether element is effectively visible (parent element chain is visible).
 		/// </summary>
 		public bool VisibleEffective {
 			get {
@@ -3236,15 +3126,6 @@ namespace Urho.Gui
 		public Urho.Color DerivedColor {
 			get {
 				return GetDerivedColor ();
-			}
-		}
-
-		/// <summary>
-		/// Return the drag button combo if this element is being dragged.
-		/// </summary>
-		public int DragButtonCombo {
-			get {
-				return GetDragButtonCombo ();
 			}
 		}
 

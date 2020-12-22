@@ -60,9 +60,9 @@ namespace Urho
 			var cache = Application.Current.ResourceCache;
 			float tolerance = 0.001f;
 			if (unlit)
-				material.SetTechnique(0, Math.Abs(color.A - 1) < tolerance ? CoreAssets.Techniques.NoTextureUnlit : CoreAssets.Techniques.NoTextureUnlitAlpha, 1, 1);
+				material.SetTechnique(0, Math.Abs(color.A - 1) < tolerance ? CoreAssets.Techniques.NoTextureUnlit : CoreAssets.Techniques.NoTextureUnlitAlpha, MaterialQuality.Medium, 1);
 			else
-				material.SetTechnique(0, Math.Abs(color.A - 1) < tolerance ? CoreAssets.Techniques.NoTexture : CoreAssets.Techniques.NoTextureAlpha, 1, 1);
+				material.SetTechnique(0, Math.Abs(color.A - 1) < tolerance ? CoreAssets.Techniques.NoTexture : CoreAssets.Techniques.NoTextureAlpha, MaterialQuality.Medium, 1);
 			material.SetShaderParameter("MatDiffColor", color);
 			return material;
 		}

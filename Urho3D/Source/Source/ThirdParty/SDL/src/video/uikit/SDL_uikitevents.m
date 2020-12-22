@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -63,9 +63,10 @@ UIKit_PumpEvents(_THIS)
     do {
         result = CFRunLoopRunInMode((CFStringRef)UITrackingRunLoopMode, seconds, TRUE);
     } while(result == kCFRunLoopRunHandledSource);
-
+#ifndef URHO3D_ANGLE_METAL
     /* See the comment in the function definition. */
     UIKit_GL_RestoreCurrentContext();
+#endif
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

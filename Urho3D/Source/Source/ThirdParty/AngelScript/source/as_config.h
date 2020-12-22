@@ -28,7 +28,7 @@
    andreas@angelcode.com
 */
 
-// Modified by Yao Wei Tjong and Skrylar for Urho3D
+// Modified by Yao Wei Tjong, Skrylar and Ramil Sattarov for Urho3D
 
 
 //
@@ -178,6 +178,16 @@
 // Oracle Solaris Studio (previously known as Sun CC compiler)
 // __SUNPRO_CC is defined
 
+// Urho3D: Added description of how to identify LCC and MCST lcc compilers
+
+// Local (or Little) C Compiler
+// __LCC__ is defined
+// __e2k__ is not defined
+
+// MCST eLbrus C Compiler
+// __LCC__ is defined
+// __e2k__ is defined
+
 
 
 //
@@ -227,6 +237,11 @@
 
 // AS_SPARC
 // Define this for SPARC CPU family
+
+// Urho3D: Added identifier for definition e2k architecture
+
+// AS_E2K
+// Define this for MCST Elbrus 2000 CPU family
 
 
 
@@ -607,7 +622,8 @@
 
 // GNU C (and MinGW or Cygwin on Windows)
 // Use the following command to determine predefined macros: echo . | g++ -dM -E -
-#if (defined(__GNUC__) && !defined(__SNC__)) || defined(EPPC) || defined(__CYGWIN__) // JWC -- use this instead for Wii
+// MSVC2015 can now use CLang too, but it shouldn't go in here
+#if (defined(__GNUC__) && !defined(__SNC__) && !defined(_MSC_VER)) || defined(EPPC) || defined(__CYGWIN__) // JWC -- use this instead for Wii
 	#define GNU_STYLE_VIRTUAL_METHOD
 	#define MULTI_BASE_OFFSET(x) (*((asPWORD*)(&x)+1))
 	#define asVSNPRINTF(a, b, c, d) vsnprintf(a, b, c, d)
@@ -804,13 +820,12 @@
 
 			// As of version 4.7 MinGW changed the ABI, presumably
 			// to be better aligned with how MSVC works
-			// Urho3D: also check for Clang version and use the same workaround
 			#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4
 				#define AS_MINGW47
 			#endif
 
-			#if (__clang_major__ == 3 && __clang_minor__ > 4)
-			    #define AS_MINGW47
+			#if (__clang_major__ == 3 && __clang_minor__ > 4) || __clang_major > 3
+				#define AS_MINGW47
 			#endif
 
 			#ifdef AS_MINGW47
@@ -842,6 +857,7 @@
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
 		#if (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
+			// x86 32bit
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
@@ -850,9 +866,8 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-
-		// Urho3D - use __aarch64__ instead of __arm64__ because GCC only emits the former
-		#elif defined(__LP64__) && !defined(__aarch64__)
+		#elif defined(__x86_64__)
+			// x86 64bit
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 			#define HAS_128_BIT_PRIMITIVES
@@ -862,60 +877,68 @@
 			// STDCALL is not available on 64bit Linux
 			#undef STDCALL
 			#define STDCALL
+		#elif defined(__ARMEL__) || defined(__arm__) || defined(__aarch64__) || defined(__AARCH64EL__)
+			// arm
 
-		// Urho3D - Add support for aarch64-linux-gnu
-		#elif defined(__aarch64__)
-			// AngelScript currently doesn't support native calling
-			// for 64bit ARM processors so it's necessary to turn on
-			// portability mode
-			#define AS_MAX_PORTABILITY
-			// STDCALL is not available on ARM
-			#undef STDCALL
-			#define STDCALL
+			// The assembler code currently doesn't support arm v4, nor 64bit (v8)
+			#if !defined(__ARM_ARCH_4__) && !defined(__ARM_ARCH_4T__) && !defined(__LP64__)
+				#define AS_ARM
 
-		#elif (defined(__ARMEL__) || defined(__arm__)) && !(defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__))
-			#define AS_ARM
+				// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
+				#define AS_NO_EXCEPTIONS
 
-			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
-			#define AS_NO_EXCEPTIONS
+				#undef STDCALL
+				#define STDCALL
 
-			#undef STDCALL
-			#define STDCALL
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+				#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 
-			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#ifndef AS_MAX_PORTABILITY
+				// Make a few checks against incompatible ABI combinations
+				#if defined(__FAST_MATH__) && __FAST_MATH__ == 1
+					#error -ffast-math is not supported with native calling conventions
+				#endif
+				#endif
 
-			#ifndef AS_MAX_PORTABILITY
-			// Make a few checks against incompatible ABI combinations
-			#if defined(__FAST_MATH__) && __FAST_MATH__ == 1
-				#error -ffast-math is not supported with native calling conventions
+				// Verify if soft-float or hard-float ABI is used
+				#if defined(__SOFTFP__) && __SOFTFP__ == 1
+					// -ffloat-abi=softfp or -ffloat-abi=soft
+					#define AS_SOFTFP
+				#endif
+
+				// Tested with both hard float and soft float abi
+				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+
+            // Urho3D - Add support for aarch64-linux-gnu
+            #elif defined(__aarch64__)
+                // arm64
+
+                // AngelScript currently doesn't support native calling
+                // for 64bit ARM processors so it's necessary to turn on
+                // portability mode
+                #define AS_MAX_PORTABILITY
+                // STDCALL is not available on ARM
+                #undef STDCALL
+                #define STDCALL
 			#endif
-			#endif
-
-			// Verify if soft-float or hard-float ABI is used
-			#if defined(__SOFTFP__) && __SOFTFP__ == 1
-				// -ffloat-abi=softfp or -ffloat-abi=soft
-				#define AS_SOFTFP
-			#endif
-
-			// Tested with both hard float and soft float abi
-			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 
 		#elif defined(__mips__)
+			// mips
 			#define AS_MIPS
 			#undef STDCALL
 			#define STDCALL
 
 			#ifdef _ABIO32
+				// 32bit O32 ABI
 				#define AS_MIPS
 
 				// All structures are returned in memory regardless of size or complexity
@@ -930,6 +953,24 @@
 				// For other ABIs the native calling convention is not available (yet)
 				#define AS_MAX_PORTABILITY
 			#endif
+		#elif defined(__PPC64__)
+			// PPC 64bit
+
+			// The code in as_callfunc_ppc_64.cpp was built for PS3 and XBox 360, that
+			// although use 64bit PPC only uses 32bit pointers.
+			// TODO: Add support for native calling conventions on Linux with PPC 64bit
+			#define AS_MAX_PORTABILITY
+		// Urho3D - Add support for e2k-linux-gnu
+		#elif defined(__e2k__)
+			// 64bit MCST Elbrus 2000
+			#define AS_E2K
+			// AngelScript currently doesn't support native calling
+			// for MCST Elbrus 2000 processor so it's necessary to turn on
+			// portability mode
+			#define AS_MAX_PORTABILITY
+			// STDCALL is not available on 64bit Linux
+			#undef STDCALL
+			#define STDCALL
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -1130,7 +1171,7 @@
 			// Support native calling conventions on Intel 32bit CPU
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
-		#elif (defined(__x86_64__) || defined(__LP64__))
+		#elif defined(__x86_64__)
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
@@ -1190,23 +1231,20 @@
 // Detect target hardware
 //------------------------------------------------
 
-// X86, Intel, AMD, etc, i.e. most PCs
-#if defined(__i386__) || defined(_M_IX86)
-	// Nothing special here
+// Big endian CPU target?
+// see: http://sourceforge.net/p/predef/wiki/Endianness/
+#if !defined(AS_BIG_ENDIAN) && \
+	defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || \
+	defined(__BIG_ENDIAN__) || \
+	defined(__ARMEB__) || \
+	defined(__THUMBEB__) || \
+	defined(__AARCH64EB__) || \
+	defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
+		#define AS_BIG_ENDIAN
 #endif
 
-// PowerPC, e.g. Mac, GameCube, PS3, XBox 360, Wii
-#if defined(__PPC__) || defined(__ppc__) || defined(_PPC_) || defined(EPPC)
-	#define AS_BIG_ENDIAN
-
-	// Gamecube
-	#if defined(_GC)
-		#define AS_USE_DOUBLE_AS_FLOAT
-	#endif
-#endif
-
-// Dreamcast console
-#ifdef __SH4_SINGLE_ONLY__
+// Dreamcast and Gamecube use only 32bit floats, so treat doubles as floats
+#if defined(__SH4_SINGLE_ONLY__) || defined(_GC)
 	#define AS_USE_DOUBLE_AS_FLOAT	// use 32bit floats instead of doubles
 #endif
 

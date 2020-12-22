@@ -43,6 +43,10 @@ namespace Urho {
 		}
 
 		public BoneWrapper GetBoneSafe(string name) => GetBoneSafe(new StringHash(name));
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Bone* Skeleton_GetBone0 (IntPtr handle, int boneNameHash);
+
 	}
 
 	public partial class AnimatedModel {

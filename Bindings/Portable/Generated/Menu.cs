@@ -103,15 +103,15 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern bool Menu_LoadXML (IntPtr handle, IntPtr source, IntPtr styleFile, bool setInstanceDefault);
+		internal static extern bool Menu_LoadXML (IntPtr handle, IntPtr source, IntPtr styleFile);
 
 		/// <summary>
 		/// Load from XML data with style. Return true if successful.
 		/// </summary>
-		public override bool LoadXml (XmlElement source, Urho.Resources.XmlFile styleFile, bool setInstanceDefault = false)
+		public override bool LoadXml (XmlElement source, Urho.Resources.XmlFile styleFile)
 		{
 			Runtime.ValidateRefCounted (this);
-			return Menu_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle, setInstanceDefault);
+			return Menu_LoadXML (handle, (object)source == null ? IntPtr.Zero : source.Handle, (object)styleFile == null ? IntPtr.Zero : styleFile.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -139,18 +139,6 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Menu_OnHover (IntPtr handle, ref Urho.IntVector2 position, ref Urho.IntVector2 screenPosition, int buttons, int qualifiers, IntPtr cursor);
-
-		/// <summary>
-		/// React to mouse hover.
-		/// </summary>
-		public override void OnHover (Urho.IntVector2 position, Urho.IntVector2 screenPosition, int buttons, int qualifiers, Cursor cursor)
-		{
-			Runtime.ValidateRefCounted (this);
-			Menu_OnHover (handle, ref position, ref screenPosition, buttons, qualifiers, (object)cursor == null ? IntPtr.Zero : cursor.Handle);
-		}
-
-		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Menu_OnShowPopup (IntPtr handle);
 
 		/// <summary>
@@ -175,15 +163,15 @@ namespace Urho.Gui
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void Menu_SetPopup (IntPtr handle, IntPtr element);
+		internal static extern void Menu_SetPopup (IntPtr handle, IntPtr popup);
 
 		/// <summary>
 		/// Set popup element to show on selection.
 		/// </summary>
-		private void SetPopup (UIElement element)
+		private void SetPopup (UIElement popup)
 		{
 			Runtime.ValidateRefCounted (this);
-			Menu_SetPopup (handle, (object)element == null ? IntPtr.Zero : element.Handle);
+			Menu_SetPopup (handle, (object)popup == null ? IntPtr.Zero : popup.Handle);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -226,7 +214,7 @@ namespace Urho.Gui
 		internal static extern void Menu_SetAccelerator (IntPtr handle, int key, int qualifiers);
 
 		/// <summary>
-		/// Set accelerator key (set zero key code to disable.)
+		/// Set accelerator key (set zero key code to disable).
 		/// </summary>
 		public void SetAccelerator (int key, int qualifiers)
 		{

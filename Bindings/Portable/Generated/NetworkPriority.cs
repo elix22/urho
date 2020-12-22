@@ -106,7 +106,7 @@ namespace Urho.Network
 		internal static extern void NetworkPriority_SetBasePriority (IntPtr handle, float priority);
 
 		/// <summary>
-		/// Set base priority. Default 100 (send updates at full frequency.)
+		/// Set base priority. Default 100 (send updates at full frequency).
 		/// </summary>
 		private void SetBasePriority (float priority)
 		{
@@ -118,7 +118,7 @@ namespace Urho.Network
 		internal static extern void NetworkPriority_SetDistanceFactor (IntPtr handle, float factor);
 
 		/// <summary>
-		/// Set priority reduction distance factor. Default 0 (no effect.)
+		/// Set priority reduction distance factor. Default 0 (no effect).
 		/// </summary>
 		private void SetDistanceFactor (float factor)
 		{
@@ -130,7 +130,7 @@ namespace Urho.Network
 		internal static extern void NetworkPriority_SetMinPriority (IntPtr handle, float priority);
 
 		/// <summary>
-		/// Set minimum priority. Default 0 (no updates when far away enough.)
+		/// Set minimum priority. Default 0 (no updates when far away enough).
 		/// </summary>
 		private void SetMinPriority (float priority)
 		{
@@ -238,7 +238,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return base priority.
 		/// Or
-		/// Set base priority. Default 100 (send updates at full frequency.)
+		/// Set base priority. Default 100 (send updates at full frequency).
 		/// </summary>
 		public float BasePriority {
 			get {
@@ -252,7 +252,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return priority reduction distance factor.
 		/// Or
-		/// Set priority reduction distance factor. Default 0 (no effect.)
+		/// Set priority reduction distance factor. Default 0 (no effect).
 		/// </summary>
 		public float DistanceFactor {
 			get {
@@ -266,7 +266,7 @@ namespace Urho.Network
 		/// <summary>
 		/// Return minimum priority.
 		/// Or
-		/// Set minimum priority. Default 0 (no updates when far away enough.)
+		/// Set minimum priority. Default 0 (no updates when far away enough).
 		/// </summary>
 		public float MinPriority {
 			get {

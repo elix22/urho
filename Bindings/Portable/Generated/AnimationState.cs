@@ -62,15 +62,15 @@ namespace Urho
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void AnimationState_SetStartBone (IntPtr handle, Bone* bone);
+		internal static extern void AnimationState_SetStartBone (IntPtr handle, Bone* startBone);
 
 		/// <summary>
 		/// Set start bone. Not supported in node animation mode. Resets any assigned per-bone weights.
 		/// </summary>
-		private void SetStartBone (Bone* bone)
+		private void SetStartBone (Bone* startBone)
 		{
 			Runtime.ValidateRefCounted (this);
-			AnimationState_SetStartBone (handle, bone);
+			AnimationState_SetStartBone (handle, startBone);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -209,7 +209,7 @@ namespace Urho
 		internal static extern IntPtr AnimationState_GetModel (IntPtr handle);
 
 		/// <summary>
-		/// Return animated model this state belongs to (model mode.)
+		/// Return animated model this state belongs to (model mode).
 		/// </summary>
 		private AnimatedModel GetModel ()
 		{
@@ -221,7 +221,7 @@ namespace Urho
 		internal static extern IntPtr AnimationState_GetNode (IntPtr handle);
 
 		/// <summary>
-		/// Return root scene node this state controls (node hierarchy mode.)
+		/// Return root scene node this state controls (node hierarchy mode).
 		/// </summary>
 		private Node GetNode ()
 		{
@@ -503,7 +503,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return animated model this state belongs to (model mode.)
+		/// Return animated model this state belongs to (model mode).
 		/// </summary>
 		public AnimatedModel Model {
 			get {
@@ -512,7 +512,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return root scene node this state controls (node hierarchy mode.)
+		/// Return root scene node this state controls (node hierarchy mode).
 		/// </summary>
 		public Node Node {
 			get {

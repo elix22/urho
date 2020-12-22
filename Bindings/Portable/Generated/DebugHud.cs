@@ -274,7 +274,7 @@ namespace Urho
 		internal static extern float DebugHud_GetProfilerInterval (IntPtr handle);
 
 		/// <summary>
-		/// Return profiler accumulation interval in seconds
+		/// Return profiler accumulation interval in seconds.
 		/// </summary>
 		private float GetProfilerInterval ()
 		{
@@ -398,7 +398,7 @@ namespace Urho
 		}
 
 		/// <summary>
-		/// Return profiler accumulation interval in seconds
+		/// Return profiler accumulation interval in seconds.
 		/// Or
 		/// Set profiler accumulation interval in seconds.
 		/// </summary>
