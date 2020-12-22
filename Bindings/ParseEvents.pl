@@ -138,7 +138,7 @@ sub mapType {
 
 sub stringHash {
     my ($str) = @_;
-	$str = lc $str;
+# TBD ELI , removed in the new Urho3D source code	$str = lc $str;
 	$hash = 0;
 	foreach $char (split //, $str) {
 		$hash = ord($char) + ($hash << 6) + ($hash << 16) - $hash;
