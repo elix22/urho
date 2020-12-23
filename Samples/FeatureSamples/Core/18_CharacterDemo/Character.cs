@@ -39,7 +39,7 @@ namespace Urho.Samples
 		float inAirTimer;
 
 		RigidBody body;
-		AnimationController animCtrl;
+		public AnimationController animCtrl;
 
 		public Character()
 		{
@@ -57,7 +57,7 @@ namespace Urho.Samples
 
 		public void FixedUpdate(float timeStep)
 		{
-			animCtrl = animCtrl ?? GetComponent<AnimationController>();
+			animCtrl = animCtrl ?? Node.GetComponent<AnimationController>(true);
 			body = body ?? GetComponent<RigidBody>();
 
 			// Update the in air timer. Reset if grounded
@@ -104,19 +104,27 @@ namespace Urho.Samples
 					{
 						body.ApplyImpulse(Vector3.UnitY * CharacterDemo.JumpForce);
 						okToJump = false;
+						animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
 					}
 				}
 				else
 					okToJump = true;
 			}
 
-			// Play walk animation if moving on ground, otherwise fade it out
-			if (softGrounded && !moveDir.Equals(Vector3.Zero))
-				animCtrl.PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
+			if ( !onGround)
+			{
+				animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+			}
 			else
-				animCtrl.Stop("Models/Jack_Walk.ani", 0.2f);
-			// Set walk animation speed proportional to velocity
-			animCtrl.SetSpeed("Models/Jack_Walk.ani", planeVelocity.Length * 0.3f);
+			{
+				// Play walk animation if moving on ground, otherwise fade it out
+				if (softGrounded && !moveDir.Equals(Vector3.Zero))
+					animCtrl.PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
+				else
+					animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
+				// Set walk animation speed proportional to velocity
+				animCtrl.SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.Length * 0.3f);
+			}
 
 			// Reset grounded flag for next frame
 			onGround = false;

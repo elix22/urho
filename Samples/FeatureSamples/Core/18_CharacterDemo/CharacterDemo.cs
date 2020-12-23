@@ -83,6 +83,7 @@ namespace Urho.Samples
 
 		void HandlePostUpdate(PostUpdateEventArgs args)
 		{
+
 			if (character == null)
 				return;
 
@@ -93,7 +94,7 @@ namespace Urho.Samples
 			Quaternion dir = rot * Quaternion.FromAxisAngle(Vector3.UnitX, character.Controls.Pitch);
 
 			// Turn head to camera pitch, but limit to avoid unnatural animation
-			Node headNode = characterNode.GetChild("Bip01_Head", true);
+			Node headNode = characterNode.GetChild("Mutant:Head", true);
 			float limitPitch = MathHelper.Clamp(character.Controls.Pitch, -45.0f, 45.0f);
 			Quaternion headDir = rot * Quaternion.FromAxisAngle(new Vector3(1.0f, 0.0f, 0.0f), limitPitch);
 			// This could be expanded to look at an arbitrary target, now just look at a point in front
@@ -309,15 +310,19 @@ namespace Urho.Samples
 			Node objectNode = scene.CreateChild("Jack");
 			objectNode.Position = (new Vector3(0.0f, 1.0f, 0.0f));
 
+			// spin node
+			Node adjustNode = objectNode.CreateChild("AdjNode");
+			adjustNode.Rotation =  (new  Quaternion(0,180,0));
+
 			// Create the rendering component + animation controller
-			AnimatedModel obj = objectNode.CreateComponent<AnimatedModel>();
-			obj.Model = cache.GetModel("Models/Jack.mdl");
-			obj.SetMaterial(cache.GetMaterial("Materials/Jack.xml"));
+			AnimatedModel obj = adjustNode.CreateComponent<AnimatedModel>();
+			obj.Model = cache.GetModel("Models/Mutant/Mutant.mdl");
+			obj.SetMaterial(cache.GetMaterial("Models/Mutant/Materials/mutant_M.xml"));
 			obj.CastShadows = true;
-			objectNode.CreateComponent<AnimationController>();
+			adjustNode.CreateComponent<AnimationController>();
 
 			// Set the head bone for manual control
-			//obj.Skeleton.GetBoneSafe("Bip01_Head").Animated = false;
+			obj.Skeleton.GetBoneSafe("Mutant:Head").Animated = false;
 
 			// Create rigidbody, and set non-zero mass so that the body becomes dynamic
 			RigidBody body = objectNode.CreateComponent<RigidBody>();
