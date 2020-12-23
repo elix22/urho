@@ -466,4 +466,18 @@ extern "C" {
 	{
 		return _target->GetBone (Urho3D::StringHash(boneNameHash));
 	}
+
+
+	DllExport unsigned int
+	Camera_GetViewOverrideFlags (Urho3D::Camera *_target)
+	{
+		return _target->GetViewOverrideFlags ();
+	}
+
+	DllExport void
+	Camera_SetViewOverrideFlags (Urho3D::Camera *_target, unsigned int flags)
+	{
+		_target->SetViewOverrideFlags (ViewOverrideFlags(flags));
+	}
+
 }

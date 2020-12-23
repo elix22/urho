@@ -111,7 +111,7 @@ namespace Urho.Samples
 			startServerButton.SubscribeToReleased (args => HandleStartServer ());
 
 			Log.SubscribeToLogMessage(HandleLogMessage);
-			Network.SubscribeToNetworkMessage(HandleNetworkMessage);
+		// TBD ELI 	Network.SubscribeToNetworkMessage(HandleNetworkMessage);
 			Network.SubscribeToServerConnected(args => UpdateButtons());
 			Network.SubscribeToServerDisconnected(args => UpdateButtons());
 			Network.SubscribeToConnectFailed(args => UpdateButtons());
@@ -215,6 +215,7 @@ namespace Urho.Samples
 			UpdateButtons();
 		}
 
+/* TBD ELI
 		unsafe void HandleNetworkMessage(NetworkMessageEventArgs args)
 		{
 			int msgID = args.MessageID;
@@ -237,7 +238,7 @@ namespace Urho.Samples
 				ShowChatText(text);
 			}
 		}
-
+*/
 		protected override string JoystickLayoutPatch => JoystickLayoutPatches.Hidden;
 	}
 }

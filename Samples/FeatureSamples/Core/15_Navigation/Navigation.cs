@@ -274,8 +274,7 @@ namespace Urho.Samples
 			{
 				Vector3 pathPos = navMesh.FindNearestPoint(hitPos, new Vector3(1.0f, 1.0f, 1.0f));
 
-				const int qualShift = 1;
-				if (Input.GetQualifierDown(qualShift))
+				if (Input.GetQualifierDown(Qualifier.Shift))
 				{
 					// Teleport
 					currentPath.Clear();

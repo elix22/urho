@@ -22,18 +22,13 @@ namespace Urho.Samples.Desktop
 				selectedSampleType = ParseSampleFromNumber(args[0]);
 			}
 
-			if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+	
+			while (selectedSampleType == null)
 			{
-				while (selectedSampleType == null)
-				{
-					WriteLine("Enter a sample number:", ConsoleColor.White);
-					selectedSampleType = ParseSampleFromNumber(Console.ReadLine());
-				}
+				WriteLine("Enter a sample number:", ConsoleColor.White);
+				selectedSampleType = ParseSampleFromNumber(Console.ReadLine());
 			}
-			else 
-			{
-				selectedSampleType = typeof(Water);	
-			}
+	
 
 			DesktopUrhoInitializer.AssetsDirectory = @"../../Assets";
 

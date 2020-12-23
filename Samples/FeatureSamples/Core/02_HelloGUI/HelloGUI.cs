@@ -33,6 +33,9 @@ namespace Urho.Samples
 		IntVector2 dragBeginPosition;
 		Button draggableFish;
 
+		[Preserve]
+		public HelloGUI() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+
 		public HelloGUI(ApplicationOptions options = null) : base(options) { }
 
 		protected override void Start()

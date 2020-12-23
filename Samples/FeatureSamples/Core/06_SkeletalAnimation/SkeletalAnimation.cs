@@ -31,6 +31,9 @@ namespace Urho.Samples
 		Camera camera;
 		bool drawDebug;
 
+		[Preserve]
+		public SkeletalAnimation() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+
 		public SkeletalAnimation(ApplicationOptions options = null) : base(options) { }
 
 		void CreateScene ()

@@ -181,11 +181,10 @@ namespace Urho.Samples
 			if (input.GetKeyDown(Key.A)) CameraNode.Translate(-Vector3.UnitX * moveSpeed * timeStep);
 			if (input.GetKeyDown(Key.D)) CameraNode.Translate( Vector3.UnitX * moveSpeed * timeStep);
 
-			const int qualShift = 1;
-
+	
 			// Set destination or spawn a new jack with left mouse button
 			if (input.GetMouseButtonPress(MouseButton.Left))
-				SetPathPoint(input.GetQualifierDown(qualShift));
+				SetPathPoint(input.GetQualifierDown(Qualifier.Shift));
 			// Add or remove objects with middle mouse button, then rebuild navigation mesh partially
 			if (input.GetMouseButtonPress(MouseButton.Middle))
 				AddOrRemoveObject();

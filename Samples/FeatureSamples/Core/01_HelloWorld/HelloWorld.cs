@@ -26,6 +26,9 @@ namespace Urho.Samples
 {
 	public class HelloWorld : Application 
 	{
+		[Preserve]
+		public HelloWorld() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+
 		public HelloWorld(ApplicationOptions options = null) : base(options) {}
 
 		protected override void Start()

@@ -78,7 +78,7 @@ namespace Urho.Samples
 					{
 						float phase = startPhase + vertexDuplicates[j] * 10.0f;
 						var src = originalVertices[j];
-
+/* TBD ELI
 						unsafe
 						{
 							//TODO: avoid unsafe
@@ -88,6 +88,7 @@ namespace Urho.Samples
 							dest->Y = src.Y * (1.0f + 0.1f * (float)Math.Sin(phase + 60.0f));
 							dest->Z = src.Z * (1.0f + 0.1f * (float)Math.Sin(phase + 120.0f));
 						}
+						*/
 					}
 					buffer.Unlock();
 				}

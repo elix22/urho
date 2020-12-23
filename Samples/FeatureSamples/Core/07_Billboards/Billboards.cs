@@ -30,6 +30,9 @@ namespace Urho.Samples
 		Scene scene;
 		bool drawDebug;
 
+		[Preserve]
+		public Billboards() : base(new ApplicationOptions(assetsFolder: "Data")) { }
+
 		public Billboards(ApplicationOptions options = null) : base(options) { }
 
 		protected override void Start()
