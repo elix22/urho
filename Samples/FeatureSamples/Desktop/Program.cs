@@ -32,7 +32,7 @@ namespace Urho.Samples.Desktop
 
 			DesktopUrhoInitializer.AssetsDirectory = @"../../Assets";
 
-			var game = (Application) Activator.CreateInstance(selectedSampleType);
+			var game = (Application) Activator.CreateInstance(selectedSampleType,args:new ApplicationOptions(assetsFolder: "Data"));
 			var exitCode = game.Run();
 			WriteLine($"Exit code: {exitCode}. Press any key to exit...", ConsoleColor.DarkYellow);
 			Console.ReadKey();
