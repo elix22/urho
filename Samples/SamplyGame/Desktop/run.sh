@@ -1,1 +1,1 @@
-cd bin ; mono SamplyGame.exe ; cd ..
+cd bin ; mono Game.exe ; cd ..

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Runtime.InteropServices;
-using Foundation;
+//using Foundation;
 
 namespace Urho.iOS
 {
@@ -11,11 +11,14 @@ namespace Urho.iOS
 
 		internal static void OnInited()
 		{
-			string docsDir = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.All, true).FirstOrDefault();
-			string resourcesDir = NSBundle.MainBundle.ResourcePath;
+			//string docsDir = NSSearchPath.GetDirectories(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.All, true).FirstOrDefault();
+			//string resourcesDir = NSBundle.MainBundle.ResourcePath;
+			string docsDir = "";
+			string resourcesDir = "";
+
 			InitSdl(resourcesDir, docsDir);
 			Sdl.SetMainReady();
-			NSFileManager.DefaultManager.ChangeCurrentDirectory(resourcesDir);
+			//NSFileManager.DefaultManager.ChangeCurrentDirectory(resourcesDir);
 		}
 	}
 }

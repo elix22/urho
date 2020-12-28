@@ -68,7 +68,7 @@ namespace SamplyGame
 		{
 			scene = new Scene();
 			scene.CreateComponent<Octree>();
-
+			
 			var physics = scene.CreateComponent<PhysicsWorld>();
 			physics.SetGravity(new Vector3(0, 0, 0));
 

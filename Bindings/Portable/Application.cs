@@ -247,14 +247,15 @@ namespace Urho
 				return;
 
 #if __ANDROID__
-			current.WaitFrameEnd();
-			Org.Libsdl.App.SDLActivity.OnDestroy();
+			// TBD ELI
+			//current.WaitFrameEnd();
+			//Org.Libsdl.App.SDLActivity.OnDestroy();
 			return;
 #endif
 			// TBD ELI , removed Current.Input.Enabled = false;
 			isExiting = true;
 #if __IOS__
-			iOS.UrhoSurface.StopRendering(current);
+		// TBD ELI	iOS.UrhoSurface.StopRendering(current);
 #endif
 
 #if WINDOWS_UWP && !UWP_HOLO

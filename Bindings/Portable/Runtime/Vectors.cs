@@ -13,9 +13,6 @@ namespace Urho
 		[DllImport (Consts.NativeImport, CallingConvention=CallingConvention.Cdecl)]
 		internal extern static IntPtr VectorSharedPtr_GetIdx (IntPtr h, int idx);
 
-		[DllImport (Consts.NativeImport, CallingConvention=CallingConvention.Cdecl)]
-		internal extern static void VectorSharedPtr_SetIdx (IntPtr h, int idx, IntPtr v);
-
 		internal class ProxyUrhoObject<T> : ProxyRefCounted<T>, IReadOnlyList<T> where T : UrhoObject
 		{
 			public ProxyUrhoObject(IntPtr handle) : base(handle) { }

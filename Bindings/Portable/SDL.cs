@@ -17,12 +17,14 @@ namespace Urho
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		static extern void SDL_SetMainReady();
 
+
+/* TBD ELI
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		static extern void SDL_WINRT_InitSdl();
 
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		static extern void SDL_WINRT_SubscribeToWindowEvents();
-
+*/
 		[DllImport(Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		static extern void SDL_AudioQuit();
 
@@ -37,8 +39,10 @@ namespace Urho
 
 		public static void InitUwp()
 		{
+/* TBD ELI
 			SDL_WINRT_InitSdl();
 			SDL_WINRT_SubscribeToWindowEvents();
+*/
 		}
 
 

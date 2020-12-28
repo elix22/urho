@@ -16,6 +16,7 @@ namespace Urho
 			if (level < LogLevel)
 				return;
 #if __ANDROID__
+/* TBD ELI
 			Android.Util.LogPriority logPriority = Android.Util.LogPriority.Verbose;
 			switch (level)
 			{
@@ -33,6 +34,7 @@ namespace Urho
 					break;
 			}
 			Android.Util.Log.WriteLine(logPriority, "UrhoSharp", str);
+*/
 #else
 			System.Diagnostics.Debug.WriteLine($"{level}: {str}");
 #endif
