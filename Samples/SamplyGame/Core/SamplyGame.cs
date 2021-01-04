@@ -22,7 +22,7 @@ namespace SamplyGame
 		public Viewport Viewport { get; private set; }
 
 		[Preserve]
-		public SamplyGame() : base(new ApplicationOptions(assetsFolder: "Data") { Height = 1024, Width = 576, Orientation = ApplicationOptions.OrientationType.Portrait}) { }
+		public SamplyGame() : base(new ApplicationOptions(assetsFolder: "Data;CoreData") { Height = 1024, Width = 576, Orientation = ApplicationOptions.OrientationType.Portrait}) { }
 
 		[Preserve]
 		public SamplyGame(ApplicationOptions opts) : base(opts) { }

@@ -152,7 +152,7 @@ namespace Urho
 
 			string[] resourcePathes =
 #if __ANDROID__
-				new[] { "Assets/CoreData" } // CoreData on Android is embedded into the lib now
+				new[] { "CoreData" } // CoreData on Android is embedded into the lib now
 #else
 				new[] { "CoreData" }
 #endif

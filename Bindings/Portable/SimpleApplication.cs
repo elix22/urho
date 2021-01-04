@@ -20,9 +20,9 @@ namespace Urho
 		public static Task<SimpleApplication> RunAsync(int width = 600, int height = 500)
 		{
 #if NET45
-			return RunAsync(new ApplicationOptions(assetsFolder: "Data") { Width = width, Height = height, ResizableWindow = true });
+			return RunAsync(new ApplicationOptions(assetsFolder: "Data;CoreData") { Width = width, Height = height, ResizableWindow = true });
 #endif
-			return RunAsync(new ApplicationOptions(assetsFolder: null));
+			return RunAsync(new ApplicationOptions(assetsFolder: "Data;CoreData"));
 		}
 
 		[Obsolete("RunAsync is Obsolete. Use Show() instead.")]

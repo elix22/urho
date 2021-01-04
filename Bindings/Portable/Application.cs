@@ -93,7 +93,7 @@ namespace Urho
 				context.AddRef();
 #endif
 
-			Options = options ?? new ApplicationOptions(assetsFolder: null);
+			Options = options ?? new ApplicationOptions(assetsFolder: "Data;CoreData");
 			handle = ApplicationProxy_ApplicationProxy(context.Handle, setupCallback, startCallback, stopCallback, Options.ToString(), Options.ExternalWindow);
 			Runtime.RegisterObject(this);
 		}
