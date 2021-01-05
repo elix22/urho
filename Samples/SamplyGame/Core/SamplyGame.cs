@@ -156,7 +156,7 @@ namespace SamplyGame
 
 		void UpdateCoins(int amount)
 		{
-			if (amount % 5 == 0 && amount > 0)
+			if (amount % 5 == 0 && amount > 0 && amount <= 10)
 			{
 				// give player a MassMachineGun each time he earns 5 coins
 				Player.Node.AddComponent(new MassMachineGun());

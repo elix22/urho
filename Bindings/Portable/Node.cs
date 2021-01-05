@@ -26,6 +26,16 @@ namespace Urho {
 	public partial class Node {
 		static Node[] ZeroArray = new Node[0];
 			
+				/// <summary>
+		/// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
+		/// </summary>
+		public void Remove ()
+		{
+			RemoveAllActions(); // TBD ELI , should remove all actions prior of deletion
+			Runtime.ValidateRefCounted (this);
+			Node_Remove (handle);
+		}
+
 		public Node[] GetChildrenWithComponent<T> (bool recursive = false) where T: Component
 		{
 			Runtime.ValidateRefCounted(this);

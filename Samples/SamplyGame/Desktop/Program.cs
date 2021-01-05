@@ -1,5 +1,4 @@
 ﻿using Urho;
-//using Urho.Desktop;
 
 namespace SamplyGame.Desktop
 {
@@ -7,7 +6,6 @@ namespace SamplyGame.Desktop
 	{
 		static void Main(string[] args)
 		{
-		//	DesktopUrhoInitializer.AssetsDirectory = @"../../Assets";
 			new SamplyGame().Run();
 		}
 	}

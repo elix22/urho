@@ -1161,14 +1161,6 @@ namespace Urho
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Node_Remove (IntPtr handle);
 
-		/// <summary>
-		/// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
-		/// </summary>
-		public void Remove ()
-		{
-			Runtime.ValidateRefCounted (this);
-			Node_Remove (handle);
-		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void Node_SetParent (IntPtr handle, IntPtr parent);

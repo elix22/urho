@@ -55,7 +55,7 @@ namespace SamplyGame
 			// show a small explosion when the cube reaches an aircraft. 
 			base.OnHit(target, killed, bulletNode);
 			var cache = Application.ResourceCache;
-			var explosionNode = Scene.CreateChild();
+			var explosionNode = bulletNode.Scene.CreateChild(); // Scene.CreateChild() is causing exception sometimes
 			SoundSource soundSource = explosionNode.CreateComponent<SoundSource>();
 			soundSource.Play(Application.ResourceCache.GetSound(Assets.Sounds.SmallExplosion));
 			soundSource.Gain = 0.3f;

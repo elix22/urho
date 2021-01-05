@@ -7,7 +7,3 @@ namespace Urho.Droid
 		}
 	}
 }
-
-namespace Android.Runtime {
-
-}

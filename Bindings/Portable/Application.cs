@@ -250,6 +250,7 @@ namespace Urho
 			// TBD ELI
 			//current.WaitFrameEnd();
 			//Org.Libsdl.App.SDLActivity.OnDestroy();
+			Current.Engine.Exit();
 			return;
 #endif
 			// TBD ELI , removed Current.Input.Enabled = false;
