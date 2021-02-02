@@ -210,10 +210,13 @@ namespace Urho
 				Current.ActionManager.CancelActiveActions();
 			LogSharp.Debug("ProxyStop");
 			UrhoPlatformInitializer.Initialized = false;
-			var context = Current.Context;
+			var context = Current?.Context;
 			var app = GetApp(h);
-			app.IsClosed = true;
-			app.Stop();
+			if(app != null)
+			{
+				app.IsClosed = true;
+				app.Stop();
+			}
 
 			LogSharp.Debug("ProxyStop: Runtime.Cleanup");
 			Runtime.Cleanup(Platform != Platforms.Android);
@@ -246,18 +249,8 @@ namespace Urho
 			if (current == null || !current.IsActive)
 				return;
 
-#if __ANDROID__
-			// TBD ELI
-			//current.WaitFrameEnd();
-			//Org.Libsdl.App.SDLActivity.OnDestroy();
-			Current.Engine.Exit();
-			return;
-#endif
 			// TBD ELI , removed Current.Input.Enabled = false;
 			isExiting = true;
-#if __IOS__
-		// TBD ELI	iOS.UrhoSurface.StopRendering(current);
-#endif
 
 #if WINDOWS_UWP && !UWP_HOLO
 			UWP.UrhoSurface.StopRendering().Wait();
@@ -274,10 +267,9 @@ namespace Urho
 
 			Current.Engine.Exit();
 
-#if NET46
+
 			if (Current.Options.DelayedStart)
-#endif
-			ProxyStop(Current.Handle);
+				ProxyStop(Current.Handle);
 
 			GC.Collect();
 			GC.WaitForPendingFinalizers();
