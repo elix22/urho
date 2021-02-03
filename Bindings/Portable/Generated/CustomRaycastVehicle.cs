@@ -112,16 +112,16 @@ namespace Urho
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
 		internal static extern void CustomRaycastVehicle_SetVehicleCenterOfMass (IntPtr handle, ref Urho.Vector3 centerOfMass);
 
-		private void SetVehicleCenterOfMass (Urho.Vector3 centerOfMass)
+		public void SetVehicleCenterOfMass (Urho.Vector3 centerOfMass)
 		{
 			Runtime.ValidateRefCounted (this);
 			CustomRaycastVehicle_SetVehicleCenterOfMass (handle, ref centerOfMass);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
-		internal static extern Urho.Vector3 CustomRaycastVehicle_GetVehicleCenterOfMass (IntPtr handle);
+		internal static extern Vector3 CustomRaycastVehicle_GetVehicleCenterOfMass (IntPtr handle);
 
-		private Urho.Vector3 GetVehicleCenterOfMass ()
+		private Vector3 GetVehicleCenterOfMass ()
 		{
 			Runtime.ValidateRefCounted (this);
 			return CustomRaycastVehicle_GetVehicleCenterOfMass (handle);
@@ -197,6 +197,15 @@ namespace Urho
 		{
 			Runtime.ValidateRefCounted (this);
 			CustomRaycastVehicle_UpdateWheelTransform (handle, wheel, interpolatedTransform);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_AddWheel (IntPtr handle, ref Urho.Vector3 connectionPointCS0, ref Urho.Vector3 wheelDirectionCS0, ref Urho.Vector3 wheelAxleCS, float suspensionRestLength, float wheelRadius, bool isFrontWheel);
+
+		public void AddWheel (Urho.Vector3 connectionPointCS0, Urho.Vector3 wheelDirectionCS0, Urho.Vector3 wheelAxleCS, float suspensionRestLength, float wheelRadius, bool isFrontWheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_AddWheel (handle, ref connectionPointCS0, ref wheelDirectionCS0, ref wheelAxleCS, suspensionRestLength, wheelRadius, isFrontWheel);
 		}
 
 		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
@@ -280,6 +289,258 @@ namespace Urho
 			CustomRaycastVehicle_CompoundScaleLocalAabbMax (handle, ref scale);
 		}
 
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetWheelSuspensionStiffness (IntPtr handle, int wheel, float stiffness);
+
+		public void SetWheelSuspensionStiffness (int wheel, float stiffness)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetWheelSuspensionStiffness (handle, wheel, stiffness);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelSuspensionStiffness (IntPtr handle, int wheel);
+
+		public float GetWheelSuspensionStiffness (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelSuspensionStiffness (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetWheelDampingRelaxation (IntPtr handle, int wheel, float damping);
+
+		public void SetWheelDampingRelaxation (int wheel, float damping)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetWheelDampingRelaxation (handle, wheel, damping);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelDampingRelaxation (IntPtr handle, int wheel);
+
+		public float GetWheelDampingRelaxation (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelDampingRelaxation (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetWheelDampingCompression (IntPtr handle, int wheel, float compression);
+
+		public void SetWheelDampingCompression (int wheel, float compression)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetWheelDampingCompression (handle, wheel, compression);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelDampingCompression (IntPtr handle, int wheel);
+
+		public float GetWheelDampingCompression (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelDampingCompression (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetWheelFrictionSlip (IntPtr handle, int wheel, float slip);
+
+		public void SetWheelFrictionSlip (int wheel, float slip)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetWheelFrictionSlip (handle, wheel, slip);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelFrictionSlip (IntPtr handle, int wheel);
+
+		public float GetWheelFrictionSlip (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelFrictionSlip (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetWheelRollInfluence (IntPtr handle, int wheel, float rollInfluence);
+
+		public void SetWheelRollInfluence (int wheel, float rollInfluence)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetWheelRollInfluence (handle, wheel, rollInfluence);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelRollInfluence (IntPtr handle, int wheel);
+
+		public float GetWheelRollInfluence (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelRollInfluence (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetSideFrictionStiffness (IntPtr handle, int wheel, float Stiffness);
+
+		public void SetSideFrictionStiffness (int wheel, float Stiffness)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetSideFrictionStiffness (handle, wheel, Stiffness);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetSideFrictionStiffness (IntPtr handle, int wheel);
+
+		public float GetSideFrictionStiffness (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetSideFrictionStiffness (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Vector3 CustomRaycastVehicle_GetChassisConnectionPointCS (IntPtr handle, int wheel);
+
+		public Vector3 GetChassisConnectionPointCS (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetChassisConnectionPointCS (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern bool CustomRaycastVehicle_IsWheelInContact (IntPtr handle, int wheel);
+
+		public bool IsWheelInContact (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_IsWheelInContact (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Vector3 CustomRaycastVehicle_GetContactPointWS (IntPtr handle, int wheel);
+
+		public Vector3 GetContactPointWS (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetContactPointWS (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Vector3 CustomRaycastVehicle_GetContactNormalWS (IntPtr handle, int wheel);
+
+		public Vector3 GetContactNormalWS (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetContactNormalWS (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetSkidInfoCumulative (IntPtr handle, int wheel, float skid);
+
+		public void SetSkidInfoCumulative (int wheel, float skid)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetSkidInfoCumulative (handle, wheel, skid);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetSkidInfoCumulative (IntPtr handle, int wheel);
+
+		public float GetSkidInfoCumulative (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetSkidInfoCumulative (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetWheelsRadius (IntPtr handle, int wheel);
+
+		public float GetWheelsRadius (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelsRadius (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetSkidInfo (IntPtr handle, int wheel, float skid);
+
+		public void SetSkidInfo (int wheel, float skid)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetSkidInfo (handle, wheel, skid);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetSkidInfo (IntPtr handle, int wheel);
+
+		public float GetSkidInfo (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetSkidInfo (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetDeltaRotation (IntPtr handle, int wheel, float rotation);
+
+		public void SetDeltaRotation (int wheel, float rotation)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetDeltaRotation (handle, wheel, rotation);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetDeltaRotation (IntPtr handle, int wheel);
+
+		public float GetDeltaRotation (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetDeltaRotation (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetRotation (IntPtr handle, int wheel, float rotation);
+
+		public void SetRotation (int wheel, float rotation)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetRotation (handle, wheel, rotation);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetRotation (IntPtr handle, int wheel);
+
+		public float GetRotation (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetRotation (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern Vector3 CustomRaycastVehicle_GetWheelAxleWS (IntPtr handle, int wheel);
+
+		public Vector3 GetWheelAxleWS (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetWheelAxleWS (handle, wheel);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern void CustomRaycastVehicle_SetRollInfluence (IntPtr handle, int wheel, float rollInfluence);
+
+		public void SetRollInfluence (int wheel, float rollInfluence)
+		{
+			Runtime.ValidateRefCounted (this);
+			CustomRaycastVehicle_SetRollInfluence (handle, wheel, rollInfluence);
+		}
+
+		[DllImport (Consts.NativeImport, CallingConvention = CallingConvention.Cdecl)]
+		internal static extern float CustomRaycastVehicle_GetRollInfluence (IntPtr handle, int wheel);
+
+		public float GetRollInfluence (int wheel)
+		{
+			Runtime.ValidateRefCounted (this);
+			return CustomRaycastVehicle_GetRollInfluence (handle, wheel);
+		}
+
 		public override StringHash Type {
 			get {
 				return UrhoGetType ();
@@ -305,12 +566,9 @@ namespace Urho
 			}
 		}
 
-		public Urho.Vector3 VehicleCenterOfMass {
+		public Vector3 VehicleCenterOfMass {
 			get {
 				return GetVehicleCenterOfMass ();
-			}
-			set {
-				SetVehicleCenterOfMass (value);
 			}
 		}
 
